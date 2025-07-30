@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Log Scarichi - Pharmagest{% endblock %}
+
+{% block page_title_full %}Log Scarichi - Pharmagest{% endblock %}
+{% block page_title_short %}Log Scarichi{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Sistema di transizioni semplice come logmovimenti */
+* {
+  box-sizing: border-box;
+}
+
+/* Transizioni base super semplici */
+body {
+  transition: background-color 0.2s ease;
+}
+
+/* Elementi base con transizioni minime */
+.mobile-table-card,
+.bg-white {
+  transition: background-color 0.2s ease;
+}
+
+/* Variabili CSS per dark mode fluido */
+:root {
+  --bg-primary: rgba(255, 255, 255, 0.95);
+  --bg-secondary: rgba(243, 244, 246, 0.9);
+  --border-light: rgba(150, 150, 150, 0.25);
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --accent-color: #0056a6;
+}
+
+.dark {
+  --bg-primary: rgba(0, 0, 0, 0.98);
+  --bg-secondary: rgba(0, 0, 0, 0.95);
+  --border-light: rgba(40, 40, 40, 0.8);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --accent-color: #60a5fa;
+}
+
+/* Mobile Cards con stile logmovimenti */
+.mobile-table-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .mobile-table-card {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.95) 100%);
+  border: 1px solid rgba(40, 40, 40, 0.8);
+}
+
+.mobile-table-header {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--accent-color);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-table-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-table-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dark .mobile-table-label {
+  color: #9ca3af;
+}
+
+.mobile-table-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.dark .mobile-table-value {
+  color: #f9fafb;
+}
+
+.mobile-table-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.mobile-note {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+/* Stili CSS per bordi di tabella in modalità scura */
+.dark table,
+.dark thead,
+.dark tbody,
+.dark tr,
+.dark td,
+.dark th {
+  border-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.dark .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Forza background nero puro per tutti gli elementi principali in dark mode */
+.dark .bg-white {
+  background-color: #000000 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #000000 !important;
+}
+
+/* Override per tutti i bordi inline in dark mode */
+.dark [style*="border"] {
+  border-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Stili per thead e tbody */
+.dark thead {
+  background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%) !important;
+}
+
+.dark tbody {
+  background: #000000 !important;
+}
+
+.table-row-hover:hover {
+  background: rgba(0, 86, 166, 0.05) !important;
+}
+
+.dark .table-row-hover:hover {
+  background: rgba(20, 20, 20, 0.8) !important;
+}
+
+/* No results state */
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.dark .no-results {
+  color: #9ca3af;
+}
+
+/* Badge e elementi colorati per dark mode */
+.dark .bg-red-100 {
+  background-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+.dark .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+/* Tutti i colori di testo per dark mode */
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.dark .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-view {
+    display: none;
+  }
+  
+  .desktop-table {
+    display: block;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Risultati -->
+{% if scarichi %}
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden" style="border: 1px solid rgba(130, 130, 130, 0.3);">
+    <!-- Desktop Table -->
+    <div class="desktop-table">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200" style="border-top: 1px solid rgba(130, 130, 130, 0.25);">
+          <thead class="bg-gray-50" style="background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%); border-bottom: 1px solid rgba(130, 130, 130, 0.25);">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-box text-blue-600"></i>
+                  Prodotto
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-exchange-alt text-green-600"></i>
+                  Movimento
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-calculator text-purple-600"></i>
+                  Quantità
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt text-orange-600"></i>
+                  Ubicazione
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-sticky-note text-yellow-600"></i>
+                  Note
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-calendar-alt text-indigo-600"></i>
+                  Data
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-user text-teal-600"></i>
+                  Utente
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
+            {% for scarico in scarichi %}
+            <tr class="table-row-hover" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <div class="flex flex-col">
+                  <span class="font-semibold text-blue-600">{{ scarico.prodotto or 'N/A' }}</span>
+                  <span class="text-xs text-gray-500">Prodotto</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  <i class="fas fa-arrow-down mr-1"></i>
+                  Trasferimento
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                {{ scarico.quantita or 0 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-map-marker-alt text-orange-500 mr-2"></i>
+                  N/A
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="{{ scarico.note or 'Nessuna nota' }}">
+                {{ scarico.note or '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-clock text-indigo-500 mr-2"></i>
+                  {{ scarico.data_ora.strftime('%d/%m/%Y %H:%M') if scarico.data_ora else 'N/A' }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-user text-teal-500 mr-2"></i>
+                  {{ scarico.username or 'N/A' }}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+      {% for scarico in scarichi %}
+      <div class="mobile-table-card">
+        <div class="mobile-table-header">
+          <span>{{ scarico.prodotto or 'N/A' }}</span>
+          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+            <i class="fas fa-arrow-down mr-1"></i>
+            Trasferimento
+          </span>
+        </div>
+        
+        <div class="mobile-table-content">
+          <div class="mobile-table-item">
+            <div class="mobile-table-label">Prodotto</div>
+            <div class="mobile-table-value">{{ scarico.prodotto or 'N/A' }}</div>
+          </div>
+          
+          <div class="mobile-table-item">
+            <div class="mobile-table-label">Quantità</div>
+            <div class="mobile-table-value">{{ scarico.quantita or 0 }}</div>
+          </div>
+          
+          <div class="mobile-table-item">
+            <div class="mobile-table-label">Data</div>
+            <div class="mobile-table-value">{{ scarico.data_ora.strftime('%d/%m/%Y %H:%M') if scarico.data_ora else 'N/A' }}</div>
+          </div>
+          
+          <div class="mobile-table-item">
+            <div class="mobile-table-label">Utente</div>
+            <div class="mobile-table-value">{{ scarico.username or 'N/A' }}</div>
+          </div>
+        </div>
+        
+        {% if scarico.note %}
+        <div class="mobile-note">
+          <div class="mobile-table-label">Note</div>
+          <div class="mobile-table-value">{{ scarico.note }}</div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% else %}
+  <div class="no-results">
+    <i class="fas fa-search text-4xl mb-4"></i>
+    <h3 class="text-lg font-semibold mb-2">Nessun scarico trovato</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-4">Non ci sono scarichi registrati nel sistema.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{{ url_for('scaricomerce') }}" 
+         class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+        <i class="fas fa-arrow-down mr-2"></i>Scarico da Magazzino
+      </a>
+      <a href="{{ url_for('scarico_merce_non_in_magazzino') }}" 
+         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+        <i class="fas fa-external-link-alt mr-2"></i>Scarico NON da Magazzino
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

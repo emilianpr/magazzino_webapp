@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Nuovo Prodotto - Pharmagest{% endblock %}
+
+{% block page_title_full %}Nuovo Prodotto - Pharmagest (Alpha v3.0){% endblock %}
+{% block page_title_short %}Nuovo Prodotto{% endblock %}
+
+{% block extra_css %}
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+  color: #0056a6;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+}
+
+.form-section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #003d7a;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  letter-spacing: 0.01em;
+  transition: color 0.3s ease;
+}
+
+.dark .form-section-title {
+  color: #ffffff;
+}
+
+.dark .icon-circle {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  color: #ffffff;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: #0056a6;
+  margin-top: 1rem;
+}
+
+.dark form label {
+  color: #ffffff;
+}
+
+form input[type="text"],
+form input[type="number"],
+form select {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #b6d4f7;
+  border-radius: 0.7rem;
+  background: #fff;
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  color: #003d7a;
+  transition: border 0.2s;
+}
+
+form input[type="text"]:focus,
+form input[type="number"]:focus,
+form select:focus {
+  outline: none;
+  border-color: #0056a6;
+  box-shadow: 0 0 0 2px #e3f2fd;
+}
+
+form button[type="submit"] {
+  width: 100%;
+  margin-top: 2rem;
+  background: linear-gradient(90deg, #0056a6 0%, #00a8e8 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 0.9rem 0;
+  box-shadow: 0 4px 16px 0 rgba(0,86,166,0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  transition: background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+form button[type="submit"]:hover {
+  background: linear-gradient(90deg, #003d7a 0%, #0056a6 100%);
+  box-shadow: 0 8px 24px 0 rgba(0,86,166,0.13);
+}
+
+@media (max-width: 600px) {
+  .glass-card {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  form button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+  }
+}
+{% endblock %}
+
+{% block content %}
+<div class="w-full flex justify-center items-center min-h-screen py-8">
+  <div class="glass-card content-container w-full max-w-xl mx-auto">
+    <div class="icon-circle mb-2">
+      <i class="fas fa-plus"></i>
+    </div>
+    <h2 class="form-section-title mb-6">
+      Inserisci un nuovo prodotto
+    </h2>
+    <form method="POST" action="{{ url_for('nuovo_prodotto') }}" autocomplete="off">
+      <label for="nome_prodotto">Nome Prodotto:</label>
+      <input type="text" id="nome_prodotto" name="nome_prodotto" required placeholder="Nome prodotto..." />
+
+      <label for="codice_prodotto">Codice Prodotto:</label>
+      <input type="text" id="codice_prodotto" name="codice_prodotto" required placeholder="Codice prodotto..." />
+
+      <label for="magazzino_id">Magazzino:</label>
+      <select id="magazzino_id" name="magazzino_id" required>
+        <option value="1">Farmacia</option>
+        <option value="2">Grossisti</option>
+      </select>
+
+      <label for="stato">Stato:</label>
+      <select id="stato" name="stato" required>
+        <option value="in_magazzino">In Magazzino</option>
+        <option value="in_arrivo">In Arrivo</option>
+        <option value="in_utilizzo">In Utilizzo</option>
+        <option value="spedito">Spedito</option>
+        <option value="baia_uscita">Baia Uscita</option>
+        <option value="in_preparazione">In Preparazione</option>
+        <option value="altro">Altro</option>
+        <option value="test">Test</option>
+        <option value="laboratorio">Laboratorio</option>
+      </select>
+
+      <label for="quantita">Quantità iniziale:</label>
+      <input type="number" id="quantita" name="quantita" min="0" required placeholder="Quantità..." />
+
+      <label for="ubicazione">Ubicazione:</label>
+      <input type="text" id="ubicazione" name="ubicazione" placeholder="Ubicazione (opzionale)..." />
+
+      <button type="submit">
+        <i class="fas fa-check-circle"></i>
+        Salva prodotto
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile Menu (hidden by default) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-black shadow-lg z-10">
+  <div class="flex justify-around">
+    <a href="{{ url_for('index') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'index' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+      <i class="fas fa-boxes text-lg"></i>
+      <span class="text-xs mt-1">Magazzino</span>
+    </a>
+    <a href="{{ url_for('movimento') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'movimento' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+      <i class="fas fa-exchange-alt text-lg"></i>
+      <span class="text-xs mt-1">Movimento</span>
+    </a>
+    <a href="{{ url_for('carico_merci') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+      <i class="fas fa-arrow-up text-lg"></i>
+      <span class="text-xs mt-1">Carico</span>
+    </a>
+    <a href="{{ url_for('scaricomerce') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'scaricomerce' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+      <i class="fas fa-arrow-down text-lg"></i>
+      <span class="text-xs mt-1">Scarico</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

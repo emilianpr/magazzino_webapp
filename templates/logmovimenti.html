@@ -1,0 +1,1219 @@
+{% extends "base.html" %}
+
+{% block page_title_full %}Log Movimenti - Pharmagest{% endblock %}
+{% block page_title_short %}Log Movimenti{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Sistema di transizioni semplice come index.html */
+* {
+  box-sizing: border-box;
+}
+
+/* Transizioni base super semplici */
+body {
+  transition: background-color 0.2s ease;
+}
+
+/* Elementi base con transizioni minime */
+.filter-container,
+.filter-group,
+.filter-input-compact,
+.mobile-table-card,
+.bg-white {
+  transition: background-color 0.2s ease;
+}
+
+/* Variabili CSS per dark mode fluido */
+:root {
+  --bg-primary: rgba(255, 255, 255, 0.95);
+  --bg-secondary: rgba(243, 244, 246, 0.9);
+  --border-light: rgba(150, 150, 150, 0.25);
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --accent-color: #0056a6;
+}
+
+.dark {
+  --bg-primary: rgba(10, 10, 10, 0.95);
+  --bg-secondary: rgba(26, 26, 26, 0.9);
+  --border-light: rgba(90, 90, 90, 0.7);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --accent-color: #60a5fa;
+}
+
+/* Filtri e ricerca - sistema CSS variabili */
+.filter-container {
+  background: linear-gradient(120deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, #00a8e8 100%);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.filter-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.filter-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-items: center;
+}
+
+.filter-group {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.filter-group-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Input e controlli con variabili CSS */
+.filter-input-compact {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  background: var(--bg-primary);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.notes-input-wrapper {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  width: 100%;
+}
+
+.notes-input-compact {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.notes-search-compact {
+  grid-column: 1 / -1;
+  position: relative;
+  max-width: none;
+  width: 100%;
+}
+
+.search-icon-compact {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.filter-btn-compact {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.filter-btn-primary-compact {
+  background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.3);
+  transition: all 0.2s ease;
+}
+
+.filter-btn-primary-compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 86, 166, 0.4);
+}
+
+.filter-btn-secondary-compact {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  border-color: rgba(130, 130, 130, 0.2);
+  transition: all 0.2s ease;
+}
+
+.filter-btn-secondary-compact:hover {
+  background: rgba(107, 114, 128, 0.2);
+}
+
+.dark .filter-btn-secondary-compact {
+  color: var(--text-secondary);
+  border-color: rgba(120, 120, 120, 0.6);
+  background: rgba(55, 65, 81, 0.3);
+}
+
+.dark .filter-btn-secondary-compact:hover {
+  background: rgba(55, 65, 81, 0.5);
+  color: var(--text-primary);
+}
+
+/* Risultati filtrati con animazioni ottimizzate */
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.dark .no-results {
+  color: var(--text-secondary);
+}
+
+/* Azioni filtro compatte */
+.filter-actions-compact {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  border-top: 1px solid var(--border-light);
+  min-height: 60px;
+}
+
+.filter-actions-compact > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-actions-compact > div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+/* Filtri attivi - semplificati */
+.filter-input-compact.active {
+  border-color: var(--accent-color) !important;
+  background-color: rgba(0, 86, 166, 0.08) !important;
+}
+
+.dark .filter-input-compact.active {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+}
+
+.filter-group.has-active {
+  border-color: var(--accent-color) !important;
+  background: linear-gradient(135deg, rgba(0, 86, 166, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%) !important;
+}
+
+.dark .filter-group.has-active {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(26, 26, 26, 0.9) 100%) !important;
+}
+
+/* Stili CSS per bordi di tabella in modalità scura */
+.dark table,
+.dark thead,
+.dark tbody,
+.dark tr,
+.dark td,
+.dark th {
+  border-color: rgba(120, 120, 120, 0.6) !important;
+}
+
+.dark .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(120, 120, 120, 0.6) !important;
+}
+
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-top-color: rgba(120, 120, 120, 0.6) !important;
+}
+
+/* Stili per thead e tbody */
+.dark thead {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+.dark tbody {
+  background: #0a0a0a !important;
+}
+
+.dark .table-row-hover:hover {
+  background: rgba(55, 65, 81, 0.5) !important;
+}
+
+/* Rimozione ottimizzazioni hardware non necessarie */
+.filter-group,
+.filter-input-compact,
+.filter-btn-compact,
+.mobile-table-card {
+  /* transform: translateZ(0); - Rimosso per migliorare prestazioni */
+}
+
+/* Contenitori principali */
+.container,
+.filter-container,
+.bg-white {
+  transition: background-color 0.2s ease;
+}
+
+/* Contenitore risultati dark mode */
+.dark .bg-white {
+  background-color: #0a0a0a !important;
+  border-color: rgba(120, 120, 120, 0.6) !important;
+}
+
+/* Responsive compatto */
+@media (max-width: 768px) {
+  .filter-compact-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    justify-items: center;
+  }
+  
+  .filter-container {
+    padding: 1.5rem;
+    margin: 0.75rem;
+  }
+  
+  .filter-actions-compact {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .filter-actions-compact > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .filter-btn-compact {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .filter-group {
+    padding: 0.75rem;
+    max-width: 300px;
+    width: 100%;
+  }
+  
+  .filter-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  #filter-status {
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* Stili mobile specifici per Log Movimenti con animazioni ottimizzate */
+.mobile-table-card {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #0056a6;
+}
+
+.mobile-table-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.15);
+}
+
+.dark .mobile-table-card {
+  background: #0a0a0a !important;
+  border-left-color: #60a5fa !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .mobile-table-card:hover {
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3) !important;
+}
+
+.mobile-table-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0056a6;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dark .mobile-table-header {
+  color: #60a5fa !important;
+}
+
+.mobile-table-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.mobile-table-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-table-label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.dark .mobile-table-label {
+  color: var(--text-secondary) !important;
+}
+
+.mobile-table-value {
+  color: #374151;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.dark .mobile-table-value {
+  color: var(--text-primary) !important;
+}
+
+.mobile-note {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(130, 130, 130, 0.3);
+  grid-column: 1 / -1;
+}
+
+.dark .mobile-note {
+  border-color: rgba(120, 120, 120, 0.6) !important;
+}
+
+/* Rimozione ottimizzazioni prestazioni non necessarie */
+.filter-container,
+.filter-group,
+.mobile-table-card,
+.bg-white {
+  /* contain: layout; - Rimosso per migliorare fluidità */
+}
+
+/* Elementi senza transizioni superflue */
+.mobile-table-label,
+.mobile-table-value,
+.filter-group-title,
+.fas,
+.far,
+.fab {
+  /* Rimosso transition per migliorare prestazioni */
+}
+
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none !important;
+  }
+  
+  .mobile-view {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-view {
+    display: none !important;
+  }
+  
+  .desktop-table {
+    display: block !important;
+  }
+}
+
+/* Rimozione sezioni dark mode ottimizzate non necessarie */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto">
+  <!-- Sistema di filtri avanzato con design compatto -->
+  <div class="filter-container ">
+    <div class="filter-title">
+      <i class="fas fa-filter"></i>
+      Filtri di Ricerca Avanzati
+    </div>
+    
+    <div class="filter-compact-grid">
+      <!-- Filtro Prodotto -->
+      <div class="filter-group" id="filter-group-prodotto">
+        <div class="filter-group-title">
+          <i class="fas fa-box"></i>
+          Prodotto
+        </div>
+        <input type="text" 
+               id="filterNomeProdotto" 
+               class="filter-input-compact " 
+               placeholder="Cerca nome prodotto..."
+               autocomplete="off">
+      </div>
+      
+      <!-- Filtro Movimento -->
+      <div class="filter-group" id="filter-group-movimento">
+        <div class="filter-group-title">
+          <i class="fas fa-exchange-alt"></i>
+          Movimento
+        </div>
+        <select id="filterMovimento" class="filter-input-compact ">
+          <option value="">Tutti i tipi</option>
+          <option value="carico">Carico</option>
+          <option value="scarico">Scarico</option>
+        </select>
+      </div>
+      
+      <!-- Filtro Quantità -->
+      <div class="filter-group" id="filter-group-quantita">
+        <div class="filter-group-title">
+          <i class="fas fa-calculator"></i>
+          Quantità
+        </div>
+        <input type="number" 
+               id="filterQuantitaMin" 
+               class="filter-input-compact " 
+               placeholder="Min..."
+               min="0">
+        <input type="number" 
+               id="filterQuantitaMax" 
+               class="filter-input-compact " 
+               placeholder="Max..."
+               min="0">
+      </div>
+      
+      <!-- Filtro Ubicazione -->
+      <div class="filter-group" id="filter-group-ubicazione">
+        <div class="filter-group-title">
+          <i class="fas fa-map-marker-alt"></i>
+          Ubicazione
+        </div>
+        <input type="text" 
+               id="filterUbicazione" 
+               class="filter-input-compact " 
+               placeholder="Cerca ubicazione..."
+               autocomplete="off">
+      </div>
+      
+      <!-- Filtro Utente -->
+      <div class="filter-group" id="filter-group-utente">
+        <div class="filter-group-title">
+          <i class="fas fa-user"></i>
+          Utente
+        </div>
+        <input type="text" 
+               id="filterUtente" 
+               class="filter-input-compact " 
+               placeholder="Cerca utente..."
+               autocomplete="off">
+      </div>
+      
+      <!-- Filtro Magazzino -->
+      <div class="filter-group" id="filter-group-magazzino">
+        <div class="filter-group-title">
+          <i class="fas fa-warehouse"></i>
+          Magazzino
+        </div>
+        <select id="filterMagazzino" class="filter-input-compact ">
+          <option value="">-- Tutti --</option>
+          {% for mag in magazzini_opzioni %}
+            <option value="{{ mag }}">{{ mag }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <!-- Filtro Data -->
+      <div class="filter-group" id="filter-group-data">
+        <div class="filter-group-title">
+          <i class="fas fa-calendar-alt"></i>
+          Data
+        </div>
+        <input type="date" 
+               id="filterDataDa" 
+               class="filter-input-compact "
+               title="Data da">
+        <input type="date" 
+               id="filterDataA" 
+               class="filter-input-compact "
+               title="Data a">
+      </div>
+      
+      <!-- Ricerca nelle Note -->
+      <div class="notes-search-compact filter-group" id="filter-group-note">
+        <div class="filter-group-title">
+          <i class="fas fa-sticky-note"></i>
+          Note
+        </div>
+        <div class="notes-input-wrapper ">
+          <input type="text" 
+                 id="filterNote" 
+                 class="notes-input-compact" 
+                 placeholder="Cerca nelle note..."
+                 autocomplete="off">
+          <i class="fas fa-search search-icon-compact "></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-actions-compact">
+      <div>
+        <div id="filter-status" style="color: #6b7280; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-info-circle"></i>
+          <span id="filter-status-text">Nessun filtro attivo</span>
+        </div>
+        <div id="results-counter" style="color: #0056a6; font-size: 0.85rem; font-weight: 500; margin-top: 0.25rem;">
+          Totale: {{ movimenti|length }} movimenti
+        </div>
+      </div>
+      <div>
+        <button onclick="resetFilters()" 
+                class="filter-btn-compact filter-btn-secondary-compact ">
+          <i class="fas fa-times"></i>
+          Cancella Filtri
+        </button>
+        <button onclick="exportToCSV()" 
+                class="filter-btn-compact filter-btn-primary-compact">
+          <i class="fas fa-download"></i>
+          Esporta CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risultati -->
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden " style="border: 1px solid rgba(130, 130, 130, 0.3);">
+    <!-- Desktop Table -->
+    <div class="desktop-table">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200" id="movimentiTable" style="border-top: 1px solid rgba(130, 130, 130, 0.25);">
+          <thead class="bg-gray-50" style="background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%); border-bottom: 1px solid rgba(130, 130, 130, 0.25);">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-box text-blue-600"></i>
+                  Prodotto
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-exchange-alt text-green-600"></i>
+                  Movimento
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-calculator text-purple-600"></i>
+                  Quantità
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt text-orange-600"></i>
+                  Ubicazione
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-sticky-note text-yellow-600"></i>
+                  Note
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-calendar-alt text-indigo-600"></i>
+                  Data
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-user text-teal-600"></i>
+                  Utente
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200" id="movimentiTableBody">
+            {% for movimento in movimenti %}
+            <tr class="table-row-hover " style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <div class="flex flex-col">
+                  <span class="font-semibold text-blue-600">{{ movimento.nome_prodotto or 'N/A' }}</span>
+                  <span class="text-xs text-gray-500">Prodotto</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  {% if movimento.da_magazzino %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+                  {% if movimento.da_magazzino %}<i class="fas fa-arrow-down mr-1"></i>{% else %}<i class="fas fa-arrow-up mr-1"></i>{% endif %}
+                  {{ 'Trasferimento' if movimento.da_magazzino and movimento.a_magazzino else ('Scarico' if movimento.da_magazzino else 'Carico') }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                {{ movimento.quantita or 0 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-map-marker-alt text-orange-500 mr-2"></i>
+                  {{ movimento.da_ubicazione or movimento.a_ubicazione or 'N/A' }}
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="{{ movimento.note or 'Nessuna nota' }}">
+                {{ movimento.note or '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-clock text-indigo-500 mr-2"></i>
+                  {{ movimento.data_ora.strftime('%d/%m/%Y %H:%M') if movimento.data_ora else 'N/A' }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div class="flex items-center">
+                  <i class="fas fa-user text-teal-500 mr-2"></i>
+                  {{ movimento.username or 'N/A' }}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="mobile-view">
+      <div id="mobileMovimentiContainer">
+        {% for movimento in movimenti %}
+        <div class="mobile-table-card  movimento-row">
+          <div class="mobile-table-header">
+            <span>{{ movimento.nome_prodotto or 'N/A' }}</span>
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium
+              {% if movimento.da_magazzino %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+              {% if movimento.da_magazzino %}<i class="fas fa-arrow-down mr-1"></i>{% else %}<i class="fas fa-arrow-up mr-1"></i>{% endif %}
+              {{ 'Trasferimento' if movimento.da_magazzino and movimento.a_magazzino else ('Scarico' if movimento.da_magazzino else 'Carico') }}
+            </span>
+          </div>
+          
+          <div class="mobile-table-content">
+            <div class="mobile-table-item">
+              <div class="mobile-table-label">Prodotto</div>
+              <div class="mobile-table-value">{{ movimento.nome_prodotto or 'N/A' }}</div>
+            </div>
+            
+            <div class="mobile-table-item">
+              <div class="mobile-table-label">Quantità</div>
+              <div class="mobile-table-value">{{ movimento.quantita or 0 }}</div>
+            </div>
+            
+            <div class="mobile-table-item">
+              <div class="mobile-table-label">Ubicazione</div>
+              <div class="mobile-table-value">{{ movimento.da_ubicazione or movimento.a_ubicazione or 'N/A' }}</div>
+            </div>
+            
+            <div class="mobile-table-item">
+              <div class="mobile-table-label">Data</div>
+              <div class="mobile-table-value">{{ movimento.data_ora.strftime('%d/%m/%Y %H:%M') if movimento.data_ora else 'N/A' }}</div>
+            </div>
+            
+            <div class="mobile-table-item">
+              <div class="mobile-table-label">Utente</div>
+              <div class="mobile-table-value">{{ movimento.username or 'N/A' }}</div>
+            </div>
+          </div>
+          
+          {% if movimento.note %}
+          <div class="mobile-note">
+            <div class="mobile-table-label">Note</div>
+            <div class="mobile-table-value">{{ movimento.note }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Messaggio nessun risultato -->
+    <div id="noResults" class="no-results " style="display: none;">
+      <i class="fas fa-search text-4xl mb-4"></i>
+      <h3 class="text-lg font-semibold mb-2">Nessun movimento trovato</h3>
+      <p>Modifica i filtri per visualizzare altri risultati</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Dati dei movimenti dal backend
+const movimentiData = {{ movimenti|tojson }};
+
+// Sistema di filtri con ottimizzazioni delle prestazioni
+let filterTimeout;
+let allMovimenti = [];
+let filteredMovimenti = [];
+
+// Inizializzazione semplificata
+document.addEventListener('DOMContentLoaded', function() {
+  initializeFilters();
+  cacheMovimenti();
+});
+
+// Estrai nome magazzino dai campi da_magazzino e a_magazzino
+function extractMagazzino(movimento) {
+  // Ritorna il magazzino di destinazione (a_magazzino) se presente, altrimenti quello di origine (da_magazzino)
+  return movimento.a_magazzino || movimento.da_magazzino || '';
+}
+
+// Cache dei movimenti per prestazioni ottimali
+function cacheMovimenti() {
+  const rows = document.querySelectorAll('#movimentiTableBody tr');
+  const mobileCards = document.querySelectorAll('.movimento-row');
+  
+  allMovimenti = movimentiData.map((movimento, index) => {
+    return {
+      row: rows[index] || null,
+      mobileCard: mobileCards[index] || null,
+      data: {
+        nomeProdotto: (movimento.nome_prodotto || '').toLowerCase(),
+        movimento: determineMovementType(movimento).toLowerCase(),
+        quantita: parseInt(movimento.quantita) || 0,
+        ubicazione: (movimento.da_ubicazione || movimento.a_ubicazione || '').toLowerCase(),
+        note: (movimento.note || '').toLowerCase(),
+        data: movimento.data_ora || '',
+        utente: (movimento.username || '').toLowerCase(),
+        magazzino: extractMagazzino(movimento).toLowerCase()
+      }
+    };
+  });
+  
+  filteredMovimenti = [...allMovimenti];
+}
+
+// Determina il tipo di movimento
+function determineMovementType(movimento) {
+  if (movimento.da_magazzino && movimento.a_magazzino) {
+    return 'Trasferimento';
+  } else if (movimento.da_magazzino) {
+    return 'Scarico';
+  } else {
+    return 'Carico';
+  }
+}
+
+// Inizializzazione filtri con debounce ottimizzato
+function initializeFilters() {
+  const filters = [
+    'filterNomeProdotto', 'filterMovimento', 
+    'filterQuantitaMin', 'filterQuantitaMax', 'filterUbicazione', 
+    'filterNote', 'filterDataDa', 'filterDataA', 'filterUtente', 'filterMagazzino'
+  ];
+  
+  filters.forEach(filterId => {
+    const element = document.getElementById(filterId);
+    if (element) {
+      element.addEventListener('input', debounceFilter);
+      element.addEventListener('change', debounceFilter);
+    }
+  });
+}
+
+// Debounce ottimizzato per le prestazioni
+function debounceFilter() {
+  clearTimeout(filterTimeout);
+  filterTimeout = setTimeout(() => {
+    requestAnimationFrame(applyFilters);
+  }, 150);
+}
+
+// Applicazione filtri con ottimizzazioni
+function applyFilters() {
+  const filters = getFilterValues();
+  const activeFilters = getActiveFilters(filters);
+  
+  // Aggiorna interfaccia filtri attivi
+  updateFilterUI(activeFilters);
+  
+  if (activeFilters.length === 0) {
+    showAllMovimenti();
+    return;
+  }
+  
+  // Filtraggio ottimizzato
+  filteredMovimenti = allMovimenti.filter(movimento => {
+    return activeFilters.every(filter => {
+      switch(filter.type) {
+        case 'text':
+          return movimento.data[filter.field].includes(filter.value);
+        case 'select':
+          return movimento.data[filter.field].includes(filter.value);
+        case 'number':
+          if (filter.field === 'quantitaMin') {
+            return movimento.data.quantita >= filter.value;
+          }
+          if (filter.field === 'quantitaMax') {
+            return movimento.data.quantita <= filter.value;
+          }
+          return true;
+        case 'date':
+          return filterByDate(movimento.data.data, filter.field, filter.value);
+        default:
+          return true;
+      }
+    });
+  });
+  
+  updateDisplayedMovimenti();
+}
+
+// Ottieni valori filtri
+function getFilterValues() {
+  return {
+    nomeProdotto: document.getElementById('filterNomeProdotto')?.value?.toLowerCase().trim() || '',
+    movimento: document.getElementById('filterMovimento')?.value?.toLowerCase().trim() || '',
+    quantitaMin: document.getElementById('filterQuantitaMin')?.value || '',
+    quantitaMax: document.getElementById('filterQuantitaMax')?.value || '',
+    ubicazione: document.getElementById('filterUbicazione')?.value?.toLowerCase().trim() || '',
+    note: document.getElementById('filterNote')?.value?.toLowerCase().trim() || '',
+    dataDa: document.getElementById('filterDataDa')?.value || '',
+    dataA: document.getElementById('filterDataA')?.value || '',
+    utente: document.getElementById('filterUtente')?.value?.toLowerCase().trim() || '',
+    magazzino: document.getElementById('filterMagazzino')?.value?.toLowerCase().trim() || ''
+  };
+}
+
+// Ottieni filtri attivi
+function getActiveFilters(filters) {
+  const activeFilters = [];
+  
+  if (filters.nomeProdotto) activeFilters.push({type: 'text', field: 'nomeProdotto', value: filters.nomeProdotto});
+  if (filters.movimento) activeFilters.push({type: 'select', field: 'movimento', value: filters.movimento});
+  if (filters.quantitaMin) activeFilters.push({type: 'number', field: 'quantitaMin', value: parseInt(filters.quantitaMin)});
+  if (filters.quantitaMax) activeFilters.push({type: 'number', field: 'quantitaMax', value: parseInt(filters.quantitaMax)});
+  if (filters.ubicazione) activeFilters.push({type: 'text', field: 'ubicazione', value: filters.ubicazione});
+  if (filters.note) activeFilters.push({type: 'text', field: 'note', value: filters.note});
+  if (filters.dataDa) activeFilters.push({type: 'date', field: 'dataDa', value: filters.dataDa});
+  if (filters.dataA) activeFilters.push({type: 'date', field: 'dataA', value: filters.dataA});
+  if (filters.utente) activeFilters.push({type: 'text', field: 'utente', value: filters.utente});
+  if (filters.magazzino) activeFilters.push({type: 'select', field: 'magazzino', value: filters.magazzino});
+  
+  return activeFilters;
+}
+
+// Aggiorna UI filtri attivi con animazioni ottimizzate
+function updateFilterUI(activeFilters) {
+  const filterInputs = document.querySelectorAll('.filter-input-compact');
+  const filterGroups = document.querySelectorAll('.filter-group');
+  const statusText = document.getElementById('filter-status-text');
+  const statusElement = document.getElementById('filter-status');
+  
+  // Reset classi
+  filterInputs.forEach(input => input.classList.remove('active'));
+  filterGroups.forEach(group => group.classList.remove('has-active'));
+  
+  // Applica classi attive
+  if (activeFilters.length > 0) {
+    activeFilters.forEach(filter => {
+      const input = document.getElementById(getInputIdFromField(filter.field));
+      if (input) {
+        input.classList.add('active');
+        input.closest('.filter-group')?.classList.add('has-active');
+      }
+    });
+    
+    statusText.textContent = `${activeFilters.length} filtro${activeFilters.length > 1 ? 'i' : ''} attivo${activeFilters.length > 1 ? 'i' : ''}`;
+    statusElement.style.color = '#0056a6';
+  } else {
+    statusText.textContent = 'Nessun filtro attivo';
+    statusElement.style.color = '#6b7280';
+  }
+}
+
+// Mapping campi - input ID
+function getInputIdFromField(field) {
+  const mapping = {
+    'nomeProdotto': 'filterNomeProdotto',
+    'movimento': 'filterMovimento',
+    'quantitaMin': 'filterQuantitaMin',
+    'quantitaMax': 'filterQuantitaMax',
+    'ubicazione': 'filterUbicazione',
+    'note': 'filterNote',
+    'dataDa': 'filterDataDa',
+    'dataA': 'filterDataA',
+    'utente': 'filterUtente',
+    'magazzino': 'filterMagazzino'
+  };
+  return mapping[field] || field;
+}
+
+// Filtro per data ottimizzato
+function filterByDate(dataMovimento, tipo, valore) {
+  if (!dataMovimento || !valore) return true;
+  
+  try {
+    const parts = dataMovimento.split(' ')[0].split('/');
+    const movimentoDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    const filterDate = new Date(valore);
+    
+    if (tipo === 'dataDa') {
+      return movimentoDate >= filterDate;
+    } else if (tipo === 'dataA') {
+      return movimentoDate <= filterDate;
+    }
+  } catch (e) {
+    console.warn('Errore parsing data:', e);
+  }
+  
+  return true;
+}
+
+// Mostra tutti i movimenti
+function showAllMovimenti() {
+  filteredMovimenti = [...allMovimenti];
+  updateDisplayedMovimenti();
+}
+
+// Aggiorna movimenti visualizzati con ottimizzazioni DOM
+function updateDisplayedMovimenti() {
+  const noResultsElement = document.getElementById('noResults');
+  
+  if (filteredMovimenti.length === 0) {
+    hideAllMovimenti();
+    noResultsElement.style.display = 'block';
+    return;
+  }
+  
+  noResultsElement.style.display = 'none';
+  
+  // Batch DOM updates per prestazioni
+  requestAnimationFrame(() => {
+    allMovimenti.forEach(movimento => {
+      const isVisible = filteredMovimenti.includes(movimento);
+      
+      if (movimento.row) {
+        movimento.row.style.display = isVisible ? '' : 'none';
+      }
+      if (movimento.mobileCard) {
+        movimento.mobileCard.style.display = isVisible ? '' : 'none';
+      }
+    });
+  });
+}
+
+// Nascondi tutti i movimenti
+function hideAllMovimenti() {
+  allMovimenti.forEach(movimento => {
+    if (movimento.row) movimento.row.style.display = 'none';
+    if (movimento.mobileCard) movimento.mobileCard.style.display = 'none';
+  });
+}
+
+// Reset filtri con animazioni
+function resetFilters() {
+  const filterInputs = document.querySelectorAll('.filter-input-compact');
+  
+  filterInputs.forEach(input => {
+    input.value = '';
+    input.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.filter-group').forEach(group => {
+    group.classList.remove('has-active');
+  });
+  
+  // Animazione reset
+  requestAnimationFrame(() => {
+    showAllMovimenti();
+    updateFilterUI([]);
+  });
+}
+
+// Mostra tutti i movimenti
+function showAllMovimenti() {
+  filteredMovimenti = [...allMovimenti];
+  updateDisplayedMovimenti();
+}
+
+// Aggiorna visualizzazione movimenti
+function updateDisplayedMovimenti() {
+  // Nascondi tutte le righe e card
+  allMovimenti.forEach(movimento => {
+    movimento.row.style.display = 'none';
+    if (movimento.mobileCard) {
+      movimento.mobileCard.style.display = 'none';
+    }
+  });
+  
+  // Mostra solo i movimenti filtrati
+  filteredMovimenti.forEach(movimento => {
+    movimento.row.style.display = '';
+    if (movimento.mobileCard) {
+      movimento.mobileCard.style.display = '';
+    }
+  });
+  
+  // Aggiorna contatore risultati
+  updateResultsCounter();
+}
+
+// Aggiorna contatore risultati
+function updateResultsCounter() {
+  const counter = document.getElementById('results-counter');
+  if (counter) {
+    const total = allMovimenti.length;
+    const filtered = filteredMovimenti.length;
+    counter.textContent = filtered === total 
+      ? `Totale: ${total} movimenti`
+      : `Trovati: ${filtered} di ${total} movimenti`;
+  }
+}
+
+// Export CSV ottimizzato
+function exportToCSV() {
+  if (filteredMovimenti.length === 0) {
+    alert('Nessun dato da esportare');
+    return;
+  }
+  
+  const headers = ['Nome Prodotto', 'Movimento', 'Quantità', 'Ubicazione', 'Note', 'Data', 'Utente'];
+  const csvContent = [
+    headers.join(','),
+    ...filteredMovimenti.map(movimento => {
+      const cells = movimento.row.querySelectorAll('td');
+      return [
+        `"${cells[0]?.querySelector('span')?.textContent || ''}"`,
+        `"${cells[1]?.textContent?.replace(/[^\w\s]/gi, '').trim() || ''}"`,
+        `"${cells[2]?.textContent?.trim() || ''}"`,
+        `"${cells[3]?.textContent?.replace(/[^\w\s]/gi, '').trim() || ''}"`,
+        `"${cells[4]?.textContent?.trim() || ''}"`,
+        `"${cells[5]?.textContent?.replace(/[^\w\s:\/]/gi, '').trim() || ''}"`,
+        `"${cells[6]?.textContent?.replace(/[^\w\s]/gi, '').trim() || ''}"`
+      ].join(',');
+    })
+  ].join('\n');
+  
+  // Download ottimizzato
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `log_movimenti_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  
+  // Notifica visuale
+  showExportNotification();
+}
+
+// Notifica export con animazione
+function showExportNotification() {
+  const notification = document.createElement('div');
+  notification.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 86, 166, 0.3);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    ">
+      <i class="fas fa-check-circle"></i>
+      Export completato con successo!
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Animazioni per notifiche
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

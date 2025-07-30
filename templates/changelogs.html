@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}Changelog - Pharmagest{% endblock %}
+
+{% block page_title_full %}Changelog Sistema - Pharmagest{% endblock %}
+{% block page_title_short %}Changelog{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Sistema AMOLED dark mode come le altre pagine */
+* {
+  box-sizing: border-box;
+}
+
+/* Transizioni fluide */
+body {
+  transition: background-color 0.2s ease;
+}
+
+/* Variabili CSS per dark mode AMOLED */
+:root {
+  --bg-primary: rgba(255, 255, 255, 0.95);
+  --bg-secondary: rgba(243, 244, 246, 0.9);
+  --border-light: rgba(150, 150, 150, 0.25);
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --accent-color: #0056a6;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+}
+
+.dark {
+  --bg-primary: rgba(0, 0, 0, 0.98);
+  --bg-secondary: rgba(0, 0, 0, 0.95);
+  --border-light: rgba(40, 40, 40, 0.8);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --accent-color: #60a5fa;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+}
+
+/* Glass card con stile AMOLED */
+.glass-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.dark .glass-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-light);
+}
+
+.glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Changelog entries styling */
+.changelog-entry {
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-primary);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: var(--shadow-light);
+  transition: all 0.2s ease;
+}
+
+.dark .changelog-entry {
+  background: var(--bg-secondary);
+  border-left-color: var(--accent-color);
+  box-shadow: var(--shadow-light);
+}
+
+.changelog-date {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.changelog-version {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.changelog-description {
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: color 0.2s ease;
+}
+
+/* Form styling */
+form label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: var(--accent-color);
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+form input[type="text"],
+form input[type="date"],
+form textarea {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.7rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.dark form input[type="text"],
+.dark form input[type="date"],
+.dark form textarea {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+.dark form input[type="text"]:focus,
+.dark form input[type="date"]:focus,
+.dark form textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+/* Button styling */
+.btn-primary {
+  background: linear-gradient(90deg, #0056a6 0%, #00a8e8 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dark .btn-primary {
+  background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #003d7a 0%, #0056a6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.2);
+}
+
+.dark .btn-primary:hover {
+  background: linear-gradient(90deg, #1e3a8a 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dark .btn-secondary {
+  background: #4b5563;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.dark .btn-secondary:hover {
+  background: #374151;
+}
+
+/* Action buttons */
+.btn-action {
+  color: var(--accent-color);
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+}
+
+.btn-action:hover {
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+.btn-action.delete {
+  color: #dc2626;
+}
+
+.dark .btn-action.delete {
+  color: #ef4444;
+}
+
+.btn-action.delete:hover {
+  color: #b91c1c;
+}
+
+.dark .btn-action.delete:hover {
+  color: #dc2626;
+}
+
+/* Section titles */
+.section-title {
+  color: var(--accent-color);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.empty-state i {
+  color: var(--text-secondary);
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  transition: color 0.2s ease;
+}
+
+.empty-state h3 {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  transition: color 0.2s ease;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="{ showForm: false, editingId: null }">
+  <div class="flex items-center justify-between mb-6">
+    {% if session.get('is_admin') %}
+    <button @click="showForm = !showForm; editingId = null" 
+            class="btn-primary">
+      <i class="fas fa-plus mr-2"></i>
+      <span class="hidden md:inline">Nuovo Changelog</span>
+      <span class="md:hidden">Nuovo</span>
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Form per nuovo/modifica changelog -->
+  {% if session.get('is_admin') %}
+  <div x-show="showForm" class="glass-card mb-6" x-transition>
+    <h3 class="section-title">
+      <span x-show="!editingId">Nuovo Changelog</span>
+      <span x-show="editingId">Modifica Changelog</span>
+    </h3>
+    <form method="POST" action="{{ url_for('changelogs') }}">
+      <input type="hidden" name="changelog_id" x-bind:value="editingId">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="versione">Versione</label>
+          <input type="text" id="versione" name="versione" required 
+                 placeholder="es. v1.2.3">
+        </div>
+        <div>
+          <label for="data_rilascio">Data Rilascio</label>
+          <input type="date" id="data_rilascio" name="data_rilascio" required>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="descrizione">Descrizione delle modifiche</label>
+        <textarea id="descrizione" name="descrizione" rows="6" required 
+                  placeholder="Descrivi le nuove funzionalità, correzioni di bug, miglioramenti..."></textarea>
+      </div>
+      <div class="flex gap-2">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save mr-2"></i>
+          <span x-show="!editingId">Salva Changelog</span>
+          <span x-show="editingId">Aggiorna Changelog</span>
+        </button>
+        <button type="button" @click="showForm = false; editingId = null" 
+                class="btn-secondary">
+          <i class="fas fa-times mr-2"></i>Annulla
+        </button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- Lista Changelog -->
+  <div class="glass-card">
+    <h2 class="section-title">
+      <i class="fas fa-history mr-2"></i>Note di Rilascio
+    </h2>
+    
+    {% if changelogs %}
+      {% for changelog in changelogs %}
+      <div class="changelog-entry">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <div class="changelog-version">{{ changelog.versione }}</div>
+            <div class="changelog-date">{{ changelog.data_rilascio.strftime('%d/%m/%Y') }}</div>
+          </div>
+          {% if session.get('is_admin') %}
+          <div class="flex gap-2">
+            <button @click="editChangelog({{ changelog.id }}, '{{ changelog.versione }}', '{{ changelog.data_rilascio.strftime('%Y-%m-%d') }}', {{ changelog.descrizione|tojson }})" 
+                    class="btn-action">
+              <i class="fas fa-edit"></i>
+            </button>
+            <form method="POST" action="{{ url_for('delete_changelog', changelog_id=changelog.id) }}" 
+                  class="inline" onsubmit="return confirm('Sei sicuro di voler eliminare questo changelog?')">
+              <button type="submit" class="btn-action delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+        <div class="changelog-description">
+          {{ changelog.descrizione|replace('\n', '<br>')|safe }}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-code-branch"></i>
+        <h3>Nessun changelog</h3>
+        <p>Non ci sono ancora changelog nel sistema.</p>
+        {% if session.get('is_admin') %}
+        <button @click="showForm = true" 
+                class="btn-primary">
+          <i class="fas fa-plus mr-2"></i>Aggiungi il primo changelog
+        </button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if session.get('is_admin') %}
+function editChangelog(id, versione, data, descrizione) {
+  // Imposta i valori del form per la modifica
+  document.getElementById('versione').value = versione;
+  document.getElementById('data_rilascio').value = data;
+  document.getElementById('descrizione').value = descrizione;
+  
+  // Usa Alpine.js per aggiornare lo stato
+  document.querySelector('[x-data]').__x.$data.editingId = id;
+  document.querySelector('[x-data]').__x.$data.showForm = true;
+}
+{% endif %}
+</script>
+{% endblock %}

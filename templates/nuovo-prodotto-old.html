@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nuovo Prodotto - Pharmagest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- AGGIUNGI Alpine.js QUI -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            phg: {
+              primary: "#0056a6",
+              secondary: "#e3f2fd",
+              accent: "#00a8e8",
+              dark: "#003d7a",
+              light: "#f0f8ff",
+            },
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+    }
+    
+    .dark {
+      --bg-primary: #000000;
+      --bg-secondary: #0a0a0a;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #d1d5db;
+      --border-color: #2a2a2a;
+    }
+
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(10px);
+      border: 1px solid #e3f2fd;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
+      border-radius: 1.25rem;
+      padding: 2.5rem 2rem;
+      max-width: 430px;
+      margin: 2.5rem auto;
+      position: relative;
+    }
+    .glass-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 1.25rem;
+      background: linear-gradient(120deg, #e3f2fd 0%, #f0f8ff 100%);
+      opacity: 0.18;
+      z-index: 0;
+    }
+    .icon-circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+      color: #0056a6;
+      font-size: 2rem;
+      margin: 0 auto 1.5rem auto;
+      box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+    }
+    .form-section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #003d7a;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    form label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+      color: #0056a6;
+      margin-top: 1rem;
+    }
+    form input[type="text"],
+    form input[type="number"],
+    form select {
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid #b6d4f7;
+      border-radius: 0.7rem;
+      background: #fff;
+      margin-bottom: 0.2rem;
+      font-size: 1rem;
+      color: #003d7a;
+      transition: border 0.2s;
+    }
+    form input[type="text"]:focus,
+    form input[type="number"]:focus,
+    form select:focus {
+      outline: none;
+      border-color: #0056a6;
+      box-shadow: 0 0 0 2px #e3f2fd;
+    }
+    form button[type="submit"] {
+      width: 100%;
+      margin-top: 2rem;
+      background: linear-gradient(90deg, #0056a6 0%, #00a8e8 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 0.8rem;
+      padding: 0.9rem 0;
+      box-shadow: 0 4px 16px 0 rgba(0,86,166,0.09);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      transition: background 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    form button[type="submit"]:hover {
+      background: linear-gradient(90deg, #003d7a 0%, #0056a6 100%);
+      box-shadow: 0 8px 24px 0 rgba(0,86,166,0.13);
+    }
+    @media (max-width: 600px) {
+      .glass-card {
+        padding: 1.2rem 0.5rem;
+        max-width: 98vw;
+      }
+      form button[type="submit"] {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* AGGIUNGO GLI STILI MOBILE MANCANTI */
+    .mobile-sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+    
+    .mobile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 19;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .mobile-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .hamburger-menu {
+      display: flex;
+      flex-direction: column;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .hamburger-line {
+      width: 100%;
+      height: 2px;
+      background-color: #0056a6;
+      margin: 2px 0;
+      transition: 0.3s;
+    }
+    
+    .hamburger-menu.active .hamburger-line:nth-child(1) {
+      transform: rotate(-45deg) translate(-4px, 4px);
+    }
+    
+    .hamburger-menu.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .hamburger-menu.active .hamburger-line:nth-child(3) {
+      transform: rotate(45deg) translate(-4px, -4px);
+    }
+    
+    .nav-pill {
+      transition: all 0.3s ease;
+    }
+    .nav-pill:hover {
+      background-color: rgba(0, 86, 166, 0.1);
+    }
+    .nav-pill.active {
+      background-color: rgba(0, 86, 166, 0.2);
+      border-left: 3px solid #0056a6;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="$watch('darkMode', val => { 
+  localStorage.setItem('darkMode', val); 
+  if(val) document.documentElement.classList.add('dark'); 
+  else document.documentElement.classList.remove('dark'); 
+}); 
+if(darkMode) document.documentElement.classList.add('dark')">>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="w-full max-w-2xl mx-auto mt-4">
+        {% for category, message in messages %}
+          <div class="px-4 py-2 rounded text-sm mb-2
+            {% if category == 'success' %}bg-green-100 text-green-800
+            {% elif category == 'error' or category == 'danger' %}bg-red-100 text-red-800
+            {% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay md:hidden" 
+       :class="{ 'active': sidebarOpen }" 
+       @click="sidebarOpen = false"></div>
+
+  <!-- Sidebar Navigation -->
+  <div class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 hidden md:block">
+    <div class="flex items-center justify-center h-16 px-4">
+      <img src="https://raw.githubusercontent.com/emilianpr/phg-img/refs/heads/main/HEAD_Pharmagest.png"
+           alt="Pharmagest Logo"
+           class="h-10 mx-auto">
+    </div>
+    <nav class="mt-8 px-4 space-y-1">
+      <a href="{{ url_for('index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'index' %}active{% endif %}">
+        <i class="fas fa-boxes mr-3 {% if request.endpoint == 'index' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Gestione Magazzino
+      </a>
+      <a href="{{ url_for('movimento') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'movimento' %}active{% endif %}">
+        <i class="fas fa-exchange-alt mr-3 {% if request.endpoint == 'movimento' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Movimento
+      </a>
+      <a href="{{ url_for('logmovimenti') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'logmovimenti' %}active{% endif %}">
+        <i class="fas fa-file-invoice mr-3 {% if request.endpoint == 'logmovimenti' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Log Movimenti
+      </a>
+      <a href="{{ url_for('logscarico') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'logscarico' %}active{% endif %}">
+        <i class="fas fa-file-arrow-down mr-3 {% if request.endpoint == 'logscarico' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Log Scarichi
+      </a>
+      <div x-data="{ open: false }" class="relative">
+        <a href="#" @click.prevent="open = !open"
+           class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}active{% endif %}">
+          <i class="fas fa-arrow-down mr-3 {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+          Scarico Merci
+          <i class="fas fa-chevron-down ml-auto text-xs"></i>
+        </a>
+        <div x-show="open" @click.away="open = false"
+             class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-30"
+             x-transition>
+          <a href="{{ url_for('scaricomerce') }}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-phg-secondary {% if request.endpoint == 'scaricomerce' %}font-bold text-phg-primary{% endif %}">
+            Scarico da Magazzino
+          </a>
+          <a href="{{ url_for('scarico_merce_non_in_magazzino') }}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-phg-secondary {% if request.endpoint == 'scarico_merce_non_in_magazzino' %}font-bold text-phg-primary{% endif %}">
+            Scarico NON in Magazzino
+          </a>
+        </div>
+      </div>
+      <a href="{{ url_for('carico_merci') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'carico_merci' %}active{% endif %}">
+        <i class="fas fa-arrow-up mr-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Carico Merci
+      </a>
+      {% if session.get('is_admin') %}
+      <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
+        <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Nuovo Utente
+      </a>
+      {% endif %}
+    </nav>
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-white rounded-full border border-gray-200">
+          <img class="h-10 w-10 rounded-full" src="https://raw.githubusercontent.com/emilianpr/phg-img/main/user-128.svg" alt="User profile" />
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-900">{{ username }}</p>
+          <p class="text-sm text-gray-500">
+            {% if session.get('is_admin') %}
+            Amministratore
+            {% else %}
+            Utente
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Mobile Sidebar -->
+  <div class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 md:hidden mobile-sidebar"
+       :class="{ 'open': sidebarOpen }">
+    <div class="flex items-center justify-center h-16 px-4">
+      <img src="https://raw.githubusercontent.com/emilianpr/phg-img/refs/heads/main/HEAD_Pharmagest.png" 
+           alt="Pharmagest Logo" 
+           class="h-10 mx-auto">
+    </div>
+    <nav class="mt-8 px-4 space-y-1">
+      <a href="{{ url_for('index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'index' %}active{% endif %}">
+        <i class="fas fa-boxes mr-3 {% if request.endpoint == 'index' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Gestione Magazzino
+      </a>
+      <a href="{{ url_for('movimento') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'movimento' %}active{% endif %}">
+        <i class="fas fa-exchange-alt mr-3 {% if request.endpoint == 'movimento' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Movimento
+      </a>
+      <a href="{{ url_for('logmovimenti') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'logmovimenti' %}active{% endif %}">
+        <i class="fas fa-file-invoice mr-3 {% if request.endpoint == 'logmovimenti' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Log Movimenti
+      </a>
+      <a href="{{ url_for('logscarico') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'logscarico' %}active{% endif %}">
+        <i class="fas fa-file-arrow-down mr-3 {% if request.endpoint == 'logscarico' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Log Scarichi
+      </a>
+      <div x-data="{ open: false }" class="relative">
+        <a href="#" @click.prevent="open = !open"
+           class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}active{% endif %}">
+          <i class="fas fa-arrow-down mr-3 {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+          Scarico Merci
+          <i class="fas fa-chevron-down ml-auto text-xs"></i>
+        </a>
+        <div x-show="open" @click.away="open = false"
+             class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-30"
+             x-transition>
+          <a href="{{ url_for('scaricomerce') }}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-phg-secondary {% if request.endpoint == 'scaricomerce' %}font-bold text-phg-primary{% endif %}">
+            Scarico da Magazzino
+          </a>
+          <a href="{{ url_for('scarico_merce_non_in_magazzino') }}"
+             class="block px-4 py-2 text-sm text-gray-700 hover:bg-phg-secondary {% if request.endpoint == 'scarico_merce_non_in_magazzino' %}font-bold text-phg-primary{% endif %}">
+            Scarico NON in Magazzino
+          </a>
+        </div>
+      </div>
+      <a href="{{ url_for('carico_merci') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'carico_merci' %}active{% endif %}">
+        <i class="fas fa-arrow-up mr-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Carico Merci
+      </a>
+      {% if session.get('is_admin') %}
+      <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
+        <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Nuovo Utente
+      </a>
+      {% endif %}
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="md:ml-64 flex justify-center items-center w-full min-h-screen">
+    <!-- Top Navigation -->
+    <div class="md:hidden sticky top-0 z-10 bg-white shadow-sm w-full" style="position: fixed; left: 0; right: 0; top: 0;">
+      <div class="flex items-center justify-between h-16 px-4">
+        <div class="flex items-center">
+          <button class="mr-3 hamburger-menu" 
+                  :class="{ 'active': sidebarOpen }"
+                  @click="sidebarOpen = !sidebarOpen">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+          </button>
+          <h1 class="text-lg font-bold text-phg-primary">Nuovo Prodotto</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Icona Changelog -->
+          <a href="{{ url_for('changelogs') }}" 
+             class="p-2 text-gray-500 hover:text-phg-primary hover:bg-phg-secondary rounded-lg transition-colors duration-200" 
+             title="Changelog">
+            <i class="fas fa-code-branch text-lg"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Top Navigation (nascosta) -->
+    <div class="hidden md:block fixed top-0 right-0 z-10 p-4">
+      <a href="{{ url_for('changelogs') }}" 
+         class="p-3 text-gray-500 hover:text-phg-primary hover:bg-white hover:shadow-lg rounded-lg transition-all duration-200" 
+         title="Changelog">
+        <i class="fas fa-code-branch text-xl"></i>
+      </a>
+    </div>
+
+    <div class="glass-card content-container w-full max-w-xl mx-auto" style="margin-top: 80px; margin-bottom: 100px;">
+      <div class="icon-circle mb-2">
+        <i class="fas fa-plus"></i>
+      </div>
+      <h2 class="form-section-title mb-6">
+        Inserisci un nuovo prodotto
+      </h2>
+      <form method="POST" action="{{ url_for('nuovo_prodotto') }}" autocomplete="off">
+        <label for="nome_prodotto">Nome Prodotto:</label>
+        <input type="text" id="nome_prodotto" name="nome_prodotto" required placeholder="Nome prodotto..." />
+
+        <label for="codice_prodotto">Codice Prodotto:</label>
+        <input type="text" id="codice_prodotto" name="codice_prodotto" required placeholder="Codice prodotto..." />
+
+        <label for="magazzino_id">Magazzino:</label>
+        <select id="magazzino_id" name="magazzino_id" required>
+          <option value="1">Farmacia</option>
+          <option value="2">Grossisti</option>
+        </select>
+
+        <label for="stato">Stato:</label>
+        <select id="stato" name="stato" required>
+          <option value="in_magazzino">In Magazzino</option>
+          <option value="in_arrivo">In Arrivo</option>
+          <option value="in_utilizzo">In Utilizzo</option>
+          <option value="spedito">Spedito</option>
+          <option value="baia_uscita">Baia Uscita</option>
+          <option value="in_preparazione">In Preparazione</option>
+          <option value="altro">Altro</option>
+          <option value="test">Test</option>
+          <option value="laboratorio">Laboratorio</option>
+        </select>
+
+        <label for="quantita">Quantità iniziale:</label>
+        <input type="number" id="quantita" name="quantita" min="0" required placeholder="Quantità..." />
+
+        <label for="ubicazione">Ubicazione:</label>
+        <input type="text" id="ubicazione" name="ubicazione" placeholder="Ubicazione (opzionale)..." />
+
+        <button type="submit">
+          <i class="fas fa-check-circle"></i>
+          Salva prodotto
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg z-10">
+    <div class="flex justify-around">
+      <a href="{{ url_for('index') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'index' %}text-phg-primary{% else %}text-gray-500{% endif %}">
+        <i class="fas fa-boxes text-lg"></i>
+        <span class="text-xs mt-1">Magazzino</span>
+      </a>
+      <a href="{{ url_for('movimento') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'movimento' %}text-phg-primary{% else %}text-gray-500{% endif %}">
+        <i class="fas fa-exchange-alt text-lg"></i>
+        <span class="text-xs mt-1">Movimento</span>
+      </a>
+      <a href="{{ url_for('carico_merci') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500{% endif %}">
+        <i class="fas fa-arrow-up text-lg"></i>
+        <span class="text-xs mt-1">Carico</span>
+      </a>
+      <a href="{{ url_for('scaricomerce') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'scaricomerce' %}text-phg-primary{% else %}text-gray-500{% endif %}">
+        <i class="fas fa-arrow-down text-lg"></i>
+        <span class="text-xs mt-1">Scarico</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Gestione Magazzino - Pharmagest{% endblock %}
+
+{% block extra_css %}
+    .dashboard-card-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+      color: #0056a6;
+      font-size: 2.5rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+    }
+    
+    .dark .dashboard-card-icon {
+      background: linear-gradient(135deg, rgba(227, 242, 253, 0.2) 0%, rgba(0, 168, 232, 0.4) 100%);
+      color: #60a5fa;
+    }
+
+    .floating-btn {
+      box-shadow: 0 10px 15px -3px rgba(0, 86, 166, 0.3), 0 4px 6px -2px rgba(0, 86, 166, 0.1);
+      transition: all 0.3s ease;
+    }
+    .floating-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 86, 166, 0.3), 0 10px 10px -5px rgba(0, 86, 166, 0.1);
+    }
+    .table-row-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 86, 166, 0.1), 0 2px 4px -1px rgba(0, 86, 166, 0.06);
+      background: #e3f2fd;
+      border-radius: 1rem;
+    }
+    
+    .dark .table-row-hover:hover {
+      background: rgba(55, 65, 81, 0.5);
+    }
+    .filter-toggle {
+      transition: all 0.3s ease;
+    }
+    .filter-toggle.active {
+      background-color: #0056a6;
+      color: white;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+    .status-active {
+      background-color: #e3f2fd;
+      color: #0056a6;
+    }
+    .status-inactive {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    .status-warning {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    .mobile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .mobile-stat-card {
+      background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(0, 86, 166, 0.1);
+    }
+    
+    .mobile-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0056a6, #00a8e8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-size: 16px;
+    }
+    
+    .mobile-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0056a6;
+      margin-bottom: 4px;
+    }
+    
+    .mobile-stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+{% endblock %}
+
+{% block page_title_full %}Gestione Magazzino - Pharmagest (Alpha v3.0){% endblock %}
+{% block page_title_short %}Magazzino{% endblock %}
+
+{% block content %}
+<div x-data="{ 
+  filtersOpen: false,
+  editingRow: null,
+  compensazioneData: null,
+  ubicazioneSelezionata: null
+}">
+
+  <!-- Buttons Row -->
+  <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+    <!-- Left side: Filters button -->
+    <div>
+      <button @click="filtersOpen = !filtersOpen" 
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 filter-toggle"
+              :class="{ 'active': filtersOpen }">
+        <i class="fas fa-filter"></i>
+        <span class="hidden md:inline">Filtri</span>
+      </button>
+    </div>
+    
+    <!-- Right side: Export and action buttons -->
+    <div class="flex flex-wrap gap-2">
+      <!-- Export buttons - hidden on mobile -->
+      <div class="hidden md:flex gap-2">
+        <a href="{{ url_for('esporta_magazzino') }}" 
+           class="px-3 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 flex items-center gap-2">
+          <i class="fas fa-download"></i>
+          Esporta TXT
+        </a>
+        <a href="{{ url_for('esporta_magazzino_xlsx') }}" 
+           class="px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 flex items-center gap-2">
+          <i class="fas fa-file-excel"></i>
+          Esporta Excel
+        </a>
+      </div>
+      
+      <!-- Action buttons -->
+      <a href="{{ url_for('movimento') }}" 
+         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+        <i class="fas fa-exchange-alt"></i>
+        <span class="hidden md:inline">Nuovo Movimento</span>
+        <span class="md:hidden">Movimento</span>
+      </a>
+      <a href="{{ url_for('nuovo_prodotto') }}" 
+         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+        <i class="fas fa-plus"></i>
+        <span class="hidden md:inline">Nuovo Prodotto</span>
+        <span class="md:hidden">Prodotto</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Stats Cards -->
+  <div class="mobile-stats md:hidden">
+    <div class="mobile-stat-card">
+      <div class="mobile-stat-icon">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <div class="mobile-stat-value">{{ total_products }}</div>
+      <div class="mobile-stat-label">Prodotti</div>
+    </div>
+    <div class="mobile-stat-card">
+      <div class="mobile-stat-icon">
+        <i class="fas fa-exchange-alt"></i>
+      </div>
+      <div class="mobile-stat-value">{{ movements_today }}</div>
+      <div class="mobile-stat-label">Mov. Oggi</div>
+    </div>
+  </div>
+
+  <!-- Desktop Stats Cards -->
+  <div class="hidden md:flex flex-col md:flex-row gap-6 mb-8 w-full">
+    <div class="glass-card flex-1 rounded-xl p-10 flex flex-col items-center justify-center w-full">
+      <div class="dashboard-card-icon">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <p class="text-base font-medium text-gray-500 dark:text-gray-400 text-center">Prodotti Totali</p>
+      <p class="mt-2 text-4xl font-bold text-phg-dark dark:text-white text-center">{{ total_products }}</p>
+    </div>
+    <div class="glass-card flex-1 rounded-xl p-10 flex flex-col items-center justify-center w-full">
+      <div class="dashboard-card-icon" style="background: linear-gradient(135deg, #e3f2fd 0%, #a7f3d0 100%); color: #059669;">
+        <i class="fas fa-exchange-alt"></i>
+      </div>
+      <p class="text-base font-medium text-gray-500 dark:text-gray-400 text-center">Movimenti Oggi</p>
+      <p class="mt-2 text-4xl font-bold text-phg-dark dark:text-white text-center">{{ movements_today }}</p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div x-show="filtersOpen" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0 transform -translate-y-2"
+       x-transition:enter-end="opacity-100 transform translate-y-0"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100 transform translate-y-0"
+       x-transition:leave-end="opacity-0 transform -translate-y-2">
+    <div class="glass-card rounded-xl p-6 mb-6">
+      <form method="GET" action="{{ url_for('index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Codice Prodotto</label>
+          <input type="text" name="filtro_codice" value="{{ filtro_codice }}" 
+                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome Prodotto</label>
+          <input type="text" name="filtro_nome" value="{{ filtro_nome }}" 
+                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Magazzino</label>
+          <select name="filtro_magazzino" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Tutti --</option>
+            {% for magazzino in magazzini %}
+              <option value="{{ magazzino }}" {% if filtro_magazzino == magazzino %}selected{% endif %}>{{ magazzino }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stato</label>
+          <select name="filtro_stato" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Tutti --</option>
+            <option value="attivo" {% if filtro_stato == 'attivo' %}selected{% endif %}>Attivo</option>
+            <option value="inattivo" {% if filtro_stato == 'inattivo' %}selected{% endif %}>Inattivo</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ubicazione</label>
+          <select name="filtro_ubicazione" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">-- Tutte --</option>
+            {% for ubicazione in ubicazioni %}
+              <option value="{{ ubicazione }}" {% if filtro_ubicazione == ubicazione %}selected{% endif %}>{{ ubicazione }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Note</label>
+          <input type="text" name="filtro_note" value="{{ filtro_note }}" 
+                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex items-end gap-2">
+          <button type="button" 
+                  onclick="window.location='{{ url_for('index') }}'"
+                  class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 flex items-center gap-2">
+            <i class="fas fa-undo"></i>
+            Reset
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2">
+            <i class="fas fa-search"></i>
+            Applica
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stock Header -->
+  <div class="glass-card rounded-xl p-6 mb-6">
+    <h2 class="text-2xl font-bold text-phg-primary dark:text-white flex items-center gap-3">
+      <i class="fas fa-warehouse text-blue-600"></i>
+      Stock Campospinoso
+    </h2>
+  </div>
+
+  <!-- Desktop Table -->
+  <div class="hidden md:block glass-card rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white dark:bg-gray-800">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Codice</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nome Prodotto</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ubicazione</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stato</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+          {% for g in giacenze %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 table-row-hover" id="row-{{ g.id }}">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ g.codice_prodotto }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ g.nome_prodotto }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ g.quantita }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ g.ubicazione or '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="badge {% if g.stato == 'attivo' %}status-active{% else %}status-inactive{% endif %}">
+                {{ g.stato.title() }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white max-w-xs truncate">{{ g.note or '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <button onclick="editRow({{ g.id }}, '{{ g.ubicazione|default('-') }}', '{{ g.stato }}', {{ g.quantita }}, '{{ g.note|default('') }}')"
+                      class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile View - Show only on mobile -->
+  <div class="md:hidden space-y-4">
+    {% for g in giacenze %}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h3 class="font-semibold text-gray-900 dark:text-white">{{ g.nome_prodotto }}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">{{ g.codice_prodotto }}</p>
+        </div>
+        <span class="badge {% if g.stato == 'attivo' %}status-active{% else %}status-inactive{% endif %}">
+          {{ g.stato.title() }}
+        </span>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <span class="text-gray-500 dark:text-gray-400">Quantità:</span>
+          <span class="font-medium text-gray-900 dark:text-white">{{ g.quantita }}</span>
+        </div>
+        <div>
+          <span class="text-gray-500 dark:text-gray-400">Ubicazione:</span>
+          <span class="font-medium text-gray-900 dark:text-white">{{ g.ubicazione or '-' }}</span>
+        </div>
+      </div>
+      {% if g.note %}
+      <div class="mt-2 text-sm">
+        <span class="text-gray-500 dark:text-gray-400">Note:</span>
+        <span class="text-gray-900 dark:text-white">{{ g.note }}</span>
+      </div>
+      {% endif %}
+      <div class="flex justify-end mt-3">
+        <button onclick="editMobileRow({{ g.id }}, '{{ g.ubicazione|default('') }}', '{{ g.stato }}', {{ g.quantita }}, '{{ g.note|default('') }}')"
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+          <i class="fas fa-edit"></i> Modifica
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- Mobile FAB for adding new product -->
+<a href="{{ url_for('nuovo_prodotto') }}" 
+   class="md:hidden fixed bottom-20 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center z-10">
+  <i class="fas fa-plus text-xl"></i>
+</a>
+
+<script>
+// JavaScript functions for editing would go here
+function editRow(id, ubicazione, stato, quantita, note) {
+  // Implementation for desktop edit
+  console.log('Edit row:', id, ubicazione, stato, quantita, note);
+}
+
+function editMobileRow(id, ubicazione, stato, quantita, note) {
+  // Implementation for mobile edit
+  console.log('Edit mobile row:', id, ubicazione, stato, quantita, note);
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Scarico Merci - Pharmagest{% endblock %}
+
+{% block page_title_full %}Scarico Merce in Magazzino - Pharmagest{% endblock %}
+{% block page_title_short %}Scarico Merci{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Sistema di transizioni semplice come logmovimenti */
+* {
+  box-sizing: border-box;
+}
+
+/* Transizioni base super semplici */
+body {
+  transition: background-color 0.2s ease;
+}
+
+/* Elementi base con transizioni minime */
+.glass-card,
+.bg-white {
+  transition: background-color 0.2s ease;
+}
+
+/* Variabili CSS per dark mode fluido AMOLED */
+:root {
+  --bg-primary: rgba(255, 255, 255, 0.95);
+  --bg-secondary: rgba(243, 244, 246, 0.9);
+  --border-light: rgba(150, 150, 150, 0.25);
+  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --accent-color: #0056a6;
+}
+
+.dark {
+  --bg-primary: rgba(0, 0, 0, 0.98);
+  --bg-secondary: rgba(0, 0, 0, 0.95);
+  --border-light: rgba(40, 40, 40, 0.8);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --accent-color: #60a5fa;
+}
+
+/* Glass card ottimizzata per AMOLED */
+.glass-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem;
+  position: fixed;
+  top: 50%;
+  left: calc(256px + (100vw - 256px) / 2);
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 500px;
+  z-index: 1000;
+}
+
+/* Responsive per mobile - quando sidebar è nascosta */
+@media (max-width: 768px) {
+  .glass-card {
+    left: 50%;
+  }
+}
+
+.dark .glass-card {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.95) 100%);
+  border: 1px solid rgba(40, 40, 40, 0.8);
+}
+
+/* Forza background nero puro per tutti gli elementi principali in dark mode */
+.dark .bg-white {
+  background-color: #000000 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #000000 !important;
+}
+
+/* Colori di testo ottimizzati per AMOLED */
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+/* Input e form elements per dark mode */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark textarea,
+.dark select {
+  background-color: rgba(20, 20, 20, 0.8) !important;
+  border-color: rgba(60, 60, 60, 0.8) !important;
+  color: #f9fafb !important;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="number"]:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Dropdown suggerimenti per dark mode */
+.dark .suggestions-dropdown {
+  background-color: #000000 !important;
+  border-color: rgba(40, 40, 40, 0.8) !important;
+  color: #f9fafb !important;
+}
+
+.dark .suggestion-item:hover {
+  background-color: rgba(30, 30, 30, 0.8) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(30, 30, 30, 0.8) !important;
+}
+
+.dark .bg-blue-100 {
+  background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Labels per dark mode */
+.dark label {
+  color: #d1d5db !important;
+}
+
+/* Quantità info per dark mode */
+.dark #quantita-disponibile-info {
+  color: #34d399 !important;
+}
+
+.dark .text-green-700 {
+  color: #34d399 !important;
+}
+
+.dark .text-red-600 {
+  color: #f87171 !important;
+}
+
+/* Flash messages per dark mode */
+.dark .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.dark .text-green-800 {
+  color: #86efac !important;
+}
+
+.dark .bg-red-100 {
+  background-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+.dark .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.dark .text-gray-800 {
+  color: #f9fafb !important;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .glass-card {
+    padding: 1.5rem 1rem;
+    margin: 1rem;
+    left: 50% !important;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+  <h1 class="text-2xl font-bold text-phg-primary mb-6 text-center">
+    <i class="fas fa-dolly-flatbed mr-2"></i>Scarico Merce in Magazzino
+  </h1>
+  
+  <form method="POST" action="{{ url_for('scaricomerce') }}" class="space-y-5">
+    <div>
+      <label for="prodotto_input" class="block text-sm font-medium text-gray-700 mb-1">Prodotto</label>
+      <input type="text" id="prodotto_input" name="prodotto_input" autocomplete="off" required
+             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary"
+             placeholder="Cerca prodotto per nome o codice...">
+      <!-- Dati prodotti nascosti per JavaScript -->
+      <datalist id="prodotti-list" style="display: none;">
+        {% for prodotto in prodotti_magazzino %}
+          {% set nome_clean = prodotto.nome_prodotto.replace('_', ' ').replace('-', ' ').replace('.', ' ').replace('/', ' ').replace('  ', ' ') %}
+          <option data-id="{{ prodotto.id }}" value="{{ nome_clean|title }} ({{ prodotto.codice_prodotto }})"></option>
+        {% endfor %}
+      </datalist>
+      <input type="hidden" name="prodotto_id" id="prodotto_id">
+    </div>
+    
+    <div>
+      <label for="ubicazione" class="block text-sm font-medium text-gray-700 mb-1">Ubicazione</label>
+      <select id="ubicazione" name="ubicazione" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary">
+        <option value="">-- Tutte le ubicazioni --</option>
+        {% for ub in ubicazioni_magazzino %}
+          <option value="{{ ub }}">{{ ub }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div>
+      <label for="quantita" class="block text-sm font-medium text-gray-700 mb-1">Quantità da scaricare</label>
+      <input type="number" id="quantita" name="quantita" min="1" required 
+             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary"
+             placeholder="Inserisci quantità...">
+      <div id="quantita-disponibile-info" class="mt-1 text-green-700 text-sm font-semibold">
+        Seleziona un prodotto per vedere la quantità disponibile
+      </div>
+    </div>
+    
+    <div>
+      <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Note</label>
+      <textarea id="note" name="note" rows="3" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary"
+                placeholder="Note aggiuntive (opzionale)..."></textarea>
+    </div>
+    
+    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2">
+      <i class="fas fa-arrow-down"></i>
+      Scarica Merce
+    </button>
+  </form>
+</div>
+
+<script>
+// Script avanzato per autosuggest e sincronizzazione prodotto
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('prodotto_input');
+  const hiddenId = document.getElementById('prodotto_id');
+  const datalist = document.getElementById('prodotti-list');
+  
+  // Crea mappa prodotti e lista per filtri
+  const prodotti = [];
+  const map = {};
+  for (const opt of datalist.options) {
+    const prodotto = {
+      id: opt.getAttribute('data-id'),
+      text: opt.value,
+      nome: opt.value.split('(')[0].trim(),
+      codice: opt.value.split('(')[1]?.replace(')', '').trim() || ''
+    };
+    prodotti.push(prodotto);
+    map[opt.value] = opt.getAttribute('data-id');
+  }
+
+  // Crea dropdown suggerimenti personalizzato
+  const suggestionsDiv = document.createElement('div');
+  suggestionsDiv.className = 'suggestions-dropdown absolute z-50 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden';
+  suggestionsDiv.style.top = '100%';
+  input.parentElement.style.position = 'relative';
+  input.parentElement.appendChild(suggestionsDiv);
+
+  // Funzione per mostrare suggerimenti
+  function showSuggestions(query) {
+    const filtered = prodotti.filter(p => 
+      p.nome.toLowerCase().includes(query.toLowerCase()) || 
+      p.codice.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10);
+
+    if (filtered.length > 0 && query.length > 0) {
+      suggestionsDiv.innerHTML = filtered.map(p => 
+        `<div class="suggestion-item p-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0" data-id="${p.id}" data-text="${p.text}">
+          <div class="font-medium text-gray-900">${p.nome}</div>
+          <div class="text-sm text-gray-500">${p.codice}</div>
+        </div>`
+      ).join('');
+      suggestionsDiv.classList.remove('hidden');
+    } else {
+      suggestionsDiv.classList.add('hidden');
+    }
+  }
+
+  // Event listeners
+  input.addEventListener('input', function() {
+    const value = this.value.trim();
+    if (map[value]) {
+      hiddenId.value = map[value];
+      suggestionsDiv.classList.add('hidden');
+      // Trigger aggiornamento quantità
+      updateQuantitaDisponibile();
+    } else {
+      hiddenId.value = '';
+      showSuggestions(value);
+    }
+  });
+
+  input.addEventListener('focus', function() {
+    if (this.value.length > 0) {
+      showSuggestions(this.value);
+    }
+  });
+
+  // Click sui suggerimenti
+  suggestionsDiv.addEventListener('click', function(e) {
+    const suggestion = e.target.closest('[data-id]');
+    if (suggestion) {
+      const text = suggestion.getAttribute('data-text');
+      const id = suggestion.getAttribute('data-id');
+      input.value = text;
+      hiddenId.value = id;
+      suggestionsDiv.classList.add('hidden');
+      updateQuantitaDisponibile();
+    }
+  });
+
+  // Nasconde suggerimenti quando si clicca fuori
+  document.addEventListener('click', function(e) {
+    if (!input.parentElement.contains(e.target)) {
+      suggestionsDiv.classList.add('hidden');
+    }
+  });
+
+  // Gestione tasti freccia e Enter
+  input.addEventListener('keydown', function(e) {
+    const suggestions = suggestionsDiv.querySelectorAll('[data-id]');
+    const current = suggestionsDiv.querySelector('.bg-blue-100');
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (current) {
+        current.classList.remove('bg-blue-100');
+        const next = current.nextElementSibling || suggestions[0];
+        next.classList.add('bg-blue-100');
+      } else if (suggestions.length > 0) {
+        suggestions[0].classList.add('bg-blue-100');
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (current) {
+        current.classList.remove('bg-blue-100');
+        const prev = current.previousElementSibling || suggestions[suggestions.length - 1];
+        prev.classList.add('bg-blue-100');
+      } else if (suggestions.length > 0) {
+        suggestions[suggestions.length - 1].classList.add('bg-blue-100');
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (current) {
+        current.click();
+      }
+    } else if (e.key === 'Escape') {
+      suggestionsDiv.classList.add('hidden');
+    }
+  });
+
+  // Funzione per aggiornare quantità disponibile
+  function updateQuantitaDisponibile() {
+    const prodottoId = hiddenId.value;
+    const ubicazione = document.getElementById('ubicazione').value;
+    const quantitaInfo = document.getElementById('quantita-disponibile-info');
+    
+    if (!prodottoId) {
+      quantitaInfo.textContent = 'Seleziona un prodotto per vedere la quantità disponibile';
+      quantitaInfo.className = 'mt-1 text-green-700 text-sm font-semibold';
+      return;
+    }
+
+    if (ubicazione) {
+      // Quantità per ubicazione specifica
+      fetch(`/api/quantita_disponibile/${prodottoId}/${ubicazione}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.quantita !== undefined) {
+            quantitaInfo.textContent = `Quantità disponibile in ${ubicazione}: ${data.quantita}`;
+            quantitaInfo.className = data.quantita > 0 ? 'mt-1 text-green-700 text-sm font-semibold' : 'mt-1 text-red-600 text-sm font-semibold';
+          }
+        })
+        .catch(() => {
+          quantitaInfo.textContent = 'Errore nel recupero quantità';
+          quantitaInfo.className = 'mt-1 text-red-600 text-sm font-semibold';
+        });
+    } else {
+      // Quantità totale
+      fetch(`/api/quantita_disponibile/${prodottoId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.quantita !== undefined) {
+            quantitaInfo.textContent = `Quantità totale disponibile: ${data.quantita}`;
+            quantitaInfo.className = data.quantita > 0 ? 'mt-1 text-green-700 text-sm font-semibold' : 'mt-1 text-red-600 text-sm font-semibold';
+          }
+        })
+        .catch(() => {
+          quantitaInfo.textContent = 'Errore nel recupero quantità';
+          quantitaInfo.className = 'mt-1 text-red-600 text-sm font-semibold';
+        });
+    }
+  }
+
+  // Event listener per cambio ubicazione
+  document.getElementById('ubicazione').addEventListener('change', updateQuantitaDisponibile);
+});
+</script>
+{% endblock %}

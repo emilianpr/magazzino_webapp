@@ -1,0 +1,513 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+  margin: 20px;
+  background-color: #f8fafc;
+  color: #333;
+}
+
+h1, h2 {
+  color: #2c3e50;
+}
+
+form fieldset {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 15px;
+  align-items: center;
+  overflow-x: auto;
+}
+
+form legend {
+  font-weight: bold;
+  padding: 0 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+form label {
+  display: inline-block;
+  width: auto;
+  margin-bottom: 0;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+form input[type="text"],
+form select {
+  width: auto;
+  min-width: 150px;
+  padding: 8px;
+  margin-bottom: 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form select:focus {
+  border-color: #2980b9;
+  outline: none;
+}
+
+form button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: #3498db;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+table th, table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+table th {
+  background-color: #2980b9;
+  color: white;
+  cursor: pointer;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tr:hover {
+  background-color: #d6eaf8;
+}
+
+p {
+  font-style: italic;
+  color: #666;
+}
+
+/* Styles for sortable table headers */
+table th a {
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+table th a:hover {
+  background-color: #3498db;
+  text-decoration: underline;
+}
+
+table th a:focus {
+  outline: 2px solid #2980b9;
+  outline-offset: 2px;
+}
+
+table th a .arrow {
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+/* Styles for movimento form */
+form#movimento-form {
+  max-width: 700px;
+  margin: 0 auto 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-gap: 15px 20px;
+  align-items: center;
+}
+
+form#movimento-form label {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+form#movimento-form input[type="text"],
+form#movimento-form input[type="number"],
+form#movimento-form select,
+form#movimento-form textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+form#movimento-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+form#movimento-form button {
+  grid-column: 2 / 3;
+  padding: 10px 20px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+form#movimento-form button:hover {
+  background-color: #3498db;
+}
+
+/* Styles for prodotto input autocomplete */
+#prodotto_input {
+  width: 300px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+#prodotto_input:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem;
+  position: relative;
+}
+.glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 1.25rem;
+  background: linear-gradient(120deg, #e3f2fd 0%, #f0f8ff 100%);
+  opacity: 0.18;
+  z-index: 0;
+}
+
+.dashboard-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+  color: #0056a6;
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+}
+
+.floating-btn {
+  box-shadow: 0 10px 15px -3px rgba(0, 86, 166, 0.3), 0 4px 6px -2px rgba(0, 86, 166, 0.1);
+  transition: all 0.3s ease;
+}
+.floating-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 86, 166, 0.3), 0 10px 10px -5px rgba(0, 86, 166, 0.1);
+}
+
+.table-row-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 86, 166, 0.1), 0 2px 4px -1px rgba(0, 86, 166, 0.06);
+  background: #e3f2fd;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.status-active {
+  background-color: #e3f2fd;
+  color: #0056a6;
+}
+.status-inactive {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.status-warning {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.filter-toggle {
+  transition: all 0.3s ease;
+}
+/* Rimuoviamo la classe .filter-toggle.active per permettere a Tailwind di gestire i colori */
+
+.nav-pill {
+  transition: all 0.3s ease;
+}
+.nav-pill:hover {
+  background-color: rgba(0, 86, 166, 0.1);
+}
+.nav-pill.active {
+  background-color: rgba(0, 86, 166, 0.2);
+  border-left: 3px solid #0056a6;
+}
+
+@media (max-width: 600px) {
+  .glass-card {
+    padding: 1.2rem 0.5rem;
+  }
+  form button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Puoi aggiungere qui altre classi comuni che trovi nei vari template */
+
+/* Classi per l'editing inline */
+.edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #0056a6;
+  box-shadow: 0 0 0 3px rgba(0, 86, 166, 0.1);
+}
+
+.edit-form {
+  display: none;
+}
+
+.edit-form.active {
+  display: table-row;
+}
+
+/* Classi per mobile quick edit */
+.mobile-quick-edit {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.quick-qty-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-qty-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.quick-qty-input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.quick-save-btn {
+  width: 32px;
+  height: 32px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.quick-save-btn:hover {
+  background-color: #059669;
+}
+
+.quick-cancel-btn {
+  width: 32px;
+  height: 32px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.quick-cancel-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Mobile action menu styles */
+.mobile-action-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.mobile-menu-item {
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.mobile-menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+.mobile-menu-item-danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.ubicazione-option {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ubicazione-option:hover {
+  border-color: #0056a6;
+  background-color: #f0f8ff;
+}
+
+.ubicazione-option.selected {
+  border-color: #0056a6;
+  background-color: #e3f2fd;
+}
+
+/* Responsive table optimizations */
+.desktop-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.desktop-table th:nth-child(1) { width: 10%; } /* Codice */
+.desktop-table th:nth-child(2) { width: 20%; } /* Prodotto */
+.desktop-table th:nth-child(3) { width: 10%; } /* Magazzino */
+.desktop-table th:nth-child(4) { width: 12%; } /* Ubicazione */
+.desktop-table th:nth-child(5) { width: 10%; } /* Stato */
+.desktop-table th:nth-child(6) { width: 8%; }  /* Quantità */
+.desktop-table th:nth-child(7) { width: 20%; } /* Note - ridotta */
+.desktop-table th:nth-child(8) { width: 10%; } /* Azioni */
+
+/* Note column styling */
+.desktop-table td:nth-child(7) {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.desktop-table td:nth-child(7):hover {
+  overflow: visible;
+  white-space: normal;
+  background-color: #f8fafc;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  padding: 8px;
+}
+
