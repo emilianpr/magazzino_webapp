@@ -40,16 +40,18 @@ body {
   --accent-color: #60a5fa;
 }
 
-/* Glass card ottimizzata per AMOLED */
+/* Spaziatura sotto la topbar (gestita dal container globale, nessuna regola speciale necessaria qui) */
+
+/* Glass card ottimizzata per AMOLED + refined padding */
 .glass-card {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-light);
   border-radius: 1.25rem;
-  padding: 2rem;
-  margin: 2rem auto;
-  max-width: none;
+  padding: 1.75rem 1.5rem 2rem;
+  margin: 0 auto 2.25rem;
+  max-width: 1320px;
   width: 100%;
 }
 
@@ -199,24 +201,12 @@ body {
 
 /* Effetti e animazioni migliorate */
 .glass-card {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  backdrop-filter: blur(15px);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-light);
-  border-radius: 1.25rem;
-  padding: 2rem;
-  margin: 2rem auto;
-  max-width: none;
-  width: 100%;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.35s ease;
 }
 
-.glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
-}
+.glass-card:hover { transform:translateY(-2px); box-shadow:0 14px 44px -4px rgba(31,38,135,0.28); }
 
 .dark .glass-card:hover {
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
@@ -248,12 +238,7 @@ body {
 }
 
 /* Effetti per tabelle */
-.table-container {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
+ .table-container { border-radius:18px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.08); transition:all .3s ease; border:1px solid rgba(0,86,166,.08); }
 
 .table-container:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -264,47 +249,21 @@ body {
   position: relative;
 }
 
-.table-row-hover:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(135deg, #e3f2fd, #f0f8ff);
-  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.1);
-}
+ .table-row-hover:hover { transform:translateY(-1px); background:linear-gradient(135deg,#e3f2fd,#f0f8ff); box-shadow:0 6px 14px -2px rgba(0,86,166,.15); }
 
 .dark .table-row-hover:hover {
   background: linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(40, 40, 40, 0.6));
 }
 
 /* Badge migliorati */
-.status-badge {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
+ .status-badge { position:relative; overflow:hidden; transition:all .3s ease; font-weight:600; letter-spacing:.5px; backdrop-filter:blur(3px); }
 
 /* Pulsanti migliorati */
-.btn-enhanced {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #0056a6, #00a8e8);
-  border: none;
-  color: white;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 86, 166, 0.3);
-}
+ .btn-enhanced { position:relative; overflow:hidden; background:linear-gradient(135deg,#0056a6,#00a8e8); border:none; color:#fff; font-weight:600; letter-spacing:.5px; transition:all .25s ease; box-shadow:0 6px 18px -4px rgba(0,86,166,.4); }
 
-.btn-enhanced:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 86, 166, 0.4);
-  background: linear-gradient(135deg, #003d7a, #0056a6);
-}
+ .btn-enhanced:hover { transform:translateY(-2px); box-shadow:0 10px 28px -4px rgba(0,86,166,.5); background:linear-gradient(135deg,#003d7a,#0056a6); }
 
-.btn-enhanced:active {
-  transform: translateY(0);
-}
+ .btn-enhanced:active { transform:translateY(0); }
 
 /* Input e form migliorati */
 .form-input-enhanced {
@@ -498,41 +457,150 @@ body {
 .dark .mobile-checkbox:hover {
   background: rgba(96, 165, 250, 0.05);
 }
+
+/* --- BLOCCO STILI FILTRI (allineato a logmovimenti) --- */
+.filter-container {
+  background: linear-gradient(120deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.5rem;
+  padding: 2.1rem 2rem 1.7rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, #00a8e8 100%);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.filter-title { text-align:center; margin:0 .5rem 1.3rem; font-size:1.15rem; font-weight:700; color:var(--accent-color); display:flex; align-items:center; justify-content:center; gap:.5rem; }
+
+.filter-compact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.2rem; justify-items:center; }
+
+.filter-group { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:.75rem; padding:1rem; width:100%; max-width:220px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+
+.filter-group-title { font-size:.8rem; font-weight:600; color:var(--accent-color); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.65rem; display:flex; align-items:center; justify-content:center; gap:.5rem; }
+
+.filter-input-compact { width:100%; padding:.6rem; border:1px solid var(--border-light); border-radius:.5rem; background:var(--bg-primary); font-size:.85rem; margin-bottom:.4rem; color:inherit; }
+
+.notes-input-wrapper { position:relative; background:var(--bg-primary); border:1px solid var(--border-light); border-radius:.75rem; padding:.55rem 3rem .55rem 1rem; width:100%; display:flex; align-items:center; }
+
+.notes-input-compact { width:100%; background:transparent; border:none; outline:none; font-size:.9rem; color:inherit; }
+
+.notes-search-compact { grid-column:1 / -1; position:relative; max-width:none; width:100%; }
+
+.search-icon-compact { position:absolute; right:1rem; top:50%; transform:translateY(-50%); color:#6b7280; cursor:pointer; padding:.25rem; border-radius:.25rem; }
+
+.filter-btn-compact { padding:.7rem 1.4rem; border-radius:.75rem; font-size:.85rem; font-weight:600; border:1px solid transparent; cursor:pointer; display:flex; align-items:center; gap:.5rem; min-width:130px; justify-content:center; }
+
+.filter-btn-primary-compact { background:linear-gradient(135deg,#0056a6 0%,#00a8e8 100%); color:#fff; box-shadow:0 4px 12px rgba(0,86,166,.3); transition:all .2s ease; }
+.filter-btn-primary-compact:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(0,86,166,.4); }
+
+.filter-btn-secondary-compact { background:rgba(107,114,128,.1); color:#6b7280; border-color:rgba(130,130,130,.2); transition:all .2s ease; }
+.filter-btn-secondary-compact:hover { background:rgba(107,114,128,.2); }
+
+.filter-actions-compact { display:flex; gap:1rem; justify-content:space-between; align-items:center; margin-top:1rem; padding-top:1.1rem; border-top:1px solid var(--border-light); }
+.filter-actions-compact > div:last-child { display:flex; align-items:center; gap:1rem; }
+.filter-actions-compact > div:first-child { display:flex; align-items:center; }
+
+@media (max-width: 768px) {
+  .filter-compact-grid { grid-template-columns:1fr; gap:.75rem; }
+  .filter-container { padding:1.5rem; margin:0.75rem; }
+  .filter-actions-compact { flex-direction:column; gap:.75rem; align-items:stretch; }
+  .filter-btn-compact { width:100%; min-width:auto; }
+  .filter-group { padding:.75rem; max-width:300px; width:100%; }
+  .filter-title { font-size:1.05rem; margin-bottom:1rem; }
+  #filter-status { text-align:center; justify-content:center; }
+}
+
+/* Stato attivo filtro */
+.filter-input-compact.active { border-color:var(--accent-color)!important; background-color:rgba(0,86,166,.08)!important; }
+.filter-group.has-active { border-color:var(--accent-color)!important; background:linear-gradient(135deg, rgba(0,86,166,.05) 0%, rgba(255,255,255,.8) 100%)!important; }
+.dark .filter-group.has-active { background:linear-gradient(135deg, rgba(96,165,250,.1) 0%, rgba(26,26,26,.9) 100%)!important; }
+/* --- FINE BLOCCO STILI FILTRI --- */
+
+/* ---- OVERRIDES SPECIFICI PAGINA (layout più allineato) ---- */
+.page-scarico-non-magazzino .filters-aligned.filter-container { padding:1.15rem 1.15rem .75rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-title { justify-content:flex-start; text-align:left; margin:0 0 .75rem .15rem; font-size:1rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-compact-grid { display:flex; gap:.85rem; margin-bottom:.4rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-group { max-width:240px; align-items:flex-start; text-align:left; padding:0.55rem .7rem .5rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-group-title { justify-content:flex-start; margin-bottom:.4rem; font-size:.72rem; }
+.page-scarico-non-magazzino .filters-aligned .notes-search-compact { grid-column:auto; max-width:none; flex:1; }
+.page-scarico-non-magazzino .filters-aligned .notes-input-wrapper { padding:.4rem 2.4rem .4rem .65rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-actions-compact { padding-top:.45rem; margin-top:.45rem; border-top:1px solid var(--border-light); }
+.page-scarico-non-magazzino .filters-aligned #filter-status { font-size:.72rem; }
+.page-scarico-non-magazzino .filters-aligned .filter-btn-compact { min-width:105px; font-size:.75rem; padding:.45rem .85rem; }
+@media (max-width:900px){
+  .page-scarico-non-magazzino .filters-aligned .filter-compact-grid { flex-wrap:wrap; }
+}
+@media (max-width:640px){
+  .page-scarico-non-magazzino .filters-aligned .filter-compact-grid { flex-direction:column; }
+  .page-scarico-non-magazzino .filters-aligned .filter-actions-compact { flex-direction:column; align-items:flex-start; }
+  .page-scarico-non-magazzino .filters-aligned .filter-btn-compact { width:100%; }
+}
+/* ---- FINE OVERRIDES SPECIFICI ---- */
+/* Distacco sotto topbar sticky (fallback nel caso padding venga sovrascritto) */
+.main-content-area > .sticky + .page-scarico-non-magazzino { padding-top:2.25rem; }
+/* Spacer visivo aggiuntivo per questa pagina */
+.page-scarico-non-magazzino .top-spacer { height:0.75rem; }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Desktop View -->
-<div class="desktop-table glass-card">
-  <h2 class="text-2xl font-bold page-title mb-6 text-center">
-    <i class="fas fa-list mr-3 icon-bounce"></i>Scarico Merce NON in Magazzino
-  </h2>
-  
-  <!-- Filtri Desktop -->
-  <form method="GET" action="{{ url_for('scarico_merce_non_in_magazzino') }}">
-    <div class="flex flex-col md:flex-row md:items-end md:space-x-4 mb-6">
-      <div>
-        <label for="filtro_stato" class="block text-sm font-medium text-gray-700 mb-2">
-          <i class="fas fa-filter mr-1"></i>Filtra per stato
-        </label>
-        <select id="filtro_stato" name="filtro_stato" class="form-input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary">
-          <option value="">-- Tutti --</option>
-          {% for stato in stati_non_magazzino %}
-            <option value="{{ stato }}" {% if filtro_stato == stato %}selected{% endif %}>{{ stato|format_db_string }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="flex-1">
-        <label for="filtro_note" class="block text-sm font-medium text-gray-700 mb-2">
-          <i class="fas fa-search mr-1"></i>Filtra per note
-        </label>
-        <input type="text" id="filtro_note" name="filtro_note" value="{{ filtro_note|default('') }}" class="form-input-enhanced w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-phg-primary focus:border-phg-primary" placeholder="Cerca nelle note...">
-      </div>
+<div class="container mx-auto pt-20 md:pt-24 page-scarico-non-magazzino" style="max-width:1320px;">
+  <div class="top-spacer" aria-hidden="true"></div>
+  <!-- Card Filtri -->
+  <div class="filter-container glass-card filters-aligned" style="max-width:1320px;">
+    <div class="filter-title">
+      <i class="fas fa-sliders-h"></i>
+      Filtri Scarico NON in Magazzino
     </div>
-  </form>
-  
-  <!-- Tabella Desktop -->
-  <form method="POST" action="{{ url_for('scarico_merce_non_in_magazzino') }}">
+    <form method="GET" action="{{ url_for('scarico_merce_non_in_magazzino') }}" id="desktopFilterForm" class="mb-4">
+      <div class="filter-compact-grid">
+        <div class="filter-group" style="max-width:240px;">
+          <div class="filter-group-title"><i class="fas fa-filter"></i> Stato</div>
+          <select id="filtro_stato" name="filtro_stato" class="filter-input-compact" autofocus>
+            <option value="">-- Tutti --</option>
+            {% for stato in stati_non_magazzino %}
+              <option value="{{ stato }}" {% if filtro_stato == stato %}selected{% endif %}>{{ stato|format_db_string }}</option>
+            {% endfor %}
+          </select>
+        </div>
+  <div class="filter-group notes-search-compact">
+          <div class="filter-group-title"><i class="fas fa-sticky-note"></i> Note</div>
+          <div class="notes-input-wrapper" style="padding:0.55rem 1rem;">
+            <input type="text" id="filtro_note" name="filtro_note" value="{{ filtro_note|default('') }}" class="notes-input-compact" placeholder="Cerca nelle note..." />
+            <i class="fas fa-search search-icon-compact" onclick="document.getElementById('desktopFilterForm').submit()"></i>
+          </div>
+        </div>
+      </div>
+      <div class="filter-actions-compact" style="margin-top:1rem;">
+        <div id="filter-status" style="color:#6b7280; font-size:.9rem; font-weight:600; display:flex; align-items:center; gap:.5rem;">
+          <i class="fas fa-info-circle"></i>
+          <span id="filter-status-text">{{ 'Filtro stato attivo' if filtro_stato else 'Nessun filtro attivo' }}</span>
+        </div>
+        <div>
+          <a href="{{ url_for('scarico_merce_non_in_magazzino') }}" class="filter-btn-compact filter-btn-secondary-compact"><i class="fas fa-times"></i> Reset</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Card Risultati -->
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden" style="border:1px solid rgba(130,130,130,0.25);">
+    <div class="px-4 py-4 flex items-center justify-between border-b" style="border-color:rgba(130,130,130,0.25); background:linear-gradient(135deg,#f8fafc 0%, #e3f2fd 100%);">
+      <h2 class="text-lg font-bold text-phg-primary flex items-center gap-2"><i class="fas fa-list"></i> Prodotti da scaricare</h2>
+      <span class="text-sm text-gray-600">{{ prodotti_non_magazzino|length }} elementi</span>
+    </div>
+    <form method="POST" action="{{ url_for('scarico_merce_non_in_magazzino') }}">
     <input type="hidden" name="filtro_stato" value="{{ filtro_stato }}">
     <input type="hidden" name="filtro_note" value="{{ filtro_note }}">
     <div class="table-container overflow-x-auto">
@@ -606,13 +674,13 @@ body {
         </tbody>
       </table>
     </div>
-    <div class="flex justify-end mt-6">
-      <button type="submit" class="btn-enhanced py-3 px-8 rounded-lg font-semibold text-lg flex items-center gap-3 transition-all duration-300">
-        <i class="fas fa-arrow-down"></i>
-        Scarica Selezionati
+    <div class="flex justify-end mt-5 px-6 pb-6">
+      <button type="submit" class="filter-btn-compact filter-btn-primary-compact" style="min-width:200px; font-size:1rem;">
+        <i class="fas fa-arrow-down"></i> Scarica Selezionati
       </button>
     </div>
-  </form>
+    </form>
+  </div>
 </div>
 
 <!-- Mobile View -->

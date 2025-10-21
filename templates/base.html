@@ -44,6 +44,14 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* Reset base margins */
+    body, html {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    
     
     body {
       font-family: 'Inter', sans-serif;
@@ -397,6 +405,52 @@
       height: 20px;
       cursor: pointer;
     }
+
+    /* Global icon-circle centralizzata */
+    .icon-circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+      color: #0056a6;
+      font-size: 2rem;
+      margin: 0 auto 1.2rem auto;
+      box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+      transition: all 0.2s ease;
+    }
+    .dark .icon-circle {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2563eb 100%);
+      color: #60a5fa;
+      box-shadow: 0 2px 8px rgba(96, 165, 250, 0.2);
+    }
+    .icon-circle.small-icon { width: 2.75rem; height: 2.75rem; font-size: 1.35rem; margin: 0; }
+
+    /* Gradient button riutilizzabile */
+    .gradient-btn {
+      background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+      color: #ffffff;
+      transition: all .3s ease;
+      box-shadow: 0 10px 15px -3px rgba(0,86,166,.3), 0 4px 6px -2px rgba(0,86,166,.1);
+    }
+    .gradient-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,86,166,.3),0 10px 10px -5px rgba(0,86,166,.1); }
+    .dark .gradient-btn { background: linear-gradient(135deg,#1e40af 0%,#2563eb 100%); box-shadow: 0 4px 16px 0 rgba(37,99,235,.3); }
+    .dark .gradient-btn:hover { box-shadow: 0 4px 12px rgba(29,78,216,.4); }
+
+    /* Bug button */
+    .bug-btn {
+      background: transparent;
+      color: #374151; /* gray-700 */
+      transition: background .25s ease, color .25s ease;
+    }
+    .bug-btn:hover {
+      background: rgba(239,68,68,0.12); /* soft red tint */
+      color: #991b1b; /* red-800 for text change subtle */
+    }
+    .dark .bug-btn { color: #d1d5db; /* gray-300 */ }
+    .dark .bug-btn:hover { background: rgba(239,68,68,0.18); color: #fca5a5; }
     
     .hamburger-line {
       width: 100%;
@@ -417,15 +471,112 @@
     .hamburger-menu.active .hamburger-line:nth-child(2) {
       opacity: 0;
     }
+
+    /* Elimina gap tra sticky nav e contenuto - DISABLED per permettere spacing corretto */
+    /*
+    .main-content-area > .sticky + * {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+    */
+
+    /* Override padding-top generato con pt-16 in index.html */
+    .main-content-area .pt-16 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+    /* Standard top spacing for all pages - solves topbar overlap issue */
+    .page-content {
+      padding-top: 5rem !important; /* 80px spacing after sticky topbar */
+    }
+    
+    /* Special case for index page which already handles its own spacing */
+    .page-content.index-page {
+      padding-top: 0 !important;
+    }
+
+    
+    
+
+    /* DISABLED - troppo aggressivo per spacing pagine */
+    /*
+    .main-content-area > .sticky + * > div {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+    */
     
     .hamburger-menu.active .hamburger-line:nth-child(3) {
       transform: rotate(45deg) translate(-4px, -4px);
+    } 
+    
+    /* Break margin collapse on sticky to avoid top gap */
+    
+      .sticky {
+    overflow: auto !important;
+    border-top: 1px solid transparent !important;
+  }
+  .sticky h1 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+    
+    /* Scrollbar pulita cross-browser */
+    :root {
+      --scrollbar-bg: #f1f5f9; /* slate-100 */
+      --scrollbar-thumb: #cbd5e1; /* slate-300 */
+      --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
+      --scrollbar-thumb-active: #64748b; /* slate-500 */
+    }
+    .dark :root, .dark {
+      --scrollbar-bg: #0f0f0f;
+      --scrollbar-thumb: #2d2d2d;
+      --scrollbar-thumb-hover: #3a3a3a;
+      --scrollbar-thumb-active: #4b4b4b;
+    }
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+    }
+    /* WebKit */
+    *::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    *::-webkit-scrollbar-track {
+      background: var(--scrollbar-bg);
+    }
+    *::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 999px;
+      border: 2px solid var(--scrollbar-bg);
+      transition: background .2s ease, border-color .2s ease;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background: var(--scrollbar-thumb-hover);
+    }
+    *::-webkit-scrollbar-thumb:active {
+      background: var(--scrollbar-thumb-active);
+    }
+    /* Evita che su elementi rotondi la scrollbar rompa il design */
+    .glass-card::-webkit-scrollbar {
+      width: 8px;
+    }
+    .glass-card {
+      scrollbar-width: thin;
+    }
+    /* Nascondi scrollbar orizzontali indesiderate */
+    body, .main-content-area {
+      overflow-x: hidden;
     }
     
-    {% block extra_css %}{% endblock %}
-    
+   
+
+</style>
+{% block extra_css %}{% endblock %}
     <script>
-    // Forza rimozione gap dopo caricamento - Soluzione Opus
     document.addEventListener('DOMContentLoaded', function() {
       const mainContent = document.querySelector('.main-content-area');
       const stickyNav = mainContent.querySelector('.sticky');
@@ -437,7 +588,6 @@
       }
     });
     </script>
-  </style>
 </head>
 <body x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" 
       x-init="
@@ -466,16 +616,21 @@
       "
       :class="{ 'dark': darkMode }"
       class="bg-gray-50 dark:bg-black min-h-screen overflow-x-hidden"
-      :style="darkMode ? 'background-color: #000000 !important;' : ''">>>
+      :style="darkMode ? 'background-color: #000000 !important;' : ''">
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
-        <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 mx-4 rounded text-sm
+        <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 mx-4 rounded text-sm flex items-center gap-3
           {% if category == 'success' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
           {% elif category == 'error' or category == 'danger' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
           {% else %}bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200{% endif %}">
-          {{ message }}
+          <span>{{ message }}</span>
+          {% if category == 'success' and request.endpoint == 'movimento' %}
+            <a href="{{ url_for('index') }}" class="text-xs font-semibold px-2 py-1 rounded bg-white/70 dark:bg-black/40 border border-current hover:underline">
+              Vai al Magazzino
+            </a>
+          {% endif %}
         </div>
       {% endfor %}
     {% endif %}
@@ -529,14 +684,31 @@
         <i class="fas fa-arrow-up mr-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
         Carico Merci
       </a>
+      <a href="{{ url_for('warehouse_reconciliation') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint == 'warehouse_reconciliation' %}active{% endif %}">
+        <i class="fas fa-balance-scale mr-3 {% if request.endpoint == 'warehouse_reconciliation' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
+        Confronto AS400
+      </a>
+      <a href="{{ url_for('rientro_merce') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint == 'rientro_merce' %}active{% endif %}">
+        <i class="fas fa-undo mr-3 {% if request.endpoint == 'rientro_merce' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
+        Rientro Merce
+      </a> 
+      
       {% if session.get('is_admin') %}
+
       <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
         <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
         Nuovo Utente
       </a>
       {% endif %}
     </nav>
-    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-600">
+    <div class="absolute bottom-0 left-0 right-0 p-4">
+      <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-600">
+        <a href="https://github.com/emilianpr/magazzino_webapp/issues" target="_blank" rel="noopener" class="bug-btn group flex items-center w-full px-4 py-2 text-sm font-medium rounded-md">
+          <i class="fas fa-bug text-red-500 mr-2"></i>
+          <span class="flex-grow text-left">Segnala Bug</span>
+          <i class="fas fa-up-right-from-square text-xs text-gray-400 group-hover:text-red-500 transition-colors"></i>
+        </a>
+      </div>
       <div class="flex items-center">
         <div class="flex-shrink-0 bg-white dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600">
           <img class="h-10 w-10 rounded-full" src="https://raw.githubusercontent.com/emilianpr/phg-img/main/user-128.svg" alt="User profile" />
@@ -609,11 +781,21 @@
         <i class="fas fa-arrow-up mr-3 {% if request.endpoint == 'carico_merci' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
         Carico Merci
       </a>
+      <a href="{{ url_for('warehouse_reconciliation') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'warehouse_reconciliation' %}active{% endif %}">
+        <i class="fas fa-balance-scale mr-3 {% if request.endpoint == 'warehouse_reconciliation' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Riconciliazione Magazzino
+      </a>
       <a href="{{ url_for('nuovo_prodotto') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'nuovo_prodotto' %}active{% endif %}">
         <i class="fas fa-plus mr-3 {% if request.endpoint == 'nuovo_prodotto' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
         Nuovo Prodotto
       </a>
+      <a href="{{ url_for('rientro_merce') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'rientro_merce' %}active{% endif %}">
+        <i class="fas fa-undo mr-3 {% if request.endpoint == 'rientro_merce' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Rientro Merce
+      </a>
+
       {% if session.get('is_admin') %}
+
       <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
         <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
         Nuovo Utente
@@ -638,7 +820,7 @@
             <div class="hamburger-line"></div>
           </button>
           <h1 class="text-lg md:text-xl font-bold text-phg-primary">
-            <span class="hidden md:inline">{% block page_title_full %}Gestione Magazzino - Pharmagest (Alpha v3.0){% endblock %}</span>
+            <span class="hidden md:inline">{% block page_title_full %}Gestione Magazzino - Pharmagest ({{ app_version }}){% endblock %}</span>
             <span class="md:hidden">{% block page_title_short %}Magazzino{% endblock %}</span>
           </h1>
         </div>
@@ -680,6 +862,12 @@
         <i class="fas fa-arrow-up text-lg"></i>
         <span class="text-xs mt-1">Carico</span>
       </a>
+      {% if session.get('is_admin') %}
+      <a href="{{ url_for('rientro_merce') }}" class="flex flex-col items-center p-3 {% if request.endpoint == 'rientro_merce' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}">
+        <i class="fas fa-undo text-lg"></i>
+        <span class="text-xs mt-1">Rientro</span>
+      </a>
+      {% endif %}
     </div>
   </div>
 

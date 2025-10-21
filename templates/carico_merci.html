@@ -211,10 +211,27 @@ form button[type="submit"]:hover {
     margin: 1.5rem auto;
   }
 }
+
+/* Wrapper per centrare verticalmente la card */
+.carico-wrapper {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+@media (max-height: 820px) {
+  .carico-wrapper {
+    align-items: flex-start;
+    padding: 1.5rem 1rem;
+  }
+}
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="carico-wrapper">
   <div class="glass-card content-container w-full max-w-xl mx-auto">
     <div class="icon-circle mb-2">
       <i class="fas fa-arrow-up"></i>
@@ -257,6 +274,7 @@ form button[type="submit"]:hover {
       </button>
     </form>
   </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

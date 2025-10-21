@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% block title %}Rientro Merce - Pharmagest{% endblock %}
+{% block page_title_full %}Rientro Merce - Pharmagest{% endblock %}
+{% block page_title_short %}Rientro Merce{% endblock %}
+{% block extra_css %}
+<style>
+/* Sistema AMOLED dark mode come altri template */
+* { box-sizing: border-box; }
+body { transition: background-color 0.2s ease; }
+
+:root {
+  --bg-primary: rgba(255,255,255,0.95);
+  --bg-secondary: rgba(243,244,246,0.9);
+  --border-light: rgba(150,150,150,0.25);
+  --shadow-light: 0 8px 32px 0 rgba(31,38,135,0.15);
+  --accent-color: #0056a6;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+}
+.dark {
+  --bg-primary: rgba(0,0,0,0.98);
+  --bg-secondary: rgba(0,0,0,0.95);
+  --border-light: rgba(40,40,40,0.8);
+  --shadow-light: 0 8px 32px 0 rgba(0,0,0,0.6);
+  --accent-color: #60a5fa;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+}
+
+/* Glass card con stile AMOLED */
+.glass-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.dark .glass-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-light);
+}
+
+.glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Product card (derivata da glass-card) */
+.product-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.25rem;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0,86,166,0.35);
+}
+.dark .product-card:hover {
+  border-color: rgba(96,165,250,0.4);
+}
+
+/* Status badges come index */
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.badge-fuori {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.dark .badge-fuori {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Action button come floating-btn di index */
+.action-btn {
+  background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+  box-shadow: 0 10px 15px -3px rgba(0, 86, 166, 0.3), 0 4px 6px -2px rgba(0, 86, 166, 0.1);
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 86, 166, 0.3), 0 10px 10px -5px rgba(0, 86, 166, 0.1);
+}
+
+.dark .action-btn {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
+}
+
+.dark .action-btn:hover {
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+}
+
+/* Form styling come carico_merci */
+.form-select, .form-input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.7rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.dark .form-select, 
+.dark .form-input {
+  background: var(--bg-secondary);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+/* Riutilizzo icon-circle già definita negli altri template (carico_merci, movimento) */
+/* Solo calibrazione dimensione interna per icone piccole */
+.icon-circle.small-icon { font-size: 1.25rem; }
+
+/* Empty state styling */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+  color: #0056a6;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem auto;
+  box-shadow: 0 2px 8px rgba(0,86,166,0.08);
+}
+
+.dark .empty-icon {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2563eb 100%);
+  color: #60a5fa;
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.2);
+}
+
+/* Styling per campo nuova ubicazione */
+.form-input[name="target_ubicazione"] {
+  border: 2px solid #0056a6 !important;
+  background: linear-gradient(135deg, rgba(227, 242, 253, 0.3) 0%, rgba(255, 255, 255, 0.8) 100%) !important;
+  font-weight: 500;
+}
+
+.dark .form-input[name="target_ubicazione"] {
+  border-color: #60a5fa !important;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%) !important;
+}
+
+.form-select option[value="NUOVA_UBICAZIONE"] {
+  background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+  font-weight: 600;
+  color: #0056a6;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex flex-col overflow-hidden">
+  <div class="flex-1 overflow-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" x-data="{ filtro: '', selected: null }">
+      
+      <!-- Header con breadcrumb e azioni -->
+      <div class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <nav class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              <a href="{{ url_for('index') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Magazzino</a>
+              <span class="mx-2">›</span>
+              <span class="text-gray-900 dark:text-white font-medium">Rientro merce</span>
+            </nav>
+                <div class="flex items-center gap-3">
+              <div class="icon-circle small-icon">
+                <i class="fas fa-undo"></i>
+              </div>
+              <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Rientro merce in magazzino</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-1">Riporta i prodotti fuori magazzino in ubicazioni esistenti</p>
+              </div>
+            </div>
+          </div>
+          <a href="{{ url_for('index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Torna al magazzino
+          </a>
+        </div>
+      </div>
+
+      <!-- Flash messages con styling migliorato -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-6 space-y-3">
+            {% for category, message in messages %}
+              <div class="flex items-start gap-3 p-4 rounded-xl border {% if category == 'success' %}bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300{% elif category in ['error','danger'] %}bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300{% else %}bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300{% endif %}">
+                <div class="flex-shrink-0">
+                  {% if category == 'success' %}
+                    <i class="fas fa-check-circle text-lg"></i>
+                  {% elif category in ['error','danger'] %}
+                    <i class="fas fa-exclamation-triangle text-lg"></i>
+                  {% else %}
+                    <i class="fas fa-info-circle text-lg"></i>
+                  {% endif %}
+                </div>
+                <div class="font-medium">{{ message }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Filtro search migliorato -->
+      <div class="glass-card rounded-2xl p-6 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <i class="fas fa-search text-gray-400"></i>
+          <h3 class="font-semibold text-gray-900 dark:text-white">Filtra prodotti</h3>
+        </div>
+        <input 
+          type="text" 
+          x-model="filtro" 
+          placeholder="Cerca per nome prodotto o codice..." 
+          class="form-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      <!-- Lista prodotti fuori magazzino -->
+      {% if giacenze_fuori and giacenze_fuori|length > 0 %}
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 mb-6">
+            <i class="fas fa-boxes text-gray-400"></i>
+            <h3 class="font-semibold text-gray-900 dark:text-white">Prodotti fuori magazzino ({{ giacenze_fuori|length }})</h3>
+          </div>
+          
+          {% for g in giacenze_fuori %}
+            <div class="product-card rounded-2xl p-6" x-show="'{{ g.nome_prodotto|format_db_string }} {{ g.codice_prodotto }}'.toLowerCase().includes(filtro.toLowerCase())">
+              <div class="flex flex-col lg:flex-row lg:items-center gap-6">
+                
+                <!-- Informazioni prodotto -->
+                <div class="flex-1">
+                  <div class="flex items-start gap-4">
+                    <div class="icon-circle small-icon">
+                      <i class="fas fa-box"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">
+                        {{ g.nome_prodotto|format_db_string }}
+                      </h4>
+                      <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                        <span class="flex items-center gap-1">
+                          <i class="fas fa-barcode text-xs"></i>
+                          {{ g.codice_prodotto }}
+                        </span>
+                        <span class="status-badge badge-fuori">
+                          {{ g.stato|format_db_string }}
+                        </span>
+                        <span class="flex items-center gap-1 font-medium">
+                          <i class="fas fa-cubes text-xs"></i>
+                          {{ g.quantita }} pz
+                        </span>
+                      </div>
+                      {% if g.ubicazione_fuori %}
+                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          <i class="fas fa-map-marker-alt text-xs mr-1"></i>
+                          Attualmente in: {{ g.ubicazione_fuori|format_db_string }}
+                        </div>
+                      {% endif %}
+                      {% if g.note %}
+                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          <i class="fas fa-sticky-note text-xs mr-1"></i>
+                          {{ g.note|format_db_string }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Form di rientro -->
+                <div class="lg:w-96">
+                  <form method="POST" action="{{ url_for('rientro_merce') }}" class="space-y-4">
+                    <input type="hidden" name="giacenza_id" value="{{ g.id }}" />
+                    <input type="hidden" name="prodotto_id" value="{{ g.prodotto_id }}" />
+
+                    <div x-data="{ nuovaUbicazione: false }">
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        Ubicazione di destinazione
+                      </label>
+                      <select 
+                        @change="nuovaUbicazione = ($event.target.value === 'NUOVA_UBICAZIONE')"
+                        class="form-select w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" 
+                        :required="!nuovaUbicazione"
+                        :name="nuovaUbicazione ? '' : 'target_ubicazione'">
+                        <option value="">Seleziona ubicazione esistente in magazzino</option>
+                        {% for u in ubicazioni_per_prodotto.get(g.prodotto_id, []) %}
+                          <option value="{{ u.ubicazione }}">
+                            {{ u.ubicazione|format_db_string }} ({{ u.quantita }} pz disponibili)
+                          </option>
+                        {% endfor %}
+                        <option value="NUOVA_UBICAZIONE" class="font-semibold text-blue-600">
+                          ➕ Nuova ubicazione personalizzata
+                        </option>
+                      </select>
+                      
+                      <!-- Campo per nuova ubicazione -->
+                      <div x-show="nuovaUbicazione" 
+                           x-transition:enter="transition ease-out duration-200"
+                           x-transition:enter-start="opacity-0 transform scale-95"
+                           x-transition:enter-end="opacity-100 transform scale-100"
+                           class="relative">
+                        <input 
+                          type="text" 
+                          name="target_ubicazione"
+                          placeholder="Scrivi la nuova ubicazione..."
+                          class="form-input w-full px-4 py-3 pl-10 rounded-xl text-sm border-2 border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-blue-50 dark:bg-blue-900/20" 
+                          :required="nuovaUbicazione"
+                          x-ref="nuovaUbicazioneInput"
+                          @focus="$el.select()"
+                        />
+                        <i class="fas fa-pen absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 text-sm"></i>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <i class="fas fa-cubes mr-1"></i>
+                          Quantità da rientrare
+                        </label>
+                        <input 
+                          type="number" 
+                          name="quantita_da_rientrare" 
+                          min="1" 
+                          max="{{ g.quantita }}" 
+                          placeholder="Max {{ g.quantita }}"
+                          class="form-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                          required 
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <i class="fas fa-sticky-note mr-1"></i>
+                          Note
+                        </label>
+                        <input 
+                          type="text" 
+                          name="note" 
+                          placeholder="Note opzionali"
+                          class="form-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                        />
+                      </div>
+                    </div>
+
+                    <button type="submit" class="action-btn w-full px-6 py-3 text-white rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                      <i class="fas fa-undo mr-2"></i>
+                      Rientra in magazzino
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="glass-card rounded-2xl empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Nessun prodotto fuori magazzino
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            Tutti i prodotti risultano attualmente in magazzino. 
+            Non ci sono articoli da riportare in ubicazioni esistenti.
+          </p>
+          <div class="mt-6">
+            <a href="{{ url_for('index') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">
+              <i class="fas fa-boxes mr-2"></i>
+              Vai al magazzino
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    
+    </div>
+  </div>
+</div>
+{% endblock %}

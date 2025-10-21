@@ -11,6 +11,7 @@ import io
 import tempfile
 import os
 import xlsxwriter
+from magazzino_reconciliation import process_uploaded_files, get_webapp_api_response
 
 
 
@@ -85,6 +86,27 @@ def format_db_string(value):
     return ' '.join(word.capitalize() for word in value.replace('_', ' ').split())
 
 app.jinja_env.filters['format_db_string'] = format_db_string
+
+# Context processor: versione applicazione (ultima voce changelogs)
+@app.context_processor
+def inject_app_version():
+    version = 'Beta v1.3'  # fallback
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT versione FROM changelogs ORDER BY data_rilascio DESC, id DESC LIMIT 1")
+        row = cursor.fetchone()
+        if row and row.get('versione'):
+            version = row['versione']
+    except Exception:
+        pass
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
+    return dict(app_version=version)
 
 # API endpoint to get ubicazioni for a given prodotto_id
 @app.route("/api/ubicazioni/<int:prodotto_id>")
@@ -345,7 +367,8 @@ def movimento():
             else:
                 flash("Movimento registrato, ma nessuna giacenza aggiornata.", "warning")
 
-            return redirect(url_for("index"))
+            # Resta sulla pagina movimento per registrare più movimenti in sequenza
+            return redirect(url_for("movimento"))
 
         except ValueError:
             # Input validation error already flashed
@@ -1007,7 +1030,7 @@ def carico_merci():
                     if not magazzino_result:
                         raise Exception("Nessun magazzino trovato nel sistema")
                     magazzino_id = magazzino_result['id']
-                    stato = 'IN_MAGAZZINO'  # Default stato
+                    stato = 'in_magazzino'  # Default stato
                 cursor.execute("""
                     INSERT INTO giacenze (prodotto_id, magazzino_id, ubicazione, stato, quantita, note)
                     VALUES (%s, %s, %s, %s, %s, %s)
@@ -1393,6 +1416,237 @@ def delete_changelog(changelog_id):
     
     return redirect(url_for('changelogs'))
 
+# ---------------------------------------------------
+# Route: Rientro Merce
+# ---------------------------------------------------
+@app.route('/rientro_merce', methods=['GET', 'POST'])
+def rientro_merce():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        giacenza_id = request.form.get('giacenza_id')
+        prodotto_id = request.form.get('prodotto_id')
+        target_ubicazione = request.form.get('target_ubicazione')
+        quantita_da_rientrare = request.form.get('quantita_da_rientrare')
+        note = (request.form.get('note') or '').strip() or None
+
+        if not all([giacenza_id, prodotto_id, target_ubicazione, quantita_da_rientrare]):
+            flash('Dati incompleti per il rientro.', 'error')
+            return redirect(url_for('rientro_merce'))
+        try:
+            quantita_da_rientrare = int(quantita_da_rientrare)
+            if quantita_da_rientrare <= 0:
+                raise ValueError
+        except ValueError:
+            flash('Quantità non valida.', 'error')
+            return redirect(url_for('rientro_merce'))
+
+        try:
+            conn = connect_to_database()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("""
+                SELECT g.*, p.nome_prodotto, p.codice_prodotto
+                FROM giacenze g
+                JOIN prodotti p ON g.prodotto_id = p.id
+                WHERE g.id = %s
+            """, (giacenza_id,))
+            sorgente = cursor.fetchone()
+            if not sorgente:
+                flash('Giacenza di origine non trovata.', 'error')
+                return redirect(url_for('rientro_merce'))
+            if sorgente['prodotto_id'] != int(prodotto_id):
+                flash('Mismatch prodotto/giacenza.', 'error')
+                return redirect(url_for('rientro_merce'))
+            if sorgente['quantita'] < quantita_da_rientrare:
+                flash('Quantità richiesta superiore alla disponibilità fuori magazzino.', 'error')
+                return redirect(url_for('rientro_merce'))
+
+            cursor.execute("""
+                SELECT * FROM giacenze
+                WHERE prodotto_id = %s AND ubicazione = %s AND stato = 'in_magazzino'
+            """, (prodotto_id, target_ubicazione))
+            destinazione = cursor.fetchone()
+            
+            nuova_q_sorgente = sorgente['quantita'] - quantita_da_rientrare
+            cursor.execute("UPDATE giacenze SET quantita = %s WHERE id = %s", (nuova_q_sorgente, sorgente['id']))
+            
+            if destinazione:
+                # Ubicazione esistente: aggiorna la quantità
+                cursor.execute("""
+                    UPDATE giacenze SET quantita = quantita + %s WHERE id = %s
+                """, (quantita_da_rientrare, destinazione['id']))
+            else:
+                # Nuova ubicazione: crea un nuovo record
+                cursor.execute("""
+                    INSERT INTO giacenze (prodotto_id, quantita, ubicazione, stato, magazzino_id)
+                    VALUES (%s, %s, %s, 'in_magazzino', %s)
+                """, (prodotto_id, quantita_da_rientrare, target_ubicazione, 1))
+                # Recupera l'ID della nuova giacenza creata
+                cursor.execute("SELECT LAST_INSERT_ID() as new_id")
+                destinazione = {'id': cursor.fetchone()['new_id'], 'ubicazione': target_ubicazione, 'magazzino_id': 1}
+            
+            if nuova_q_sorgente == 0:
+                cursor.execute("DELETE FROM giacenze WHERE id = %s", (sorgente['id'],))
+
+            cursor.execute("""
+                INSERT INTO movimenti (
+                    prodotto_id, quantita, note, user_id, stato,
+                    a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                sorgente['prodotto_id'],
+                quantita_da_rientrare,
+                note or f"Rientro da stato {sorgente['stato']} verso {target_ubicazione}",
+                session.get('user_id'),
+                'rientro',
+                destinazione['ubicazione'],
+                destinazione.get('magazzino_id'),
+                sorgente.get('ubicazione'),
+                sorgente.get('magazzino_id')
+            ))
+            conn.commit()
+            flash('Rientro effettuato con successo.', 'success')
+        except Exception as e:
+            if 'conn' in locals():
+                conn.rollback()
+            flash(f'Errore durante il rientro: {e}', 'error')
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+        return redirect(url_for('rientro_merce'))
+
+    # GET
+    giacenze_fuori = []
+    ubicazioni_per_prodotto = {}
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT g.id, g.prodotto_id, g.quantita, g.ubicazione AS ubicazione_fuori, g.stato,
+                   p.nome_prodotto, p.codice_prodotto, g.note
+            FROM giacenze g
+            JOIN prodotti p ON g.prodotto_id = p.id
+            WHERE g.stato <> 'in_magazzino'
+            ORDER BY p.nome_prodotto ASC
+        """)
+        giacenze_fuori = cursor.fetchall()
+        if giacenze_fuori:
+            prodotto_ids = tuple({g['prodotto_id'] for g in giacenze_fuori})
+            placeholder = ','.join(['%s'] * len(prodotto_ids))
+            cursor.execute(f"""
+                SELECT id, prodotto_id, ubicazione, quantita, stato, magazzino_id
+                FROM giacenze
+                WHERE prodotto_id IN ({placeholder}) AND stato = 'in_magazzino'
+            """, prodotto_ids)
+            rows = cursor.fetchall()
+            for r in rows:
+                ubicazioni_per_prodotto.setdefault(r['prodotto_id'], []).append(r)
+    except Exception as e:
+        flash(f'Errore recupero dati: {e}', 'error')
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+    return render_template('rientro_merce.html', giacenze_fuori=giacenze_fuori, ubicazioni_per_prodotto=ubicazioni_per_prodotto, username=session.get('username'))
+
+# Route per pagina riconciliazione magazzino
+@app.route('/warehouse-reconciliation')
+def warehouse_reconciliation():
+    """Mostra la pagina di riconciliazione magazzino."""
+    return render_template('warehouse_reconciliation.html', username=session.get('username'))
+
+#Route per verifica e confronto giacenze magazzino
+@app.route('/api/reconcile-warehouse', methods=['POST'])
+def reconcile_warehouse():
+    """Endpoint principale per riconciliazione."""
+    try:
+        # Raccolta file
+        files_dict = {
+            'magazzino_27': request.files.get('magazzino_27'),
+            'magazzino_28': request.files.get('magazzino_28'),
+            'webapp_export': request.files.get('webapp_export')
+        }
+
+        # Validazione
+        if not files_dict['webapp_export']:
+            return jsonify({
+                'success': False,
+                'error': 'File export WebApp è obbligatorio'
+            }), 400
+
+        # Reset posizione file
+        for file_obj in files_dict.values():
+            if file_obj:
+                file_obj.seek(0)
+
+        # Processamento
+        report = process_uploaded_files(
+            files_dict['magazzino_27'],
+            files_dict['magazzino_28'], 
+            files_dict['webapp_export']
+        )
+
+        response = get_webapp_api_response(report)
+        status_code = 200 if response['success'] else 500
+
+        return jsonify(response), status_code
+
+    except Exception as e:
+        # Log dell'errore (sostituito con print per ora)
+        print(f"Errore riconciliazione: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+
+# Route di debug per AS400
+@app.route('/api/debug-as400-format', methods=['POST'])
+def debug_as400_format():
+    """Debug del formato file AS400."""
+    try:
+        file = request.files.get('as400_file')
+        if not file:
+            return jsonify({'error': 'Nessun file caricato'}), 400
+        
+        content = file.read()
+        if isinstance(content, bytes):
+            content = content.decode('utf-8')
+        
+        from magazzino_reconciliation import MagazzinoReconciliation
+        reconciler = MagazzinoReconciliation()
+        debug_info = reconciler.debug_as400_format(content)
+        
+        return jsonify(debug_info)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/health')
+def health_check():
+    """Health check."""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat()
+    })
+
+
+@app.errorhandler(413)
+def too_large(e):
+    """File troppo grande."""
+    return jsonify({
+        'success': False,
+        'error': 'File troppo grande (max 50MB)'
+    }), 413
+
+
+
 # Route per aggiornamento rapido quantità mobile
 @app.route('/aggiorna_giacenza_rapida/<int:giacenza_id>', methods=['POST'])
 def aggiorna_giacenza_rapida(giacenza_id):
@@ -1484,5 +1738,10 @@ def aggiorna_giacenza_rapida(giacenza_id):
 # {% endwith %}
 # ---------------------------------------------------
 
+
 if __name__ == '__main__':
+    # Debug: stampa la mappa delle rotte registrate
+    print('--- URL MAP ---')
+    print(app.url_map)
+    print('---------------')
     app.run(debug=True, host='0.0.0.0', port=5000)

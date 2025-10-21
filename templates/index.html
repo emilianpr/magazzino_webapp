@@ -169,6 +169,50 @@
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
 }
 
+/* Spazio sotto la topbar (uniforma con altre pagine) */
+.main-content-area > .sticky + [x-data] > .px-2.w-full:first-child { padding-top:1.75rem !important; }
+@media (max-width: 767px) {
+  .main-content-area > .sticky + [x-data] > .px-2.w-full:first-child { padding-top:1.1rem !important; }
+}
+
+/* Modal compensazione: stili locali alla pagina */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: none; /* default hidden, mostrato via JS */
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #ffffff;
+  color: #111827;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 520px;
+  width: 92%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.ubicazione-option {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ubicazione-option:hover { border-color: #0056a6; background-color: #f0f8ff; }
+.ubicazione-option.selected { border-color: #0056a6; background-color: #e3f2fd; }
+.dark .modal-overlay { background-color: rgba(0,0,0,0.7); }
+.dark .modal-content { background:#0a0a0a; color:#ffffff; border:1px solid #2a2a2a; box-shadow: 0 12px 28px rgba(0,0,0,0.6); }
+.dark #compensazione-descrizione { color: #d1d5db; }
+.dark .ubicazione-option { border-color:#2a2a2a; }
+.dark .ubicazione-option:hover { background-color:#0f172a; border-color:#2563eb; }
+.dark .ubicazione-option.selected { background-color: rgba(37,99,235,0.15); border-color:#3b82f6; }
+@supports (padding: max(0px)) { .modal-content { padding-bottom: max(24px, env(safe-area-inset-bottom)); } }
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .dashboard-card-icon {
@@ -176,8 +220,339 @@
     height: 32px;
     font-size: 16px;
     margin-bottom: 8px;
+}
+
+/* Mobile responsive - design pulito e coerente */
+@media (max-width: 768px) {
+  .dashboard-card-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  /* Spazio per navbar mobile fissa */
+  .px-2.md\\:px-6 {
+    padding-bottom: 5rem !important;
+  }
+
+  /* Glass cards responsive su mobile - mantengono lo stesso stile pulito */
+  .glass-card {
+    padding: 1.5rem;
+  }
+
+  /* Tabelle responsive su mobile */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  /* Mobile filters styling - coerente con il design */
+  .mobile-filters {
+    margin-bottom: 2rem; /* Aggiungo spazio dopo i filtri */
+  }
+  
+  .mobile-filters button {
+    background-color: #2256a7;
+    transition: all 0.2s ease;
+  }
+  
+  .mobile-filters button:hover {
+    background-color: #1e4a8c;
+  }
+
+  /* Stats cards su mobile - layout compatto orizzontale */
+  .flex.flex-col.md\\:flex-row {
+    flex-direction: row !important; /* Forza orizzontale anche su mobile */
+    gap: 0.5rem !important; /* Spazio minimo tra cards */
+  }
+
+  /* Container stats con override più specifico */
+  @media (max-width: 768px) {
+    .flex.flex-col.md\\:flex-row.gap-8 {
+      flex-direction: row !important;
+      gap: 0.5rem !important;
+      margin-bottom: 1rem !important;
+    }
+  }
+
+  /* Stats cards compatte su mobile */
+  .glass-card {
+    padding: 0.75rem 0.5rem !important; /* Padding molto ridotto */
+    text-align: center;
+  }
+
+  .dashboard-card-icon {
+    width: 24px !important; /* Icone molto piccole */
+    height: 24px !important;
+    font-size: 12px !important;
+    margin: 0 auto 0.25rem auto !important; /* Centrato con margine minimo */
+  }
+
+  /* Testo compatto nelle stats */
+  .glass-card p {
+    font-size: 0.75rem !important; /* Testo molto piccolo */
+    margin-bottom: 0.125rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .glass-card p.text-4xl {
+    font-size: 1.5rem !important; /* Numeri più piccoli */
+    margin-top: 0.25rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Mobile giacenze styling - design pulito e coerente */
+  .mobile-giacenza-item {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(34, 86, 167, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+  }
+
+  .mobile-giacenza-item:hover {
+    border-color: rgba(34, 86, 167, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .dark .mobile-giacenza-item {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(96, 165, 250, 0.15);
+  }
+
+  .mobile-giacenza-header {
+    border-bottom: 1px solid rgba(34, 86, 167, 0.1);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .dark .mobile-giacenza-header {
+    border-bottom-color: rgba(96, 165, 250, 0.15);
+  }
+
+  .mobile-giacenza-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .dark .mobile-giacenza-title {
+    color: #f8fafc;
+  }
+
+  .mobile-giacenza-code {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-family: 'Monaco', 'Menlo', monospace;
+    background: rgba(34, 86, 167, 0.08);
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 600;
+  }
+
+  .dark .mobile-giacenza-code {
+    color: #94a3b8;
+    background: rgba(96, 165, 250, 0.12);
+  }
+
+  .mobile-giacenza-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .mobile-giacenza-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-giacenza-detail-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .dark .mobile-giacenza-detail-label {
+    color: #94a3b8;
+  }
+
+  .mobile-giacenza-detail-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .dark .mobile-giacenza-detail-value {
+    color: #f8fafc;
+  }
+
+  /* Mobile actions per giacenze */
+  .mobile-giacenza-actions {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(34, 86, 167, 0.1);
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .dark .mobile-giacenza-actions {
+    border-top-color: rgba(96, 165, 250, 0.15);
+  }
+
+  .mobile-action-btn {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+  }
+
+  .edit-mobile-btn {
+    background: rgba(34, 86, 167, 0.08);
+    color: #2256a7;
+    border-color: rgba(34, 86, 167, 0.2);
+  }
+
+  .edit-mobile-btn:hover {
+    background: rgba(34, 86, 167, 0.15);
+  }
+
+  .dark .edit-mobile-btn {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+    border-color: rgba(96, 165, 250, 0.3);
+  }
+
+  .mobile-action-btn.delete {
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.2);
+  }
+
+  .mobile-action-btn.delete:hover {
+    background: rgba(220, 38, 38, 0.15);
+  }
+
+  .dark .mobile-action-btn.delete {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+
+  /* Menu a 3 puntini su mobile giacenze */
+  .toggle-mobile-action-menu {
+    background: rgba(107, 114, 128, 0.8) !important;
+    color: white !important;
+    border: 1px solid rgba(107, 114, 128, 0.3);
+    padding: 0.5rem !important;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toggle-mobile-action-menu:hover {
+    background: rgba(75, 85, 99, 0.9) !important;
+  }
+
+  .dark .toggle-mobile-action-menu {
+    background: rgba(156, 163, 175, 0.8) !important;
+    border-color: rgba(156, 163, 175, 0.3);
+  }
+
+  .mobile-action-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid rgba(34, 86, 167, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 180px;
+    margin-top: 0.25rem;
+  }
+
+  .dark .mobile-action-menu {
+    background: #1e293b;
+    border-color: rgba(96, 165, 250, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.875rem;
+    color: #374151;
+    border: none;
+    background: none;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu-item:hover {
+    background: rgba(34, 86, 167, 0.08);
+    color: #2256a7;
+  }
+
+  .mobile-menu-item:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  .mobile-menu-item:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  .mobile-menu-item-danger {
+    color: #dc2626;
+  }
+
+  .mobile-menu-item-danger:hover {
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+  }
+
+  .dark .mobile-menu-item {
+    color: #d1d5db;
+  }
+
+  .dark .mobile-menu-item:hover {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+  }
+
+  .dark .mobile-menu-item-danger {
+    color: #f87171;
+  }
+
+  .dark .mobile-menu-item-danger:hover {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
   }
 }
+
+
+
+
 </style>
 {% endblock %}
 
@@ -190,34 +565,9 @@
   ubicazioneSelezionata: null
 }">
 
-<div class="px-2 md:px-6 pt-16 pb-4 md:pb-6 w-full">
-  <!-- Mobile Stats Cards -->
-  <div class="mobile-stats md:hidden">
-    <div class="mobile-stat-card">
-      <div class="mobile-stat-icon">
-        <i class="fas fa-box-open"></i>
-      </div>
-      <div class="mobile-stat-value">{{ total_products }}</div>
-      <div class="mobile-stat-label">Prodotti</div>
-    </div>
-    <div class="mobile-stat-card">
-      <div class="mobile-stat-icon">
-        <i class="fas fa-exchange-alt"></i>
-      </div>
-      <div class="mobile-stat-value">{{ movements_today }}</div>
-      <div class="mobile-stat-label">Mov. Oggi</div>
-    </div>
-    <div class="mobile-stat-card">
-      <div class="mobile-stat-icon" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white;">
-        <i class="fas fa-chart-line"></i>
-      </div>
-      <div class="mobile-stat-value">{{ giacenze|length if giacenze else 0 }}</div>
-      <div class="mobile-stat-label">Giacenze</div>
-    </div>
-  </div>
-
+<div class="px-2 md:px-6 pt-0 pb-4 md:pb-6 w-full page-content index-page">
   <!-- Desktop Stats Cards -->
-  <div class="hidden md:flex flex-col md:flex-row gap-8 mb-8 w-full">
+  <div class="flex flex-col md:flex-row gap-8 mb-8 w-full">
     <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center">
       <div class="dashboard-card-icon">
         <i class="fas fa-box-open"></i>
@@ -344,21 +694,21 @@
               <div>
                 <label for="filtro_codice" class="block text-sm font-medium text-gray-700 mb-1">Codice Prodotto</label>
                 <input type="text" id="filtro_codice" name="filtro_codice" value="{{ filtro_codice|default('') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400">
               </div>
               
               <!-- Nome Prodotto -->
               <div>
                 <label for="filtro_nome" class="block text-sm font-medium text-gray-700 mb-1">Nome Prodotto</label>
                 <input type="text" id="filtro_nome" name="filtro_nome" value="{{ filtro_nome|default('') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400">
               </div>
               
               <!-- Magazzino -->
               <div>
                 <label for="filtro_magazzino" class="block text-sm font-medium text-gray-700 mb-1">Magazzino</label>
                 <select id="filtro_magazzino" name="filtro_magazzino"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;">
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400">
                   <option value="">-- Tutti --</option>
                   {% for mag in magazzini_opzioni %}
                     <option value="{{ mag }}" {% if filtro_magazzino == mag %}selected{% endif %}>{{ mag|format_db_string }}</option>
@@ -370,7 +720,7 @@
               <div>
                 <label for="filtro_stato" class="block text-sm font-medium text-gray-700 mb-1">Stato</label>
                 <select id="filtro_stato" name="filtro_stato"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;">
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400">
                   <option value="">-- Tutti --</option>
                   {% for st in stati_opzioni %}
                     <option value="{{ st }}" {% if filtro_stato == st %}selected{% endif %}>{{ st|format_db_string }}</option>
@@ -382,7 +732,7 @@
               <div>
                 <label for="filtro_ubicazione" class="block text-sm font-medium text-gray-700 mb-1">Ubicazione</label>
                 <select id="filtro_ubicazione" name="filtro_ubicazione"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;">
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400">
                   <option value="">-- Tutte --</option>
                   {% for ub in ubicazioni_opzioni %}
                     <option value="{{ ub }}" {% if filtro_ubicazione == ub %}selected{% endif %}>{{ ub|format_db_string }}</option>
@@ -394,17 +744,17 @@
               <div>
                 <label for="filtro_note" class="block text-sm font-medium text-gray-700 mb-1">Note</label>
                 <input type="text" id="filtro_note" name="filtro_note" value="{{ filtro_note|default('') }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" style="focus:ring-color: #2256a7; focus:border-color: #2256a7;" />
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400" />
               </div>
             </div>
             
             <div class="flex justify-end space-x-3 mt-6">
               <button type="button" onclick="window.location='{{ url_for('index') }}'"
-                      class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2" style="focus:ring-color: #2256a7;">
+                      class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
                 <i class="fas fa-undo mr-2"></i>Reset
               </button>
               <button type="submit"
-                      class="px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2" style="background-color: #2256a7; focus:ring-color: #2256a7;">
+                      class="px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2" style="background-color: #2256a7;">
                 <i class="fas fa-check mr-2"></i>Applica
               </button>
             </div>
@@ -649,8 +999,7 @@
                         data-ubicazione="{{ g.ubicazione|default('') }}" 
                         data-stato="{{ g.stato }}" 
                         data-quantita="{{ g.quantita }}" 
-                        data-note="{{ g.note|default('') }}"
-                        style="background: linear-gradient(120deg, #e3f2fd 0%, #f0f8ff 100%); color: #0056a6; border: 1px solid rgba(0, 86, 166, 0.2);">
+                        data-note="{{ g.note|default('') }}">
                   <i class="fas fa-edit mr-1"></i>Modifica
                 </button>
                 
@@ -664,14 +1013,6 @@
                   
                   <!-- Menu azioni nascosto -->
                   <div id="mobile-action-menu-{{ g.id }}" class="mobile-action-menu" style="display: none;">
-                    <button class="edit-mobile-row-btn mobile-menu-item"
-                            data-id="{{ g.id }}" 
-                            data-ubicazione="{{ g.ubicazione|default('') }}" 
-                            data-stato="{{ g.stato }}" 
-                            data-quantita="{{ g.quantita }}" 
-                            data-note="{{ g.note|default('') }}">
-                      <i class="fas fa-cog mr-2"></i>Modifica avanzata
-                    </button>
                     <button class="confirm-mobile-delete-btn mobile-menu-item mobile-menu-item-danger"
                             data-id="{{ g.id }}" 
                             data-product-name="{{ g.nome_prodotto|format_db_string }}">
@@ -773,6 +1114,25 @@
           </div>
         {% endif %}
       </div>
+      
+      <!-- Contatore totale giacenze -->
+      <div class="mt-4 glass-card rounded-xl p-4 w-full">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900">
+              <i class="fas fa-calculator text-blue-600 dark:text-blue-300"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 dark:text-white">Totale Giacenze Visualizzate</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Quantità totale dei prodotti filtrati</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div id="total-counter" class="text-2xl font-bold text-blue-600 dark:text-blue-300">0</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">unità</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -847,7 +1207,105 @@
       document.querySelectorAll('.animate-pulse').forEach(el => {
         el.classList.remove('animate-pulse');
       });
+      // Calcola il totale iniziale dopo il caricamento
+      updateTotalCounter();
     }, 2000);
+
+    // Funzione per calcolare e aggiornare il contatore totale
+    function updateTotalCounter() {
+      let total = 0;
+      
+      // Calcola solo per la vista desktop (con classi Tailwind hidden/block)
+      const desktopTable = document.querySelector('.desktop-table');
+      if (desktopTable && window.getComputedStyle(desktopTable).display !== 'none') {
+        const desktopRows = document.querySelectorAll('.desktop-table tbody tr[id^="row-"]');
+        desktopRows.forEach(row => {
+          // Controlla se la riga è visibile (non nascosta dai filtri)
+          if (window.getComputedStyle(row).display !== 'none') {
+            const quantitaCell = row.querySelector('td[id^="quantita-"] span');
+            if (quantitaCell) {
+              const quantita = parseInt(quantitaCell.textContent.trim()) || 0;
+              total += quantita;
+            }
+          }
+        });
+      }
+      
+      // Calcola solo per la vista mobile (con classi Tailwind hidden/block)  
+      const mobileView = document.querySelector('.mobile-view');
+      if (mobileView && window.getComputedStyle(mobileView).display !== 'none') {
+        const mobileCards = document.querySelectorAll('.mobile-giacenza-item');
+        mobileCards.forEach(card => {
+          // Controlla se la card è visibile (non nascosta dai filtri)
+          if (window.getComputedStyle(card).display !== 'none') {
+            const quantitaElement = card.querySelector('div[id^="mobile-quantita-"] span.font-bold');
+            if (quantitaElement) {
+              const quantita = parseInt(quantitaElement.textContent.trim()) || 0;
+              total += quantita;
+            }
+          }
+        });
+      }
+      
+      // Aggiorna il contatore
+      const counter = document.getElementById('total-counter');
+      if (counter) {
+        counter.textContent = total.toLocaleString('it-IT');
+      }
+    }
+
+    // Osserva i cambiamenti nella tabella per aggiornare il contatore
+    function observeTableChanges() {
+      const tableContainer = document.querySelector('.desktop-table');
+      const mobileContainer = document.querySelector('.mobile-view');
+      
+      if (tableContainer || mobileContainer) {
+        // Usa MutationObserver per rilevare cambiamenti nel DOM
+        const observer = new MutationObserver(() => {
+          updateTotalCounter();
+        });
+        
+        // Osserva cambiamenti nei contenitori delle giacenze
+        if (tableContainer) {
+          observer.observe(tableContainer, { 
+            childList: true, 
+            subtree: true, 
+            attributes: true, 
+            attributeFilter: ['style'] 
+          });
+        }
+        
+        if (mobileContainer) {
+          observer.observe(mobileContainer, { 
+            childList: true, 
+            subtree: true, 
+            attributes: true, 
+            attributeFilter: ['style'] 
+          });
+        }
+      }
+    }
+
+    // Inizializza l'osservatore quando la pagina è caricata
+    document.addEventListener('DOMContentLoaded', () => {
+      updateTotalCounter();
+      observeTableChanges();
+    });
+
+    // Aggiorna il contatore anche al resize della finestra (cambio desktop/mobile)
+    window.addEventListener('resize', () => {
+      setTimeout(updateTotalCounter, 100);
+    });
+
+    // Aggiorna il contatore anche quando vengono applicati i filtri
+    // (intercetta le submit del form filtri)
+    const filterForm = document.querySelector('form[method="GET"]');
+    if (filterForm) {
+      filterForm.addEventListener('submit', () => {
+        // Aggiungi un piccolo ritardo per permettere al DOM di aggiornarsi
+        setTimeout(updateTotalCounter, 100);
+      });
+    }
 
     // Funzione per attivare la modalità modifica
     function editRow(id, ubicazione, stato, quantita, note) {
@@ -1134,16 +1592,6 @@
           toggleMobileActionMenu(id);
         }
         
-        if (e.target.closest('.edit-mobile-row-btn')) {
-          const btn = e.target.closest('.edit-mobile-row-btn');
-          const id = btn.dataset.id;
-          const ubicazione = btn.dataset.ubicazione;
-          const stato = btn.dataset.stato;
-          const quantita = btn.dataset.quantita;
-          const note = btn.dataset.note;
-          editMobileRow(id, ubicazione, stato, quantita, note);
-        }
-        
         if (e.target.closest('.confirm-mobile-delete-btn')) {
           const btn = e.target.closest('.confirm-mobile-delete-btn');
           const id = btn.dataset.id;
@@ -1191,18 +1639,6 @@
     });
 
     // Funzioni per la modifica mobile
-    function editMobileRow(id, ubicazione, stato, quantita, note) {
-      // Nascondi la vista normale e mostra il form di modifica
-      document.getElementById(`mobile-view-${id}`).style.display = 'none';
-      document.getElementById(`mobile-edit-${id}`).style.display = 'block';
-      
-      // Disabilita tutti gli altri pulsanti di modifica mobile
-      document.querySelectorAll('[id^="mobile-edit-btn-"]').forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('opacity-50', 'cursor-not-allowed');
-      });
-    }
-    
     function cancelMobileEdit(id) {
       // Mostra la vista normale e nascondi il form di modifica
       document.getElementById(`mobile-view-${id}`).style.display = 'block';

@@ -2,7 +2,7 @@
 
 body {
   font-family: "Inter", sans-serif;
-  margin: 20px;
+  margin: 0 20px 20px 20px;
   background-color: #f8fafc;
   color: #333;
 }
@@ -446,7 +446,7 @@ form#movimento-form button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1000; /* sopra contenuti, sotto toast/z-50 */
 }
 
 .modal-content {
@@ -457,6 +457,7 @@ form#movimento-form button:hover {
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .ubicazione-option {
@@ -475,6 +476,43 @@ form#movimento-form button:hover {
 .ubicazione-option.selected {
   border-color: #0056a6;
   background-color: #e3f2fd;
+}
+
+/* Modal dark mode */
+.dark .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark .modal-content {
+  background: #0a0a0a;
+  color: #ffffff;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+}
+
+.dark #compensazione-descrizione {
+  color: #d1d5db;
+}
+
+.dark .ubicazione-option {
+  border-color: #2a2a2a;
+}
+
+.dark .ubicazione-option:hover {
+  background-color: #0f172a; /* blu notte coerente */
+  border-color: #2563eb;
+}
+
+.dark .ubicazione-option.selected {
+  background-color: rgba(37, 99, 235, 0.15);
+  border-color: #3b82f6;
+}
+
+/* Safe area e mobile tweaks per overlay */
+@supports (padding: max(0px)) {
+  .modal-content {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
 }
 
 /* Responsive table optimizations */

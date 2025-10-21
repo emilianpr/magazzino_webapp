@@ -181,16 +181,39 @@ form button[type="submit"]:hover {
 .dark .suggestion-item:hover {
   background-color: rgba(96, 165, 250, 0.2);
 }
+/* Layout pagina movimento: occupa meno spazio verticale */
+body.non-scroll-page { overflow:hidden; }
+.movimento-wrapper { min-height: calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:2.2rem 0 2.6rem; }
+@media (max-height: 820px) {
+  .movimento-wrapper { align-items:flex-start; padding:1.25rem 0 1.5rem; }
+  body.non-scroll-page { overflow:auto; }
+}
+/* Card compatta mantenendo stile base */
+.mov-card { padding:1.75rem 1.5rem; }
+.mov-card.mov-small { padding:1.1rem .95rem 1.25rem; }
+.mov-card.mov-small h2.form-section-title { font-size:1.05rem; }
+.mov-card.mov-small form label { margin-top:.65rem; font-size:.9rem; }
+.mov-card.mov-small .icon-circle { margin-top:.85rem; }
+.mov-card.mov-small form input[type="text"],
+.mov-card.mov-small form input[type="number"],
+.mov-card.mov-small form select,
+.mov-card.mov-small form textarea { padding:.45rem .65rem; font-size:.9rem; border-radius:.55rem; }
+.mov-card.mov-small form button[type="submit"] { font-size:1rem; padding:.7rem 0; margin-top:1rem; }
+.mov-card h2.form-section-title { margin-bottom:1.25rem !important; }
+.mov-card form label { margin-top:.85rem; }
+.mov-card form label:first-of-type { margin-top:0.25rem; }
+.mov-card form button[type="submit"] { margin-top:1.25rem; }
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="px-2 py-6">
-  <div class="glass-card w-full max-w-2xl mx-auto">
+<div class="px-2 py-6 movimento-wrapper">
+  <div class="glass-card mov-card mov-small w-full max-w-xl mx-auto">
     <div class="icon-circle mb-4">
       <i class="fas fa-exchange-alt"></i>
     </div>
-    <h2 class="form-section-title mb-6">
+  <h2 class="form-section-title mb-4">
       Registra un movimento
     </h2>
     <form id="movimento-form" method="POST" autocomplete="off">
@@ -218,6 +241,7 @@ form button[type="submit"]:hover {
           name="prodotto_input"
           autocomplete="off"
           placeholder="Cerca prodotto per nome o codice..."
+          autofocus
         />
       </div>
       <!-- Dati prodotti nascosti per JavaScript -->
@@ -255,6 +279,8 @@ form button[type="submit"]:hover {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Imposta body non scroll per questa pagina (salvo schermi troppo bassi)
+  document.body.classList.add('non-scroll-page');
   const prodottoInput = document.getElementById("prodotto_input");
   const prodottoIdInput = document.getElementById("prodotto_id");
   const prodottiList = document.getElementById("prodotti-list");
@@ -263,11 +289,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const prodotti = [];
   const prodottoMap = {};
   for (const option of prodottiList.options) {
+    // Parsing robusto: mantiene eventuali ulteriori " - " nel nome prodotto
+    const raw = option.value;
+    const sep = ' - ';
+    const sepIndex = raw.indexOf(sep);
+    let codice = raw;
+    let nomeCompleto = '';
+    if (sepIndex !== -1) {
+      codice = raw.substring(0, sepIndex).trim();
+      nomeCompleto = raw.substring(sepIndex + sep.length).trim(); // tutto il resto (può contenere altri " - ")
+    }
     const prodotto = {
       id: option.getAttribute("data-id"),
-      text: option.value,
-      codice: option.value.split(' - ')[0].trim(),
-      nome: option.value.split(' - ')[1]?.trim() || ''
+      text: raw,
+      codice: codice,
+      nome: nomeCompleto
     };
     prodotti.push(prodotto);
     prodottoMap[option.value] = option.getAttribute("data-id");
