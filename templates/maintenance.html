@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manutenzione in corso - Pharmagest</title>
+  
+  <!-- Script per applicare immediatamente la dark mode senza flash -->
+  <script>
+    (function() {
+      const darkMode = localStorage.getItem('darkMode');
+      if (darkMode === 'true') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#000000';
+        document.documentElement.style.minHeight = '100vh';
+      }
+    })();
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            phg: {
+              primary: '#0056a6',
+              secondary: '#e3f2fd',
+              accent: '#00a8e8',
+              dark: '#003d7a',
+              light: '#f0f8ff'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f0f4f8 0%, #e8eef5 100%);
+    }
+
+    .dark body {
+      background: #000000;
+    }
+    
+    /* Wide container styling */
+    .maintenance-container {
+      max-width: 1400px;
+      width: 100%;
+      padding: 0 2rem;
+    }
+
+    /* Hero section with wide glass effect */
+    .hero-glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(227, 242, 253, 0.3);
+      box-shadow: 
+        0 20px 60px rgba(0, 86, 166, 0.08),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+
+    .dark .hero-glass {
+      background: rgba(15, 15, 15, 0.85);
+      border: 1px solid rgba(227, 242, 253, 0.15);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    }
+
+    /* Gradient header bar */
+    .gradient-bar {
+      height: 6px;
+      background: linear-gradient(90deg, #0056a6 0%, #00a8e8 50%, #0056a6 100%);
+      background-size: 200% 100%;
+    }
+
+    .dark .gradient-bar {
+      background: linear-gradient(90deg, #1e40af 0%, #2563eb 50%, #1e40af 100%);
+      background-size: 200% 100%;
+    }
+
+    /* Icon styling - static and professional */
+    .status-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      color: #0056a6;
+      font-size: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 86, 166, 0.12);
+    }
+
+    .dark .status-icon {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      color: #60a5fa;
+      box-shadow: 0 4px 16px rgba(96, 165, 250, 0.2);
+    }
+
+    /* Info cards grid */
+    .info-card {
+      background: rgba(227, 242, 253, 0.3);
+      border: 1px solid rgba(0, 86, 166, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      background: rgba(227, 242, 253, 0.5);
+      border-color: rgba(0, 86, 166, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .dark .info-card {
+      background: rgba(30, 30, 30, 0.5);
+      border-color: rgba(96, 165, 250, 0.15);
+    }
+
+    .dark .info-card:hover {
+      background: rgba(40, 40, 40, 0.7);
+      border-color: rgba(96, 165, 250, 0.25);
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 2rem;
+      color: #d97706;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .dark .status-badge {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    /* Divider line */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0, 86, 166, 0.2) 50%, transparent 100%);
+    }
+
+    .dark .divider {
+      background: linear-gradient(90deg, transparent 0%, rgba(96, 165, 250, 0.2) 50%, transparent 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8"
+      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
+      :class="{ 'dark': darkMode }">
+  
+  <div class="maintenance-container">
+    <!-- Header con logo -->
+    <div class="text-center mb-12">
+      <img src="https://raw.githubusercontent.com/emilianpr/phg-img/refs/heads/main/HEAD_Pharmagest.png" 
+           alt="Pharmagest Logo" 
+           class="h-14 md:h-16 mx-auto">
+    </div>
+
+    <!-- Main hero card -->
+    <div class="hero-glass">
+      <!-- Gradient top bar -->
+      <div class="gradient-bar"></div>
+      
+      <div class="p-8 md:p-12">
+        <!-- Status badge e icon in riga -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+          <div class="flex items-center gap-4">
+            <div class="status-icon">
+              <i class="fas fa-tools"></i>
+            </div>
+            <div class="text-left">
+              <span class="status-badge">
+                Servizio non disponibile
+              </span>
+              <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2">
+                Manutenzione in corso
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descrizione principale -->
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl">
+          Il sistema di gestione magazzino è temporaneamente non disponibile per attività di manutenzione.
+        </p>
+
+        <!-- Divider -->
+        <div class="divider mb-8"></div>
+
+        <!-- Operation message box -->
+        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-200 dark:border-blue-800/50 rounded-xl p-6 mb-8">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center">
+              <i class="fas fa-cog text-white text-xl"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2 text-lg">Operazione in corso:</h3>
+              <p class="text-blue-800 dark:text-blue-200 font-medium">
+                {{ maintenance_message }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider mb-8"></div>
+
+
+  <!-- Alpine.js per dark mode -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>

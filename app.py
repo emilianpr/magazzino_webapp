@@ -1,4 +1,3 @@
-## RIMOSSA DEFINIZIONE DUPLICATA DELLA ROUTE PRIMA DELLA CREAZIONE DI app
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 import mysql.connector
 from mysql.connector import Error
@@ -17,6 +16,28 @@ from magazzino_reconciliation import process_uploaded_files, get_webapp_api_resp
 
 app = Flask(__name__)
 app.secret_key = 'f3b1a67c9e8f4d2a85e37c1f9b7d4e6f2c1a5d8f9b3c4e7f0a1d2b3c4e5f6a7b'
+
+# ========================================
+# MAINTENANCE MODE CONFIGURATION
+# ========================================
+MAINTENANCE_MODE = True
+
+# Personalizza il messaggio dell'operazione in corso
+# Cambia questo testo per descrivere l'operazione specifica
+MAINTENANCE_MESSAGE = "Migrazione del magazzino su macchina virtuale in corso, il database non è accessibile."
+
+# Before request handler per controllare la manutenzione
+@app.before_request
+def check_maintenance():
+    if MAINTENANCE_MODE:
+        # Permetti l'accesso alla pagina di manutenzione stessa
+        if request.endpoint != 'maintenance' and request.endpoint != 'static':
+            return redirect(url_for('maintenance'))
+
+# Route per la pagina di manutenzione
+@app.route('/maintenance')
+def maintenance():
+    return render_template('maintenance.html', maintenance_message=MAINTENANCE_MESSAGE)
 
 # API: ubicazioni disponibili per prodotto (per scaricomerce)
 @app.route('/api/ubicazioni_per_prodotto/<int:prodotto_id>')
