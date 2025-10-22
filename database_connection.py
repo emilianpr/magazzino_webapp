@@ -12,6 +12,6 @@ def connect_to_database():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="1310",
+        password="1312",
         database="magazzino_db"
     )

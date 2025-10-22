@@ -20,7 +20,7 @@ app.secret_key = 'f3b1a67c9e8f4d2a85e37c1f9b7d4e6f2c1a5d8f9b3c4e7f0a1d2b3c4e5f6a
 # ========================================
 # MAINTENANCE MODE CONFIGURATION
 # ========================================
-MAINTENANCE_MODE = True
+MAINTENANCE_MODE = False
 
 # Personalizza il messaggio dell'operazione in corso
 # Cambia questo testo per descrivere l'operazione specifica
