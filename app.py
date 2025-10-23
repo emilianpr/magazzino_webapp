@@ -15,7 +15,16 @@ from magazzino_reconciliation import process_uploaded_files, get_webapp_api_resp
 
 
 app = Flask(__name__)
-app.secret_key = 'f3b1a67c9e8f4d2a85e37c1f9b7d4e6f2c1a5d8f9b3c4e7f0a1d2b3c4e5f6a7b'
+
+# Carica la configurazione Flask da config_local.py o variabile d'ambiente
+try:
+    from config_local import FLASK_CONFIG
+    app.secret_key = FLASK_CONFIG['secret_key']
+    app.config['DEBUG'] = FLASK_CONFIG.get('debug', False)
+except ImportError:
+    # Fallback a variabile d'ambiente
+    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'f3b1a67c9e8f4d2a85e37c1f9b7d4e6f2c1a5d8f9b3c4e7f0a1d2b3c4e5f6a7b')
+    print("WARNING: Using default or environment SECRET_KEY. Create config_local.py for better security.")
 
 # ========================================
 # MAINTENANCE MODE CONFIGURATION
@@ -175,6 +184,9 @@ def index():
     }
     order_by = ordini_possibili.get(ordine, 'p.codice_prodotto ASC')
 
+    cursor = None
+    conn = None
+    
     try:
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
@@ -1765,4 +1777,4 @@ if __name__ == '__main__':
     print('--- URL MAP ---')
     print(app.url_map)
     print('---------------')
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=80)

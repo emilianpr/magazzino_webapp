@@ -1,0 +1,16 @@
+[Unit]
+Description=Magazzino WebApp on Port 80
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/magazzino_webapp
+Environment="PATH=/var/www/magazzino_webapp/venv/bin"
+ExecStart=/usr/bin/authbind --deep /var/www/magazzino_webapp/venv/bin/python app.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

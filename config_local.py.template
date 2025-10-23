@@ -1,0 +1,15 @@
+# Database Configuration Template
+# COPIA questo file come 'config_local.py' e inserisci le tue credenziali
+# NON commitare config_local.py su Git!
+
+DATABASE_CONFIG = {
+    'host': 'localhost',
+    'user': 'magazzino_webapp', 
+    'password': 'YOUR_PASSWORD_HERE',  # <-- Cambia con la tua password
+    'database': 'magazzino_db'
+}
+
+FLASK_CONFIG = {
+    'secret_key': 'GENERATE_RANDOM_KEY_HERE',  # <-- Genera con: python -c "import secrets; print(secrets.token_hex(32))"
+    'debug': True  # True per sviluppo, False per produzione
+}

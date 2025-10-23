@@ -1,0 +1,15 @@
+# Database Configuration - PRODUZIONE (Debian/MariaDB)
+# NON commitare questo file su Git!
+
+DATABASE_CONFIG = {
+    'host': 'localhost',
+    'user': 'magazzino_webapp', 
+    'password': 'PASSWORD_PRODUZIONE_QUI',  # Cambia con password di produzione
+    'database': 'magazzino_db',
+    'auth_plugin': 'mysql_native_password'  # Per MariaDB su Linux
+}
+
+FLASK_CONFIG = {
+    'secret_key': 'GENERA_UNA_NUOVA_SECRET_KEY_CASUALE',  # Usa secrets.token_hex(32)
+    'debug': False  # SEMPRE False in produzione!
+}
