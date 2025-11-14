@@ -8,12 +8,31 @@
   <!-- Script per applicare immediatamente la dark mode senza flash -->
   <script>
     (function() {
+      // Applica il tema salvato SUBITO
+      const savedTheme = localStorage.getItem('appTheme') || 'default';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      console.log('Theme applicato immediatamente:', savedTheme);
+      
+      // Applica la dark mode SUBITO su HTML
       const darkMode = localStorage.getItem('darkMode');
       if (darkMode === 'true') {
         document.documentElement.classList.add('dark');
         document.documentElement.style.backgroundColor = '#000000';
-        // Assicuriamoci che il body mantenga l'altezza corretta
         document.documentElement.style.minHeight = '100vh';
+        console.log('Dark mode applicata immediatamente su HTML');
+        
+        // Quando il DOM è pronto, applica anche su body
+        if (document.body) {
+          document.body.classList.add('dark');
+          document.body.style.backgroundColor = '#000000';
+          console.log('Dark mode applicata anche su BODY');
+        } else {
+          document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('dark');
+            document.body.style.backgroundColor = '#000000';
+            console.log('Dark mode applicata su BODY al DOMContentLoaded');
+          });
+        }
       }
     })();
   </script>
@@ -179,22 +198,31 @@
       }
     }
     
-    /* Reset completo per contenuto principale */
-    .nav-pill {
+    /* Reset completo per contenuto principale - ESCLUDE Neubrutalism */
+    html:not([data-theme="neubrutalism"]) .nav-pill {
       transition: all 0.3s ease;
     }
-    .nav-pill:hover {
+    html:not([data-theme="neubrutalism"]) .nav-pill:hover {
       background-color: rgba(0, 86, 166, 0.1);
     }
-    .dark .nav-pill:hover {
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill:hover {
       background-color: var(--bg-tertiary);
     }
-    .nav-pill.active {
+    html:not([data-theme="neubrutalism"]) .nav-pill.active {
       background-color: rgba(0, 86, 166, 0.2);
       border-left: 3px solid #0056a6;
     }
-    .dark .nav-pill.active {
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill.active {
       background-color: var(--bg-tertiary);
+    }
+    
+    /* Override per Neubrutalism - rimuove TUTTI gli sfondi */
+    html[data-theme="neubrutalism"] .nav-pill,
+    html[data-theme="neubrutalism"] .nav-pill:hover,
+    html[data-theme="neubrutalism"] .nav-pill.active {
+      background-color: transparent !important;
+      background: transparent !important;
+      border-left: none !important;
     }
     
     /* Dark mode toggle button */
@@ -283,18 +311,18 @@
       background-color: #0a0a0a !important;
     }
 
-    .dark th {
+    html:not([data-theme="neubrutalism"]) .dark th {
       background-color: #1a1a1a !important;
       color: var(--text-primary) !important;
     }
 
-    .dark td {
+    html:not([data-theme="neubrutalism"]) .dark td {
       background-color: #0a0a0a !important;
       color: var(--text-primary) !important;
       border-color: #2a2a2a !important;
     }
 
-    .dark tr:hover td {
+    html:not([data-theme="neubrutalism"]) .dark tr:hover td {
       background-color: #1a1a1a !important;
     }
 
@@ -342,20 +370,20 @@
       background: transparent !important;
     }
 
-    /* Navigation styles for dark mode */
-    .dark .nav-pill {
+    /* Navigation styles for dark mode - ESCLUDI Neubrutalism */
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill {
       color: #d1d5db !important;
     }
 
-    .dark .nav-pill .text-gray-500 {
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill .text-gray-500 {
       color: #9ca3af !important;
     }
 
-    .dark .nav-pill:hover {
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill:hover {
       background-color: rgba(55, 65, 81, 0.5) !important;
     }
 
-    .dark .nav-pill.active {
+    html:not([data-theme="neubrutalism"]) .dark .nav-pill.active {
       background-color: rgba(55, 65, 81, 0.7) !important;
     }
 
@@ -572,11 +600,1372 @@
       overflow-x: hidden;
     }
     
-   
+    /* Settings panel slide-in animation with bounce */
+    @keyframes slideInBounce {
+      0% {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      60% {
+        opacity: 1;
+        transform: translateX(-10px);
+      }
+      80% {
+        transform: translateX(5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideOutRight {
+      0% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+    }
+    
+    .settings-panel-enter {
+      animation: slideInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .settings-panel-leave {
+      animation: slideOutRight 0.2s ease-in forwards;
+    }
+    
+    /* Theme selector animations */
+    @keyframes slideUpBounce {
+      0% {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-10px);
+      }
+      80% {
+        transform: translateY(5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideDownOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+    }
+    
+    .theme-selector-enter {
+      animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .theme-selector-leave {
+      animation: slideDownOut 0.4s ease-in forwards;
+    }
+    
+    /* Theme glow effect */
+    .theme-glow-blue {
+      box-shadow: 0 0 60px 30px rgba(0, 86, 166, 0.3),
+                  0 0 100px 50px rgba(0, 168, 232, 0.2);
+    }
+    
+    .theme-glow-neubrutalism {
+      box-shadow: 0 0 60px 30px rgba(255, 214, 10, 0.4),
+                  0 0 100px 50px rgba(124, 58, 237, 0.3);
+    }
+    
+    /* Floating buttons with modern style - applies to all themes */
+    .floating-btn {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .floating-btn:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+      transform: translateY(-2px) !important;
+    }
+    
+    .floating-btn:active {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+      transform: translateY(0) !important;
+    }
+    
+    /* Neubrutalism Theme Styles */
+    [data-theme="neubrutalism"] {
+      /* Colors */
+      --nb-yellow: #FFD60A;
+      --nb-purple: #7C3AED;
+      --nb-blue: #3B82F6;
+      --nb-red: #EF4444;
+      --nb-green: #10B981;
+      --nb-black: #000000;
+      --nb-white: #FFFFFF;
+      --nb-gray: #F3F4F6;
+      --nb-border: 3px;
+    }
+    
+    /* PRIORITÀ MASSIMA: Rimuovi TUTTI gli sfondi dai nav-pill in Neubrutalism */
+    html[data-theme="neubrutalism"] .nav-pill,
+    html[data-theme="neubrutalism"] a.nav-pill,
+    html[data-theme="neubrutalism"] button.nav-pill,
+    html[data-theme="neubrutalism"] .nav-pill:hover,
+    html[data-theme="neubrutalism"] .nav-pill:focus,
+    html[data-theme="neubrutalism"] .nav-pill:active,
+    html[data-theme="neubrutalism"] .nav-pill.active,
+    html[data-theme="neubrutalism"] a.nav-pill:hover,
+    html[data-theme="neubrutalism"] a.nav-pill.active,
+    html[data-theme="neubrutalism"] button.nav-pill:hover,
+    html[data-theme="neubrutalism"] button.nav-pill.active {
+      background: none !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border-left: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Neubrutalism: Font - Space Grotesk style (bold, geometric) */
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    
+    [data-theme="neubrutalism"] * {
+      font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+    }
+    
+    /* Neubrutalism: Reset background to pure white */
+    [data-theme="neubrutalism"] body,
+    [data-theme="neubrutalism"] html {
+      background-color: var(--nb-white) !important;
+    }
+    
+    [data-theme="neubrutalism"] .dark body,
+    [data-theme="neubrutalism"] .dark html {
+      background-color: var(--nb-white) !important;
+    }
+    
+    [data-theme="neubrutalism"] .bg-gray-50,
+    [data-theme="neubrutalism"] .bg-gray-100,
+    [data-theme="neubrutalism"] .bg-white {
+      background-color: var(--nb-white) !important;
+    }
+    
+    [data-theme="neubrutalism"] .dark .bg-gray-50,
+    [data-theme="neubrutalism"] .dark .bg-gray-100,
+    [data-theme="neubrutalism"] .dark .bg-white,
+    [data-theme="neubrutalism"] .dark .bg-black {
+      background-color: var(--nb-white) !important;
+    }
+    
+    /* Neubrutalism: All containers and divs */
+    [data-theme="neubrutalism"] .main-content-area,
+    [data-theme="neubrutalism"] div {
+      background-color: transparent;
+    }
+    
+    /* Neubrutalism: Cards with bold black borders */
+    [data-theme="neubrutalism"] .glass-card {
+      background: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    [data-theme="neubrutalism"] .glass-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: All buttons base style */
+    [data-theme="neubrutalism"] button:not(.nav-pill),
+    [data-theme="neubrutalism"] .gradient-btn,
+    [data-theme="neubrutalism"] .floating-btn,
+    [data-theme="neubrutalism"] [type="button"]:not(.nav-pill),
+    [data-theme="neubrutalism"] [type="submit"]:not(.nav-pill) {
+      background: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      font-weight: 700 !important;
+      transition: all 0.2s ease !important;
+      text-shadow: none !important;
+    }
+    
+    [data-theme="neubrutalism"] button:hover,
+    [data-theme="neubrutalism"] .gradient-btn:hover,
+    [data-theme="neubrutalism"] .floating-btn:hover {
+      transform: translate(-2px, -2px) !important;
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"] button:active,
+    [data-theme="neubrutalism"] .gradient-btn:active,
+    [data-theme="neubrutalism"] .floating-btn:active {
+      transform: translate(2px, 2px) !important;
+      box-shadow: 2px 2px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Primary/blue buttons purple */
+    [data-theme="neubrutalism"] .bg-blue-600,
+    [data-theme="neubrutalism"] .bg-blue-500,
+    [data-theme="neubrutalism"] .bg-phg-primary,
+    [data-theme="neubrutalism"] button.bg-blue-600,
+    [data-theme="neubrutalism"] .hover\:bg-blue-700:hover {
+      background: var(--nb-purple) !important;
+      color: var(--nb-white) !important;
+      border-color: var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Success buttons green */
+    [data-theme="neubrutalism"] .bg-green-600,
+    [data-theme="neubrutalism"] .bg-green-500,
+    [data-theme="neubrutalism"] button.bg-green-600 {
+      background: var(--nb-green) !important;
+      color: var(--nb-white) !important;
+      border-color: var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Danger buttons red */
+    [data-theme="neubrutalism"] .bg-red-600,
+    [data-theme="neubrutalism"] .bg-red-500,
+    [data-theme="neubrutalism"] button.bg-red-600,
+    [data-theme="neubrutalism"] .text-red-600 {
+      background: var(--nb-red) !important;
+      color: var(--nb-white) !important;
+      border-color: var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Sidebar with bold borders */
+    [data-theme="neubrutalism"] .sidebar-header,
+    [data-theme="neubrutalism"] nav,
+    [data-theme="neubrutalism"] .fixed.inset-y-0 {
+      background: var(--nb-white) !important;
+      border-right: var(--nb-border) solid var(--nb-black) !important;
+    }
+    
+    html[data-theme="neubrutalism"] .nav-pill {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0.5rem !important;
+      font-weight: 600 !important;
+      color: var(--nb-black) !important;
+      transition: all 0.2s ease !important;
+      box-shadow: none !important;
+    }
+    
+    html[data-theme="neubrutalism"] .nav-pill:hover {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      border-left: none !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    
+    html[data-theme="neubrutalism"] .nav-pill.active {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      border-left: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Force override di tutte le classi Tailwind sui nav-pill */
+    html[data-theme="neubrutalism"] a.nav-pill,
+    html[data-theme="neubrutalism"] a.nav-pill:hover,
+    html[data-theme="neubrutalism"] a.nav-pill.active,
+    html[data-theme="neubrutalism"] button.nav-pill,
+    html[data-theme="neubrutalism"] button.nav-pill:hover,
+    html[data-theme="neubrutalism"] button.nav-pill.active {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      border-left: none !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    
+    /* SUPER OVERRIDE - usa path completo della sidebar */
+    html[data-theme="neubrutalism"] nav.fixed a.nav-pill,
+    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:hover,
+    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:focus,
+    html[data-theme="neubrutalism"] nav.fixed a.nav-pill.active,
+    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:active {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border: none !important;
+      border-left: none !important;
+      border-right: none !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    
+    /* Neubrutalism: Input fields */
+    [data-theme="neubrutalism"] input,
+    [data-theme="neubrutalism"] select,
+    [data-theme="neubrutalism"] textarea,
+    [data-theme="neubrutalism"] input[type="text"],
+    [data-theme="neubrutalism"] input[type="number"],
+    [data-theme="neubrutalism"] input[type="email"],
+    [data-theme="neubrutalism"] input[type="password"],
+    [data-theme="neubrutalism"] input[type="search"] {
+      background: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      color: var(--nb-black) !important;
+      font-weight: 600 !important;
+      box-shadow: none !important;
+    }
+    
+    [data-theme="neubrutalism"] input:focus,
+    [data-theme="neubrutalism"] select:focus,
+    [data-theme="neubrutalism"] textarea:focus {
+      outline: none !important;
+      box-shadow: 4px 4px 0 var(--nb-purple) !important;
+      transform: translate(-1px, -1px);
+      border-color: var(--nb-black) !important;
+    }
+     
+    /* Neubrutalism: Filter container & groups (logmovimenti) */
+    [data-theme="neubrutalism"] .filter-container {
+      background: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-radius: 0.75rem !important;
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+      backdrop-filter: none !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-container::before {
+      display: none !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-group {
+      background: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-group.has-active {
+      background: var(--nb-yellow) !important;
+      border-color: var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-purple) !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-input-compact,
+    [data-theme="neubrutalism"] .notes-input-wrapper {
+      background: var(--nb-white) !important;
+      border: 2px solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      font-weight: 600 !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-input-compact.active {
+      background: var(--nb-yellow) !important;
+      border-color: var(--nb-black) !important;
+      box-shadow: 3px 3px 0 var(--nb-purple) !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-input-compact:focus,
+    [data-theme="neubrutalism"] .notes-input-compact:focus {
+      outline: none !important;
+      box-shadow: 4px 4px 0 var(--nb-purple) !important;
+      transform: translate(-1px, -1px);
+    }
+
+    [data-theme="neubrutalism"] .filter-title,
+    [data-theme="neubrutalism"] .filter-group-title {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+
+    /* Neubrutalism: Filter buttons */
+    [data-theme="neubrutalism"] .filter-btn-primary-compact {
+      background: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-btn-primary-compact:hover {
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+      transform: translate(-2px, -2px) !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-btn-secondary-compact {
+      background: var(--nb-white) !important;
+      color: var(--nb-black) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+
+    [data-theme="neubrutalism"] .filter-btn-secondary-compact:hover {
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+      transform: translate(-2px, -2px) !important;
+    }
+
+    /* Neubrutalism: Tables */
+    [data-theme="neubrutalism"] table {
+      border: var(--nb-border) solid var(--nb-black) !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      background: var(--nb-white) !important;
+      box-shadow: 5px 5px 0 var(--nb-black) !important;
+    }
+    
+    /* Stato normale: sfondo giallo */
+    [data-theme="neubrutalism"] th,
+    [data-theme="neubrutalism"] table th,
+    [data-theme="neubrutalism"] thead th {
+      background: var(--nb-yellow) !important;
+      background-color: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border-bottom: var(--nb-border) solid var(--nb-black) !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      font-size: 0.875rem !important;
+      letter-spacing: 0.05em !important;
+    }
+    
+    /* Hover: sfondo bianco */
+    [data-theme="neubrutalism"] th:hover,
+    [data-theme="neubrutalism"] table th:hover,
+    [data-theme="neubrutalism"] thead th:hover {
+      background: var(--nb-white) !important;
+      background-color: var(--nb-white) !important;
+      color: var(--nb-black) !important;
+    }
+    
+    /* Override Tailwind classes on th */
+    [data-theme="neubrutalism"] th a,
+    [data-theme="neubrutalism"] th a:hover,
+    [data-theme="neubrutalism"] th a i {
+      color: var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"] td {
+      border-bottom: 2px solid var(--nb-gray) !important;
+      color: var(--nb-black) !important;
+      font-weight: 500 !important;
+      background: var(--nb-white) !important;
+    }
+    
+    [data-theme="neubrutalism"] tr:hover td {
+      background: var(--nb-gray) !important;
+    }
+    
+    /* Neubrutalism: Topbar */
+    [data-theme="neubrutalism"] .sticky {
+      background: var(--nb-white) !important;
+      border-bottom: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 0 4px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Text colors bold and clear */
+    [data-theme="neubrutalism"] .text-gray-900,
+    [data-theme="neubrutalism"] .text-gray-800,
+    [data-theme="neubrutalism"] .text-gray-700,
+    [data-theme="neubrutalism"] .text-gray-600,
+    [data-theme="neubrutalism"] .text-gray-500,
+    [data-theme="neubrutalism"] .text-gray-400,
+    [data-theme="neubrutalism"] .text-gray-300,
+    [data-theme="neubrutalism"] h1, 
+    [data-theme="neubrutalism"] h2, 
+    [data-theme="neubrutalism"] h3, 
+    [data-theme="neubrutalism"] h4,
+    [data-theme="neubrutalism"] p,
+    [data-theme="neubrutalism"] span {
+      color: var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"] .text-phg-primary {
+      color: var(--nb-purple) !important;
+      font-weight: 700 !important;
+    }
+    
+    /* Neubrutalism: Icons with bold style */
+    [data-theme="neubrutalism"] .icon-circle {
+      background: var(--nb-yellow) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      color: var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: All FontAwesome icons - make them bold and visible */
+    [data-theme="neubrutalism"] .fa,
+    [data-theme="neubrutalism"] .fas,
+    [data-theme="neubrutalism"] i.fas,
+    [data-theme="neubrutalism"] i.fa {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+      font-size: inherit !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      font-family: "Font Awesome 6 Free" !important;
+      display: inline-block !important;
+      font-style: normal !important;
+      font-variant: normal !important;
+      text-rendering: auto !important;
+      line-height: 1 !important;
+    }
+    
+    /* Neubrutalism: Icon containers with colored backgrounds */
+    [data-theme="neubrutalism"] .nav-pill i {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      background: var(--nb-yellow) !important;
+      border: 2px solid var(--nb-black) !important;
+      border-radius: 0.375rem !important;
+      color: var(--nb-black) !important;
+      margin-right: 0.5rem;
+      box-shadow: 2px 2px 0 var(--nb-black) !important;
+      font-size: 1rem !important;
+    }
+    
+    /* Neubrutalism: Active nav icons in purple */
+    [data-theme="neubrutalism"] .nav-pill.active i {
+      background: var(--nb-purple) !important;
+      color: var(--nb-white) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Hover effect on nav icons */
+    [data-theme="neubrutalism"] .nav-pill:hover i {
+      background: var(--nb-blue) !important;
+      color: var(--nb-white) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Topbar buttons and links - remove all borders and backgrounds */
+    [data-theme="neubrutalism"] .sticky button,
+    [data-theme="neubrutalism"] .sticky a,
+    [data-theme="neubrutalism"] #dark-mode-toggle,
+    [data-theme="neubrutalism"] button[title="Impostazioni"],
+    [data-theme="neubrutalism"] a[title="Changelog"] {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    
+    /* Neubrutalism: Topbar icons - clean without borders, all identical */
+    [data-theme="neubrutalism"] .sticky button i,
+    [data-theme="neubrutalism"] .sticky a i,
+    [data-theme="neubrutalism"] #dark-mode-toggle i,
+    [data-theme="neubrutalism"] .fa-sun,
+    [data-theme="neubrutalism"] .fa-moon,
+    [data-theme="neubrutalism"] .fa-code-branch,
+    [data-theme="neubrutalism"] button[title="Impostazioni"] i,
+    [data-theme="neubrutalism"] .fa-cog {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      width: auto !important;
+      height: auto !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    
+    /* Neubrutalism Dark: Topbar icons white */
+    html[data-theme="neubrutalism"] body.dark .sticky button i,
+    html[data-theme="neubrutalism"] body.dark .sticky a i,
+    html[data-theme="neubrutalism"] body.dark #dark-mode-toggle i,
+    html[data-theme="neubrutalism"] body.dark .fa-sun,
+    html[data-theme="neubrutalism"] body.dark .fa-moon,
+    html[data-theme="neubrutalism"] body.dark .fa-code-branch,
+    html[data-theme="neubrutalism"] body.dark button[title="Impostazioni"] i,
+    html[data-theme="neubrutalism"] body.dark .fa-cog {
+      color: #FFFFFF !important;
+    }
+    
+    /* Neubrutalism: Button icons inside buttons */
+    [data-theme="neubrutalism"] button i,
+    [data-theme="neubrutalism"] .gradient-btn i {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      width: auto !important;
+      height: auto !important;
+      margin-right: 0.25rem;
+    }
+    
+    /* Neubrutalism: Table action icons */
+    [data-theme="neubrutalism"] table button i {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Neubrutalism: Specific icon colors for actions */
+    [data-theme="neubrutalism"] .fa-check,
+    [data-theme="neubrutalism"] .fa-check-circle {
+      color: var(--nb-green) !important;
+    }
+    
+    [data-theme="neubrutalism"] .fa-times,
+    [data-theme="neubrutalism"] .fa-times-circle,
+    [data-theme="neubrutalism"] .fa-trash {
+      color: var(--nb-red) !important;
+    }
+    
+    [data-theme="neubrutalism"] .fa-edit,
+    [data-theme="neubrutalism"] .fa-pen {
+      color: var(--nb-blue) !important;
+    }
+    
+    [data-theme="neubrutalism"] .fa-info-circle,
+    [data-theme="neubrutalism"] .fa-exclamation-circle {
+      color: var(--nb-purple) !important;
+    }
+    
+    /* Neubrutalism: Chevron and arrow icons */
+    [data-theme="neubrutalism"] .fa-chevron-right,
+    [data-theme="neubrutalism"] .fa-chevron-left,
+    [data-theme="neubrutalism"] .fa-chevron-down,
+    [data-theme="neubrutalism"] .fa-arrow-right,
+    [data-theme="neubrutalism"] .fa-arrow-left,
+    [data-theme="neubrutalism"] .fa-arrow-up,
+    [data-theme="neubrutalism"] .fa-arrow-down {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    /* Neubrutalism: Mobile bottom menu icons */
+    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 i {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: var(--nb-yellow) !important;
+      border: 2px solid var(--nb-black) !important;
+      border-radius: 0.5rem !important;
+      color: var(--nb-black) !important;
+      box-shadow: 2px 2px 0 var(--nb-black) !important;
+      margin-bottom: 0.25rem;
+      font-size: 1.25rem !important;
+    }
+    
+    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 .text-phg-primary i {
+      background: var(--nb-purple) !important;
+      color: var(--nb-white) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: User profile icon */
+    [data-theme="neubrutalism"] img.rounded-full {
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Bug report icon - red */
+    [data-theme="neubrutalism"] .fa-bug {
+      color: var(--nb-red) !important;
+    }
+    
+    /* Neubrutalism: Shield icon for admin */
+    [data-theme="neubrutalism"] .fa-shield-alt {
+      color: var(--nb-purple) !important;
+    }
+    
+    /* Neubrutalism: User icon */
+    [data-theme="neubrutalism"] .fa-user,
+    [data-theme="neubrutalism"] .fa-user-plus {
+      color: var(--nb-blue) !important;
+    }
+    
+    /* Neubrutalism Light: Contenitore icona utente sidebar - RIMOSSO BORDO */
+    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0.rounded-full,
+    [data-theme="neubrutalism"]:not(.dark) nav .bg-white.rounded-full,
+    [data-theme="neubrutalism"]:not(.dark) nav .border.rounded-full {
+      border: none !important;
+      background: transparent !important;
+    }
+    
+    /* Neubrutalism Light: Icona utente sidebar visibile con bordo giallo */
+    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0.rounded-full {
+      border: 3px solid var(--nb-yellow) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+      background: var(--nb-white) !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0 .fa-user {
+      color: var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism Light: Rimuovi TUTTI i bordi dal container segnala bug */
+    [data-theme="neubrutalism"]:not(.dark) .bug-btn,
+    [data-theme="neubrutalism"]:not(.dark) a.bug-btn,
+    [data-theme="neubrutalism"]:not(.dark) .border-b.pb-4 {
+      border: none !important;
+      background: transparent !important;
+      border-bottom: none !important;
+      padding-bottom: 1rem !important;
+    }
+    
+    /* Neubrutalism: Shadows always black, no blur */
+    [data-theme="neubrutalism"] .shadow,
+    [data-theme="neubrutalism"] .shadow-sm,
+    [data-theme="neubrutalism"] .shadow-md,
+    [data-theme="neubrutalism"] .shadow-lg,
+    [data-theme="neubrutalism"] .shadow-xl,
+    [data-theme="neubrutalism"] .shadow-2xl {
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Links */
+    [data-theme="neubrutalism"] a {
+      color: var(--nb-purple) !important;
+      font-weight: 600 !important;
+      text-decoration: none !important;
+    }
+    
+    [data-theme="neubrutalism"] a:hover {
+      text-decoration: underline !important;
+    }
+    
+    /* Neubrutalism: Modals and overlays */
+    [data-theme="neubrutalism"] .fixed.inset-0 {
+      background: rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Neubrutalism: Settings panel */
+    [data-theme="neubrutalism"] .bg-white.dark\:bg-gray-800,
+    [data-theme="neubrutalism"] [class*="bg-gray"] {
+      background: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism Light Mode: Settings Panel dettagliato */
+    [data-theme="neubrutalism"]:not(.dark) div[x-show="settingsOpen"].fixed.bg-white {
+      background: var(--nb-white) !important;
+      border: 3px solid var(--nb-black) !important;
+      box-shadow: none !important;
+    }
+    
+    /* Settings panel header giallo */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child.border-b {
+      background: var(--nb-yellow) !important;
+      border-bottom: 3px solid var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child h3,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child i {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    /* Area utente senza bordo */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .bg-gray-100,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .rounded-full.border,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .border-gray-200,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .flex-shrink-0.border {
+      background: transparent !important;
+      border: none !important;
+    }
+    
+    /* Icona utente visibile */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] img.rounded-full {
+      border: 3px solid var(--nb-yellow) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+      background: var(--nb-white) !important;
+    }
+    
+    /* Pulsanti gialli con testo nero */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative):not([class*="text-red"]) {
+      background: var(--nb-yellow) !important;
+      border: 3px solid var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative) span,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative) i {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:hover:not(.relative) {
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      transform: translate(-2px, -2px) !important;
+    }
+    
+    /* Toggle switch */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button.relative.inline-flex {
+      border: 3px solid var(--nb-black) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Logout button rosso */
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"] {
+      background: #DC2626 !important;
+      color: var(--nb-black) !important;
+      border: 3px solid var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600:hover,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"]:hover {
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      transform: translate(-2px, -2px) !important;
+    }
+    
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600 i,
+    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"] i {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    /* Neubrutalism: Borders everywhere */
+    [data-theme="neubrutalism"] .border,
+    [data-theme="neubrutalism"] .border-gray-200,
+    [data-theme="neubrutalism"] .border-gray-300 {
+      border-color: var(--nb-black) !important;
+      border-width: 2px !important;
+    }
+    
+    /* Neubrutalism: Rounded elements stay slightly rounded */
+    [data-theme="neubrutalism"] .rounded-full {
+      border-radius: 0.75rem !important;
+    }
+    
+    
+    /* ========== DARK MODE: SOLO COLORI CAMBIATI ========== */
+    /* Background principale ultra-nero */
+    html[data-theme="neubrutalism"] body.dark {
+      background-color: #000000 !important;
+    }
+    
+    /* Testo bianco di default per TUTTO */
+    html[data-theme="neubrutalism"] body.dark,
+    html[data-theme="neubrutalism"] body.dark * {
+      color: #FFFFFF !important;
+    }
+    
+    /* Cards: sfondo scuro, bordo giallo, ombra bianca */
+    html[data-theme="neubrutalism"] body.dark .glass-card {
+      background: #141414 !important;
+      border: 3px solid var(--nb-white) !important;
+      box-shadow: 6px 6px 0 #FFFFFF !important;
+    }
+    
+    /* Sidebar e nav: sfondo nero, bordo giallo */
+    html[data-theme="neubrutalism"] body.dark .fixed.inset-y-0,
+    html[data-theme="neubrutalism"] body.dark nav {
+      background: #0a0a0a !important;
+      border-right: 3px solid var(--nb-white) !important;
+    }
+
+    /* Neubrutalism: uniform sidebar background across sections */
+    html[data-theme="neubrutalism"] .sidebar-container {
+      background: var(--nb-white) !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .sidebar-container {
+      background: #0a0a0a !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .sidebar-container nav,
+    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-footer {
+      background: transparent !important;
+    }
+
+    /* Neubrutalism: logo area inherits container background (light & dark) */
+    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header,
+    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header::before,
+    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header::after,
+    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header,
+    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header::before,
+    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header::after {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+    
+    /* Table: sfondo scuro, bordi gialli, ombra bianca */
+    html[data-theme="neubrutalism"] body.dark table {
+      background: #141414 !important;
+      border: 3px solid var(--nb-white) !important;
+      box-shadow: 6px 6px 0 #FFFFFF !important;
+    }
+    
+    /* TD: sfondo scuro */
+    html[data-theme="neubrutalism"] body.dark td {
+      background: #141414 !important;
+      border-bottom: 2px solid #0a0a0a !important;
+    }
+    
+    /* TR hover: sfondo più scuro */
+    html[data-theme="neubrutalism"] body.dark tr:hover td {
+      background: #0a0a0a !important;
+    }
+    
+    /* Elementi con background bianco forzato - RIMOSSA la regola [class*="bg-white"] che causava problemi */
+  html[data-theme="neubrutalism"] body.dark .bg-white:not(.dark\:bg-gray-800):not(.sidebar-dropdown),
+    html[data-theme="neubrutalism"] body.dark .bg-gray-50,
+    html[data-theme="neubrutalism"] body.dark .bg-gray-100 {
+      background: #141414 !important;
+      background-color: #141414 !important;
+    }
+
+    /* Neubrutalism Dark: Filter containers and groups */
+    html[data-theme="neubrutalism"] body.dark .filter-container {
+      background: #141414 !important;
+      border: 3px solid var(--nb-white) !important;
+      box-shadow: 6px 6px 0 #FFFFFF !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-group {
+      background: #0a0a0a !important;
+      border: 3px solid var(--nb-white) !important;
+      box-shadow: 3px 3px 0 #FFFFFF !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-group.has-active {
+      background: var(--nb-yellow) !important;
+      border-color: var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-purple) !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-group.has-active * {
+      color: var(--nb-black) !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-input-compact,
+    html[data-theme="neubrutalism"] body.dark .notes-input-wrapper {
+      background: #0a0a0a !important;
+      border: 2px solid var(--nb-white) !important;
+      color: #FFFFFF !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-input-compact.active {
+      background: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border-color: var(--nb-black) !important;
+      box-shadow: 3px 3px 0 var(--nb-purple) !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-input-compact:focus,
+    html[data-theme="neubrutalism"] body.dark .notes-input-compact:focus {
+      box-shadow: 4px 4px 0 var(--nb-purple) !important;
+      transform: translate(-1px, -1px);
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-btn-primary-compact {
+      background: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border: 3px solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 #FFFFFF !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-btn-primary-compact:hover {
+      box-shadow: 6px 6px 0 #FFFFFF !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-btn-secondary-compact {
+      background: var(--nb-white) !important;
+      color: var(--nb-black) !important;
+      border: 3px solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark .filter-btn-secondary-compact:hover {
+      box-shadow: 6px 6px 0 var(--nb-black) !important;
+    }
+
+    /* Sidebar dropdown: chiaro e scuro coerenti */
+    [data-theme="neubrutalism"] nav .sidebar-dropdown,
+    [data-theme="neubrutalism"] nav .sidebar-dropdown a {
+      background: #ffffff !important;
+      border-color: var(--nb-black) !important;
+      color: var(--nb-black) !important;
+    }
+
+    [data-theme="neubrutalism"] nav .sidebar-dropdown a:hover {
+      background: #f3f4f6 !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown,
+    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown a {
+      background: #0a0a0a !important;
+      border-color: var(--nb-white) !important;
+      color: #f9fafb !important;
+    }
+
+    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown a:hover {
+      background: #141414 !important;
+    }
+    
+    /* Badge pills - mantengono sfondo giallo con testo nero */
+    html[data-theme="neubrutalism"] body.dark .badge,
+    html[data-theme="neubrutalism"] body.dark span[class*="bg-green"],
+    html[data-theme="neubrutalism"] body.dark span[class*="bg-blue"],
+    html[data-theme="neubrutalism"] body.dark span[class*="bg-yellow"],
+    html[data-theme="neubrutalism"] body.dark span[class*="bg-red"] {
+      background-color: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border: 2px solid var(--nb-black) !important;
+    }
+    
+    /* Inputs: sfondo scuro, bordo giallo */
+    html[data-theme="neubrutalism"] body.dark input,
+    html[data-theme="neubrutalism"] body.dark select,
+    html[data-theme="neubrutalism"] body.dark textarea {
+      background: #0a0a0a !important;
+      border-color: var(--nb-white) !important;
+      color: #FFFFFF !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark input::placeholder,
+    html[data-theme="neubrutalism"] body.dark select::placeholder,
+    html[data-theme="neubrutalism"] body.dark textarea::placeholder {
+      color: #888888 !important;
+    }
+    
+    /* Select options */
+    html[data-theme="neubrutalism"] body.dark select option {
+      background: #0a0a0a !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* Icon circles nelle stats card - icone gialle con ombra bianca */
+    html[data-theme="neubrutalism"] body.dark .icon-circle {
+      background: var(--nb-yellow) !important;
+      border: 3px solid var(--nb-black) !important;
+      box-shadow: 5px 5px 0 #FFFFFF !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark .icon-circle i,
+    html[data-theme="neubrutalism"] body.dark .icon-circle svg,
+    html[data-theme="neubrutalism"] body.dark .icon-circle *,
+    html[data-theme="neubrutalism"] body.dark .glass-card .icon-circle i,
+    html[data-theme="neubrutalism"] body.dark .glass-card .icon-circle svg {
+      color: var(--nb-black) !important;
+      fill: var(--nb-black) !important;
+      background: var(--nb-yellow) !important;
+    }
+    
+    /* Stats card icons - forza colori */
+    html[data-theme="neubrutalism"] body.dark .glass-card i[class*="fa-"],
+    html[data-theme="neubrutalism"] body.dark .glass-card svg[class*="fa-"] {
+      color: var(--nb-black) !important;
+    }
+    
+    /* BORDI BIANCHI - Glass cards e filtri */
+    html[data-theme="neubrutalism"] body.dark .glass-card {
+      border-color: #FFFFFF !important;
+    }
+    
+    /* Header tabella "Stock Campospinoso" - bordo inferiore BIANCO */
+    html[data-theme="neubrutalism"] body.dark .glass-card > div.border-b.px-6.py-4,
+    html[data-theme="neubrutalism"] body.dark .desktop-table > div.border-b.px-6.py-4,
+    html[data-theme="neubrutalism"] body.dark .glass-card div.border-b[class*="px-6"],
+    html[data-theme="neubrutalism"] body.dark .desktop-table div.border-b[class*="px-6"] {
+      border-bottom-color: #FFFFFF !important;
+      border-bottom-width: 3px !important;
+      border-bottom-style: solid !important;
+      background: #0a0a0a !important;
+    }
+    
+    /* Filtri e pannello ricerca - TUTTI i bordi */
+    html[data-theme="neubrutalism"] body.dark .border,
+    html[data-theme="neubrutalism"] body.dark [class*="border-"] {
+      border-color: var(--nb-white) !important;
+    }
+    
+    /* Settings Panel - bordo bianco semplice */
+    html[data-theme="neubrutalism"] body.dark div[x-show="settingsOpen"].fixed.bg-white,
+    html[data-theme="neubrutalism"] body.dark div[x-show="settingsOpen"].dark\:bg-gray-800,
+    html[data-theme="neubrutalism"] body.dark .fixed.right-4.bg-white.dark\:bg-gray-800 {
+      background: #000000 !important;
+      background-color: #000000 !important;
+      border: 3px solid #FFFFFF !important;
+      box-shadow: none !important;
+    }
+    
+    /* Settings panel - header con sfondo giallo */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child.border-b {
+      background: var(--nb-yellow) !important;
+      border-bottom: 3px solid var(--nb-black) !important;
+      border-color: var(--nb-black) !important;
+    }
+    
+    /* Settings panel - titolo header nero su giallo (grassetto) */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child h3,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child i {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    /* Settings panel - divisori bianchi */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-b:not(:first-child),
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-gray-200 {
+      border-color: #FFFFFF !important;
+    }
+    
+    /* Settings panel - area utente SENZA BORDO */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .bg-gray-100,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .dark\:bg-gray-700,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-gray-200,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .rounded-full.border {
+      background: transparent !important;
+      border: none !important;
+    }
+    
+    /* Settings panel - icona utente visibile */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] img.rounded-full {
+      border: 3px solid var(--nb-yellow) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+      background: #FFFFFF !important;
+      filter: none !important;
+      opacity: 1 !important;
+    }
+    
+    /* Dark mode: Contenitore icona utente sidebar - RIMOSSO BORDO (identico a light mode) */
+    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0.rounded-full,
+    html[data-theme="neubrutalism"] body.dark nav .bg-white.rounded-full,
+    html[data-theme="neubrutalism"] body.dark nav .border.rounded-full,
+    html[data-theme="neubrutalism"] body.dark nav .dark\:bg-gray-700 {
+      border: none !important;
+      background: transparent !important;
+    }
+    
+    /* Dark mode: Icona utente sidebar visibile */
+    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0.rounded-full {
+      border: 3px solid var(--nb-yellow) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+      background: var(--nb-white) !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0 .fa-user {
+      color: var(--nb-black) !important;
+    }
+    
+    /* Dark mode: Rimuovi TUTTI i bordi dal container segnala bug (identico a light mode) */
+    html[data-theme="neubrutalism"] body.dark .bug-btn,
+    html[data-theme="neubrutalism"] body.dark a.bug-btn,
+    html[data-theme="neubrutalism"] body.dark .border-b.pb-4 {
+      border: none !important;
+      background: transparent !important;
+      border-bottom: none !important;
+      padding-bottom: 1rem !important;
+    }
+    
+    /* Settings panel - tutto il testo bianco */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] p,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] span,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-900,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-700,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-500 {
+      color: #FFFFFF !important;
+    }
+    
+    /* Settings panel - pulsanti gialli con testo NERO GRASSETTO */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative):not([class*="text-red"]) {
+      background: var(--nb-yellow) !important;
+      border: 3px solid var(--nb-black) !important;
+      transition: all 0.2s !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative) span,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative) i {
+      color: var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:hover:not(.relative) {
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+      transform: translate(-2px, -2px) !important;
+    }
+    
+    /* Toggle switch dark mode */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button.relative.inline-flex {
+      border: 3px solid var(--nb-yellow) !important;
+      box-shadow: 3px 3px 0 var(--nb-black) !important;
+    }
+    
+    /* Logout button rosso con icona NERA */
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"] {
+      background: #DC2626 !important;
+      color: var(--nb-black) !important;
+      border: 3px solid var(--nb-black) !important;
+      font-weight: 900 !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600:hover,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"]:hover {
+      transform: translate(-2px, -2px) !important;
+    }
+    
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600 i,
+    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"] i {
+      font-weight: 900 !important;
+    }
+    
+    /* Contenitori e wrapper - TUTTI SCURI */
+    html[data-theme="neubrutalism"] body.dark .container,
+    html[data-theme="neubrutalism"] body.dark .wrapper,
+    html[data-theme="neubrutalism"] body.dark [class*="container"],
+    html[data-theme="neubrutalism"] body.dark .overflow-x-auto,
+    html[data-theme="neubrutalism"] body.dark .relative {
+      background: transparent !important;
+    }
+    
+    /* Barra sopra la tabella e header */
+    html[data-theme="neubrutalism"] body.dark thead,
+    html[data-theme="neubrutalism"] body.dark thead tr {
+      background: transparent !important;
+    }
+    
+    /* Qualsiasi div con sfondo chiaro */
+    html[data-theme="neubrutalism"] body.dark div[class*="bg-"],
+    html[data-theme="neubrutalism"] body.dark section[class*="bg-"] {
+      background-color: transparent !important;
+    }
+    
+    /* SVG e icone */
+    html[data-theme="neubrutalism"] body.dark svg,
+    html[data-theme="neubrutalism"] body.dark svg path {
+      fill: currentColor !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* ECCEZIONI: Testo e icone NERI dove c'è sfondo giallo */
+    
+    /* Bottoni gialli */
+    html[data-theme="neubrutalism"] body.dark button,
+    html[data-theme="neubrutalism"] body.dark button *,
+    html[data-theme="neubrutalism"] body.dark button i,
+    html[data-theme="neubrutalism"] body.dark .gradient-btn,
+    html[data-theme="neubrutalism"] body.dark .gradient-btn *,
+    html[data-theme="neubrutalism"] body.dark .gradient-btn i,
+    html[data-theme="neubrutalism"] body.dark .floating-btn,
+    html[data-theme="neubrutalism"] body.dark .floating-btn *,
+    html[data-theme="neubrutalism"] body.dark .floating-btn i,
+    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill),
+    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill) *,
+    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill) i,
+    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill),
+    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill) *,
+    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill) i {
+      color: var(--nb-black) !important;
+    }
+    
+    /* Header tabella giallo */
+    html[data-theme="neubrutalism"] body.dark th,
+    html[data-theme="neubrutalism"] body.dark th *,
+    html[data-theme="neubrutalism"] body.dark th a,
+    html[data-theme="neubrutalism"] body.dark th i,
+    html[data-theme="neubrutalism"] body.dark thead th,
+    html[data-theme="neubrutalism"] body.dark thead th *,
+    html[data-theme="neubrutalism"] body.dark thead th a,
+    html[data-theme="neubrutalism"] body.dark thead th i {
+      color: var(--nb-black) !important;
+    }
+    
+    /* Nav-pill icons (sfondo giallo) */
+    html[data-theme="neubrutalism"] body.dark .nav-pill i,
+    html[data-theme="neubrutalism"] body.dark .nav-pill svg {
+      color: var(--nb-black) !important;
+      fill: var(--nb-black) !important;
+    }
+    
+    /* Badge gialli */
+    html[data-theme="neubrutalism"] body.dark .badge,
+    html[data-theme="neubrutalism"] body.dark .badge *,
+    html[data-theme="neubrutalism"] body.dark .badge i {
+      color: var(--nb-black) !important;
+    }
+    
+    
+    /* ===== OVERRIDE FINALE PER NAV-PILL - MASSIMA PRIORITA' ===== */
+    /* Rimuove tutti gli sfondi dalla sidebar in LIGHT mode */
+    html[data-theme="neubrutalism"] .nav-pill,
+    html[data-theme="neubrutalism"] a.nav-pill,
+    html[data-theme="neubrutalism"] button.nav-pill {
+      background-color: transparent !important;
+      background: transparent !important;
+      border-left: none !important;
+    }
+    
+    html[data-theme="neubrutalism"] .nav-pill:hover,
+    html[data-theme="neubrutalism"] a.nav-pill:hover,
+    html[data-theme="neubrutalism"] button.nav-pill:hover {
+      background-color: transparent !important;
+      background: transparent !important;
+      border-left: none !important;
+    }
+    
+    html[data-theme="neubrutalism"] .nav-pill.active,
+    html[data-theme="neubrutalism"] a.nav-pill.active,
+    html[data-theme="neubrutalism"] button.nav-pill.active {
+      background-color: transparent !important;
+      background: transparent !important;
+      border-left: none !important;
+    }
+    
+    /* Neubrutalism: Flash messages */
+    [data-theme="neubrutalism"] .bg-green-100 {
+      background: var(--nb-green) !important;
+      color: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+    }
+    
+    [data-theme="neubrutalism"] .bg-red-100 {
+      background: var(--nb-red) !important;
+      color: var(--nb-white) !important;
+      border: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 4px 4px 0 var(--nb-black) !important;
+    }
+    
+    /* Neubrutalism: Badges and tags */
+    [data-theme="neubrutalism"] .badge,
+    [data-theme="neubrutalism"] span.text-xs {
+      background: var(--nb-yellow) !important;
+      color: var(--nb-black) !important;
+      border: 2px solid var(--nb-black) !important;
+      padding: 0.25rem 0.5rem !important;
+      font-weight: 700 !important;
+    }
+    
+    /* Neubrutalism: Mobile bottom menu */
+    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 {
+      background: var(--nb-white) !important;
+      border-top: var(--nb-border) solid var(--nb-black) !important;
+      box-shadow: 0 -4px 0 var(--nb-black) !important;
+    }
 
 </style>
 {% block extra_css %}{% endblock %}
     <script>
+    // Apply theme on page load
+    (function() {
+      const savedTheme = localStorage.getItem('appTheme') || 'default';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+    
     document.addEventListener('DOMContentLoaded', function() {
       const mainContent = document.querySelector('.main-content-area');
       const stickyNav = mainContent.querySelector('.sticky');
@@ -586,6 +1975,13 @@
         nextElement.style.marginTop = '0';
         nextElement.style.paddingTop = '0';
       }
+      
+      // Watch for theme changes in localStorage
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'appTheme') {
+          document.documentElement.setAttribute('data-theme', e.newValue || 'default');
+        }
+      });
     });
     </script>
 </head>
@@ -617,6 +2013,123 @@
       :class="{ 'dark': darkMode }"
       class="bg-gray-50 dark:bg-black min-h-screen overflow-x-hidden"
       :style="darkMode ? 'background-color: #000000 !important;' : ''">
+  
+  <!-- Theme Selector Modal -->
+  <div x-data="{
+         themeSelectorOpen: false,
+         currentThemeIndex: 0,
+         previewTheme: 'default',
+         themes: [
+           { id: 'default', name: 'Pharmagest', primary: '#0056a6', secondary: '#00a8e8', glow: 'theme-glow-blue' },
+           { id: 'neubrutalism', name: 'Neubrutalism', primary: '#FFD60A', secondary: '#7C3AED', glow: 'theme-glow-neubrutalism' }
+         ],
+         get currentTheme() {
+           return this.themes[this.currentThemeIndex];
+         },
+         applyThemePreview() {
+           // Apply theme in real-time for preview
+           localStorage.setItem('appTheme', this.currentTheme.id);
+           document.documentElement.setAttribute('data-theme', this.currentTheme.id);
+           this.previewTheme = this.currentTheme.id;
+         },
+         nextTheme() {
+           this.currentThemeIndex = (this.currentThemeIndex + 1) % this.themes.length;
+           this.applyThemePreview();
+         },
+         prevTheme() {
+           this.currentThemeIndex = (this.currentThemeIndex - 1 + this.themes.length) % this.themes.length;
+           this.applyThemePreview();
+         },
+         confirmTheme() {
+           localStorage.setItem('appTheme', this.currentTheme.id);
+           this.themeSelectorOpen = false;
+         },
+         openSettings() {
+           this.themeSelectorOpen = false;
+           setTimeout(() => {
+             document.querySelector('[\\@click*=settingsOpen]').click();
+           }, 400);
+         }
+       }"
+       @open-theme-selector.window="themeSelectorOpen = true; 
+                                      const saved = localStorage.getItem('appTheme') || 'default';
+                                      currentThemeIndex = themes.findIndex(t => t.id === saved);
+                                      previewTheme = themes[currentThemeIndex].id;"
+       x-show="themeSelectorOpen"
+       class="fixed inset-0 z-[9999] flex items-end justify-center pointer-events-none"
+       style="display: none;">
+    
+    <!-- Theme Selector Bar -->
+    <div class="relative mb-6 w-full max-w-4xl mx-4 pointer-events-auto"
+         x-transition:enter="theme-selector-enter"
+         x-transition:leave="theme-selector-leave">
+      
+      <!-- Glow effect with local blur -->
+      <div class="absolute inset-0 rounded-full transition-all duration-500 blur-2xl opacity-60"
+           :class="currentTheme.glow"></div>
+      
+      <!-- Main content -->
+      <div class="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-full shadow-2xl border border-gray-200 dark:border-gray-700 px-6 py-3">
+        
+        <!-- Compact horizontal layout -->
+        <div class="flex items-center justify-between gap-4">
+          <!-- Back button -->
+          <button @click="openSettings()"
+                  class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors flex-shrink-0"
+                  title="Torna alle impostazioni">
+            <i class="fas fa-arrow-left text-gray-600 dark:text-gray-400 text-sm"></i>
+          </button>
+          
+          <!-- Previous button -->
+          <button @click="prevTheme()"
+                  class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all transform hover:scale-110 flex-shrink-0">
+            <i class="fas fa-chevron-left" 
+               :style="`color: ${currentTheme.primary}`"></i>
+          </button>
+          
+          <!-- Theme preview (compact) -->
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <div class="flex gap-2 flex-shrink-0">
+              <div class="w-8 h-8 rounded-full transition-all duration-500"
+                   :style="`background: ${currentTheme.primary}; box-shadow: 0 2px 10px ${currentTheme.primary}40`"></div>
+              <div class="w-8 h-8 rounded-full transition-all duration-500"
+                   :style="`background: ${currentTheme.secondary}; box-shadow: 0 2px 10px ${currentTheme.secondary}40`"></div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 truncate"
+                  x-text="currentTheme.name"></h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                <span x-text="currentThemeIndex + 1"></span> / <span x-text="themes.length"></span>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Next button -->
+          <button @click="nextTheme()"
+                  class="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all transform hover:scale-110 flex-shrink-0">
+            <i class="fas fa-chevron-right"
+               :style="`color: ${currentTheme.primary}`"></i>
+          </button>
+          
+          <!-- Confirm button -->
+          <button @click="confirmTheme()"
+                  class="px-4 py-2 rounded-full font-semibold text-white text-sm transition-all transform hover:scale-105 shadow-lg flex-shrink-0"
+                  :style="`background: linear-gradient(135deg, ${currentTheme.primary} 0%, ${currentTheme.secondary} 100%)`">
+            <i class="fas fa-check mr-1"></i>
+            OK
+          </button>
+          
+          <!-- Close button -->
+          <button @click="themeSelectorOpen = false"
+                  class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors flex-shrink-0"
+                  title="Chiudi">
+            <i class="fas fa-times text-gray-600 dark:text-gray-400 text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -637,7 +2150,7 @@
   {% endwith %}
 
   <!-- Sidebar Navigation -->
-  <div class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 hidden md:block">
+  <div class="sidebar-container fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 hidden md:block">
     <div class="sidebar-header flex items-center justify-center h-16 px-4">
       <img src="https://raw.githubusercontent.com/emilianpr/phg-img/refs/heads/main/HEAD_Pharmagest.png" 
            alt="Pharmagest Logo" 
@@ -667,8 +2180,8 @@
           Scarico Merci
           <i class="fas fa-chevron-down ml-auto text-xs"></i>
         </a>
-        <div x-show="open" @click.away="open = false"
-             class="absolute left-0 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-30"
+     <div x-show="open" @click.away="open = false"
+       class="absolute left-0 mt-1 w-full border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-30 sidebar-dropdown"
              x-transition>
           <a href="{{ url_for('scaricomerce') }}"
              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-phg-secondary dark:hover:bg-gray-700 {% if request.endpoint == 'scaricomerce' %}font-bold text-phg-primary{% endif %}">
@@ -701,7 +2214,7 @@
       </a>
       {% endif %}
     </nav>
-    <div class="absolute bottom-0 left-0 right-0 p-4">
+  <div class="sidebar-footer absolute bottom-0 left-0 right-0 p-4">
       <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-600">
         <a href="https://github.com/emilianpr/magazzino_webapp/issues" target="_blank" rel="noopener" class="bug-btn group flex items-center w-full px-4 py-2 text-sm font-medium rounded-md">
           <i class="fas fa-bug text-red-500 mr-2"></i>
@@ -710,8 +2223,8 @@
         </a>
       </div>
       <div class="flex items-center">
-        <div class="flex-shrink-0 bg-white dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600">
-          <img class="h-10 w-10 rounded-full" src="https://raw.githubusercontent.com/emilianpr/phg-img/main/user-128.svg" alt="User profile" />
+        <div class="flex-shrink-0 bg-white dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center h-10 w-10">
+          <i class="fas fa-user text-gray-700 dark:text-gray-300"></i>
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ username }}</p>
@@ -733,7 +2246,7 @@
        @click="sidebarOpen = false"></div>
 
   <!-- Mobile Sidebar -->
-  <div class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 md:hidden mobile-sidebar"
+  <div class="sidebar-container fixed inset-y-0 left-0 w-64 bg-white dark:bg-black shadow-lg z-20 md:hidden mobile-sidebar"
        :class="{ 'open': sidebarOpen }">
     <div class="sidebar-header flex items-center justify-center h-16 px-4">
       <img src="https://raw.githubusercontent.com/emilianpr/phg-img/refs/heads/main/HEAD_Pharmagest.png" 
@@ -808,7 +2321,7 @@
 
   <div class="md:ml-64 main-content-area">
     <!-- Top Navigation (sticky, dentro main-content-area) -->
-    <div class="sticky top-0 z-10 bg-white dark:bg-black shadow-sm">
+    <div class="sticky top-0 z-10 bg-white dark:bg-black shadow-sm overflow-visible">
       <div class="flex items-center justify-between h-16 px-4">
         <div class="flex items-center">
           <!-- Mobile hamburger menu -->
@@ -824,21 +2337,108 @@
             <span class="md:hidden">{% block page_title_short %}Magazzino{% endblock %}</span>
           </h1>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4" x-data="{ settingsOpen: false }">
           <!-- Dark Mode Toggle -->
           <button id="dark-mode-toggle" 
                   @click="console.log('Toggle clicked, current darkMode:', darkMode); darkMode = !darkMode; console.log('New darkMode:', darkMode);"
-                  class="p-2 text-gray-500 hover:text-phg-primary hover:bg-phg-secondary dark:text-gray-400 dark:hover:text-yellow-400 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200" 
+                  class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
                   title="Toggle Dark Mode">
-            <i class="fas fa-sun text-lg" x-show="darkMode"></i>
-            <i class="fas fa-moon text-lg" x-show="!darkMode"></i>
+            <i class="fas text-lg" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
           </button>
           <!-- Icona Changelog -->
           <a href="{{ url_for('changelogs') }}" 
-             class="p-2 text-gray-500 hover:text-phg-primary hover:bg-phg-secondary dark:text-gray-400 dark:hover:text-phg-primary dark:hover:bg-gray-700 rounded-lg transition-colors duration-200" 
+             class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
              title="Changelog">
             <i class="fas fa-code-branch text-lg"></i>
           </a>
+          
+          <!-- Settings Tab Toggle -->
+          <div class="relative">
+            <button @click="settingsOpen = !settingsOpen"
+                    class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
+                    title="Impostazioni">
+              <i class="fas fa-cog text-lg"></i>
+            </button>
+            
+            <!-- Settings Dropdown Panel -->
+            <div x-show="settingsOpen" 
+                 @click.away="settingsOpen = false"
+                 x-transition:enter="settings-panel-enter"
+                 x-transition:leave="settings-panel-leave"
+                 class="fixed right-4 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700"
+                 style="display: none; z-index: 9999; top: 4rem;">
+              <!-- Header -->
+              <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <i class="fas fa-cog mr-2 text-phg-primary"></i>
+                  Impostazioni
+                </h3>
+              </div>
+              
+              <!-- Settings Content -->
+              <div class="p-4 space-y-4">
+                <!-- User Info -->
+                <div class="pb-3 border-b border-gray-200 dark:border-gray-700">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center h-12 w-12">
+                      <i class="fas fa-user text-gray-700 dark:text-gray-300 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ username }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {% if session.get('is_admin') %}
+                          <i class="fas fa-shield-alt mr-1"></i>Amministratore
+                        {% else %}
+                          <i class="fas fa-user mr-1"></i>Utente
+                        {% endif %}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Settings Options -->
+                <div class="space-y-2">
+                  <!-- Dark Mode Setting -->
+                  <div class="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center">
+                      <i class="fas fa-moon text-gray-500 dark:text-gray-400 mr-3"></i>
+                      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Modalità Scura</span>
+                    </div>
+                    <button @click="darkMode = !darkMode"
+                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                            :class="darkMode ? 'bg-phg-primary' : 'bg-gray-300 dark:bg-gray-600'">
+                      <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                            :class="darkMode ? 'translate-x-6' : 'translate-x-1'"></span>
+                    </button>
+                  </div>
+                  
+                  <!-- Theme Selector Button -->
+                  <button @click="settingsOpen = false; $dispatch('open-theme-selector')"
+                          class="flex items-center w-full p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-palette text-gray-500 dark:text-gray-400 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tema Applicazione</span>
+                    <i class="fas fa-chevron-right ml-auto text-gray-400 text-xs"></i>
+                  </button>
+                  
+                  <!-- Version Info -->
+                  <div class="flex items-center justify-between p-2 rounded-md">
+                    <div class="flex items-center">
+                      <i class="fas fa-info-circle text-gray-500 dark:text-gray-400 mr-3"></i>
+                      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Versione</span>
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ app_version }}</span>
+                  </div>
+                  
+                  <!-- Logout -->
+                  <a href="{{ url_for('logout') }}"
+                     class="flex items-center p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400">
+                    <i class="fas fa-sign-out-alt mr-3"></i>
+                    <span class="text-sm font-medium">Esci</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

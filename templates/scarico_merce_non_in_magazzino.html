@@ -118,8 +118,59 @@ body {
   background-color: #000000 !important;
 }
 
+.dark thead {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+.dark thead th {
+  color: #000000 !important;
+}
+
+.dark thead th i {
+  color: #60a5fa !important;
+}
+
+.dark .bg-phg-secondary {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+.dark .text-phg-primary {
+  color: #60a5fa !important;
+}
+
 .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* Header "Prodotti da scaricare" in dark mode */
+.dark .border-b {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+  border-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+/* Neubrutalism: Header "Prodotti da scaricare" */
+[data-theme="neubrutalism"] .border-b {
+  background: var(--nb-white) !important;
+  border-color: var(--nb-black) !important;
+  border-width: 3px !important;
+}
+
+[data-theme="neubrutalism"] .border-b .text-phg-primary {
+  color: var(--nb-black) !important;
+}
+
+[data-theme="neubrutalism"] body.dark .border-b {
+  background: #141414 !important;
+  border-color: var(--nb-white) !important;
+  border-width: 3px !important;
+}
+
+[data-theme="neubrutalism"] body.dark .border-b .text-phg-primary {
+  color: var(--nb-white) !important;
 }
 
 .dark .hover\\:bg-blue-50:hover {

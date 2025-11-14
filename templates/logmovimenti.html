@@ -85,11 +85,12 @@ body {
 }
 
 .filter-compact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  justify-items: center;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .filter-group {
@@ -97,8 +98,8 @@ body {
   border: 1px solid var(--border-light);
   border-radius: 0.75rem;
   padding: 1rem;
-  width: 100%;
-  max-width: 220px;
+  width: 280px;
+  max-width: 280px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -149,10 +150,14 @@ body {
 }
 
 .notes-search-compact {
-  grid-column: 1 / -1;
   position: relative;
-  max-width: none;
   width: 100%;
+  flex-basis: 100%;
+}
+
+.notes-search-compact.filter-group {
+  width: 100%;
+  max-width: 100%;
 }
 
 .search-icon-compact {
@@ -706,7 +711,6 @@ body {
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 <div class="flex flex-col">
                   <span class="font-semibold text-blue-600">{{ movimento.nome_prodotto or 'N/A' }}</span>
-                  <span class="text-xs text-gray-500">Prodotto</span>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

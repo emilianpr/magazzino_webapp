@@ -12,12 +12,19 @@
   box-sizing: border-box;
 }
 
+/* Spazio dedicato sotto la topbar */
+.main-content-area > .sticky + .container { padding-top: 1.9rem; }
+.main-content-area > .sticky + .container .filter-container { margin-top: 0; }
+
 /* Transizioni base super semplici */
 body {
   transition: background-color 0.2s ease;
 }
 
 /* Elementi base con transizioni minime */
+.filter-container,
+.filter-group,
+.filter-input-compact,
 .mobile-table-card,
 .bg-white {
   transition: background-color 0.2s ease;
@@ -33,11 +40,225 @@ body {
 }
 
 .dark {
-  --bg-primary: rgba(0, 0, 0, 0.98);
-  --bg-secondary: rgba(0, 0, 0, 0.95);
-  --border-light: rgba(40, 40, 40, 0.8);
-  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --bg-primary: rgba(10, 10, 10, 0.95);
+  --bg-secondary: rgba(26, 26, 26, 0.9);
+  --border-light: rgba(90, 90, 90, 0.7);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   --accent-color: #60a5fa;
+}
+
+/* Filtri e ricerca - sistema CSS variabili */
+.filter-container {
+  background: linear-gradient(120deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  border-radius: 1.5rem;
+  padding: 2.35rem 2rem 1.9rem;
+  margin-top: 1.1rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, #00a8e8 100%);
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.filter-title {
+  text-align: center;
+  margin-top: 0.15rem;
+  margin-bottom: 1.6rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.filter-compact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.filter-group {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  width: 280px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.filter-group-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.filter-input-compact {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  background: var(--bg-primary);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.notes-input-wrapper {
+  position: relative;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  width: 100%;
+}
+
+.notes-input-compact {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.notes-search-compact {
+  position: relative;
+  width: 100%;
+  flex-basis: 100%;
+}
+
+.notes-search-compact.filter-group {
+  width: 100%;
+  max-width: 100%;
+}
+
+.search-icon-compact {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.filter-btn-compact {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.filter-btn-primary-compact {
+  background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.3);
+  transition: all 0.2s ease;
+}
+
+.filter-btn-primary-compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 86, 166, 0.4);
+}
+
+.filter-btn-secondary-compact {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  border-color: rgba(130, 130, 130, 0.2);
+  transition: all 0.2s ease;
+}
+
+.filter-btn-secondary-compact:hover {
+  background: rgba(107, 114, 128, 0.2);
+}
+
+.dark .filter-btn-secondary-compact {
+  color: var(--text-secondary);
+  border-color: rgba(120, 120, 120, 0.6);
+  background: rgba(55, 65, 81, 0.3);
+}
+
+.dark .filter-btn-secondary-compact:hover {
+  background: rgba(55, 65, 81, 0.5);
+  color: var(--text-primary);
+}
+
+.filter-actions-compact {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  border-top: 1px solid var(--border-light);
+  min-height: 60px;
+}
+
+.filter-actions-compact > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-actions-compact > div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+.filter-input-compact.active {
+  border-color: var(--accent-color) !important;
+  background-color: rgba(0, 86, 166, 0.08) !important;
+}
+
+.dark .filter-input-compact.active {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+}
+
+.filter-group.has-active {
+  border-color: var(--accent-color) !important;
+  background: linear-gradient(135deg, rgba(0, 86, 166, 0.05) 0%, rgba(255, 255, 255, 0.8) 100%) !important;
+}
+
+.dark .filter-group.has-active {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, rgba(26, 26, 26, 0.9) 100%) !important;
 }
 
 /* Mobile Cards con stile logmovimenti */
@@ -196,6 +417,50 @@ body {
 }
 
 @media (max-width: 768px) {
+  .filter-compact-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    justify-items: center;
+  }
+  
+  .filter-container {
+    padding: 1.5rem;
+    margin: 0.75rem;
+  }
+  
+  .filter-actions-compact {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
+  .filter-actions-compact > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .filter-btn-compact {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .filter-group {
+    padding: 0.75rem;
+    max-width: 300px;
+    width: 100%;
+  }
+  
+  .filter-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  #filter-status {
+    text-align: center;
+    justify-content: center;
+  }
+  
   .desktop-table {
     display: none;
   }
@@ -218,8 +483,119 @@ body {
 {% endblock %}
 
 {% block content %}
-<!-- Risultati -->
-{% if scarichi %}
+<div class="container mx-auto">
+  <!-- Sistema di filtri avanzato con design compatto -->
+  <div class="filter-container">
+    <div class="filter-title">
+      <i class="fas fa-filter"></i>
+      Filtri di Ricerca Avanzati
+    </div>
+    
+    <div class="filter-compact-grid">
+      <!-- Filtro Prodotto -->
+      <div class="filter-group" id="filter-group-prodotto">
+        <div class="filter-group-title">
+          <i class="fas fa-box"></i>
+          Prodotto
+        </div>
+        <input type="text" 
+               id="filterNomeProdotto" 
+               class="filter-input-compact" 
+               placeholder="Cerca nome prodotto..."
+               autocomplete="off">
+      </div>
+      
+      <!-- Filtro Quantità -->
+      <div class="filter-group" id="filter-group-quantita">
+        <div class="filter-group-title">
+          <i class="fas fa-calculator"></i>
+          Quantità
+        </div>
+        <input type="number" 
+               id="filterQuantitaMin" 
+               class="filter-input-compact" 
+               placeholder="Min..."
+               min="0">
+        <input type="number" 
+               id="filterQuantitaMax" 
+               class="filter-input-compact" 
+               placeholder="Max..."
+               min="0">
+      </div>
+      
+      <!-- Filtro Utente -->
+      <div class="filter-group" id="filter-group-utente">
+        <div class="filter-group-title">
+          <i class="fas fa-user"></i>
+          Utente
+        </div>
+        <input type="text" 
+               id="filterUtente" 
+               class="filter-input-compact" 
+               placeholder="Cerca utente..."
+               autocomplete="off">
+      </div>
+      
+      <!-- Filtro Data -->
+      <div class="filter-group" id="filter-group-data">
+        <div class="filter-group-title">
+          <i class="fas fa-calendar-alt"></i>
+          Data
+        </div>
+        <input type="date" 
+               id="filterDataDa" 
+               class="filter-input-compact"
+               title="Data da">
+        <input type="date" 
+               id="filterDataA" 
+               class="filter-input-compact"
+               title="Data a">
+      </div>
+      
+      <!-- Ricerca nelle Note -->
+      <div class="notes-search-compact filter-group" id="filter-group-note">
+        <div class="filter-group-title">
+          <i class="fas fa-sticky-note"></i>
+          Note
+        </div>
+        <div class="notes-input-wrapper">
+          <input type="text" 
+                 id="filterNote" 
+                 class="notes-input-compact" 
+                 placeholder="Cerca nelle note..."
+                 autocomplete="off">
+          <i class="fas fa-search search-icon-compact"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-actions-compact">
+      <div>
+        <div id="filter-status" style="color: #6b7280; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-info-circle"></i>
+          <span id="filter-status-text">Nessun filtro attivo</span>
+        </div>
+        <div id="results-counter" style="color: #0056a6; font-size: 0.85rem; font-weight: 500; margin-top: 0.25rem;">
+          Totale: {{ scarichi|length }} scarichi
+        </div>
+      </div>
+      <div>
+        <button onclick="resetFilters()" 
+                class="filter-btn-compact filter-btn-secondary-compact">
+          <i class="fas fa-times"></i>
+          Cancella Filtri
+        </button>
+        <button onclick="exportToCSV()" 
+                class="filter-btn-compact filter-btn-primary-compact">
+          <i class="fas fa-download"></i>
+          Esporta CSV
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risultati -->
+  {% if scarichi %}
   <div class="bg-white rounded-xl shadow-sm overflow-hidden" style="border: 1px solid rgba(130, 130, 130, 0.3);">
     <!-- Desktop Table -->
     <div class="desktop-table">
@@ -271,13 +647,12 @@ body {
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
+          <tbody class="bg-white divide-y divide-gray-200" id="scarichiTableBody" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
             {% for scarico in scarichi %}
-            <tr class="table-row-hover" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
+            <tr class="table-row-hover scarico-row" style="border-bottom: 1px solid rgba(130, 130, 130, 0.2);">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 <div class="flex flex-col">
                   <span class="font-semibold text-blue-600">{{ scarico.prodotto or 'N/A' }}</span>
-                  <span class="text-xs text-gray-500">Prodotto</span>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -318,9 +693,9 @@ body {
     </div>
 
     <!-- Mobile View -->
-    <div class="mobile-view">
+    <div class="mobile-view" id="mobileScarichiContainer">
       {% for scarico in scarichi %}
-      <div class="mobile-table-card">
+      <div class="mobile-table-card scarico-row">
         <div class="mobile-table-header">
           <span>{{ scarico.prodotto or 'N/A' }}</span>
           <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
@@ -360,8 +735,15 @@ body {
       </div>
       {% endfor %}
     </div>
+
+    <!-- Messaggio nessun risultato -->
+    <div id="noResults" class="no-results" style="display: none;">
+      <i class="fas fa-search text-4xl mb-4"></i>
+      <h3 class="text-lg font-semibold mb-2">Nessuno scarico trovato</h3>
+      <p>Modifica i filtri per visualizzare altri risultati</p>
+    </div>
   </div>
-{% else %}
+  {% else %}
   <div class="no-results">
     <i class="fas fa-search text-4xl mb-4"></i>
     <h3 class="text-lg font-semibold mb-2">Nessun scarico trovato</h3>
@@ -377,5 +759,355 @@ body {
       </a>
     </div>
   </div>
-{% endif %}
+  {% endif %}
+</div>
+
+<script>
+// Dati degli scarichi dal backend
+const scarichiData = {{ scarichi|tojson }};
+
+// Sistema di filtri
+let filterTimeout;
+let allScarichi = [];
+let filteredScarichi = [];
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+  initializeFilters();
+  cacheScarichi();
+});
+
+// Cache degli scarichi
+function cacheScarichi() {
+  const rows = document.querySelectorAll('#scarichiTableBody tr');
+  const mobileCards = document.querySelectorAll('.scarico-row');
+  
+  allScarichi = scarichiData.map((scarico, index) => {
+    return {
+      row: rows[index] || null,
+      mobileCard: mobileCards[index] || null,
+      data: {
+        nomeProdotto: (scarico.prodotto || '').toLowerCase(),
+        quantita: parseInt(scarico.quantita) || 0,
+        note: (scarico.note || '').toLowerCase(),
+        data: scarico.data_ora || '',
+        utente: (scarico.username || '').toLowerCase()
+      }
+    };
+  });
+  
+  filteredScarichi = [...allScarichi];
+}
+
+// Inizializzazione filtri
+function initializeFilters() {
+  const filters = [
+    'filterNomeProdotto', 'filterQuantitaMin', 'filterQuantitaMax',
+    'filterNote', 'filterDataDa', 'filterDataA', 'filterUtente'
+  ];
+  
+  filters.forEach(filterId => {
+    const element = document.getElementById(filterId);
+    if (element) {
+      element.addEventListener('input', debounceFilter);
+      element.addEventListener('change', debounceFilter);
+    }
+  });
+}
+
+// Debounce
+function debounceFilter() {
+  clearTimeout(filterTimeout);
+  filterTimeout = setTimeout(() => {
+    requestAnimationFrame(applyFilters);
+  }, 150);
+}
+
+// Applicazione filtri
+function applyFilters() {
+  const filters = getFilterValues();
+  const activeFilters = getActiveFilters(filters);
+  
+  updateFilterUI(activeFilters);
+  
+  if (activeFilters.length === 0) {
+    showAllScarichi();
+    return;
+  }
+  
+  filteredScarichi = allScarichi.filter(scarico => {
+    return activeFilters.every(filter => {
+      switch(filter.type) {
+        case 'text':
+          return scarico.data[filter.field].includes(filter.value);
+        case 'number':
+          if (filter.field === 'quantitaMin') {
+            return scarico.data.quantita >= filter.value;
+          }
+          if (filter.field === 'quantitaMax') {
+            return scarico.data.quantita <= filter.value;
+          }
+          return true;
+        case 'date':
+          return filterByDate(scarico.data.data, filter.field, filter.value);
+        default:
+          return true;
+      }
+    });
+  });
+  
+  updateDisplayedScarichi();
+}
+
+// Ottieni valori filtri
+function getFilterValues() {
+  return {
+    nomeProdotto: document.getElementById('filterNomeProdotto')?.value?.toLowerCase().trim() || '',
+    quantitaMin: document.getElementById('filterQuantitaMin')?.value || '',
+    quantitaMax: document.getElementById('filterQuantitaMax')?.value || '',
+    note: document.getElementById('filterNote')?.value?.toLowerCase().trim() || '',
+    dataDa: document.getElementById('filterDataDa')?.value || '',
+    dataA: document.getElementById('filterDataA')?.value || '',
+    utente: document.getElementById('filterUtente')?.value?.toLowerCase().trim() || ''
+  };
+}
+
+// Ottieni filtri attivi
+function getActiveFilters(filters) {
+  const activeFilters = [];
+  
+  if (filters.nomeProdotto) activeFilters.push({type: 'text', field: 'nomeProdotto', value: filters.nomeProdotto});
+  if (filters.quantitaMin) activeFilters.push({type: 'number', field: 'quantitaMin', value: parseInt(filters.quantitaMin)});
+  if (filters.quantitaMax) activeFilters.push({type: 'number', field: 'quantitaMax', value: parseInt(filters.quantitaMax)});
+  if (filters.note) activeFilters.push({type: 'text', field: 'note', value: filters.note});
+  if (filters.dataDa) activeFilters.push({type: 'date', field: 'dataDa', value: filters.dataDa});
+  if (filters.dataA) activeFilters.push({type: 'date', field: 'dataA', value: filters.dataA});
+  if (filters.utente) activeFilters.push({type: 'text', field: 'utente', value: filters.utente});
+  
+  return activeFilters;
+}
+
+// Aggiorna UI filtri attivi
+function updateFilterUI(activeFilters) {
+  const filterInputs = document.querySelectorAll('.filter-input-compact');
+  const filterGroups = document.querySelectorAll('.filter-group');
+  const statusText = document.getElementById('filter-status-text');
+  const statusElement = document.getElementById('filter-status');
+  
+  filterInputs.forEach(input => input.classList.remove('active'));
+  filterGroups.forEach(group => group.classList.remove('has-active'));
+  
+  if (activeFilters.length > 0) {
+    activeFilters.forEach(filter => {
+      const input = document.getElementById(getInputIdFromField(filter.field));
+      if (input) {
+        input.classList.add('active');
+        input.closest('.filter-group')?.classList.add('has-active');
+      }
+    });
+    
+    statusText.textContent = `${activeFilters.length} filtro${activeFilters.length > 1 ? 'i' : ''} attivo${activeFilters.length > 1 ? 'i' : ''}`;
+    statusElement.style.color = '#0056a6';
+  } else {
+    statusText.textContent = 'Nessun filtro attivo';
+    statusElement.style.color = '#6b7280';
+  }
+}
+
+// Mapping campi - input ID
+function getInputIdFromField(field) {
+  const mapping = {
+    'nomeProdotto': 'filterNomeProdotto',
+    'quantitaMin': 'filterQuantitaMin',
+    'quantitaMax': 'filterQuantitaMax',
+    'note': 'filterNote',
+    'dataDa': 'filterDataDa',
+    'dataA': 'filterDataA',
+    'utente': 'filterUtente'
+  };
+  return mapping[field] || field;
+}
+
+// Filtro per data
+function filterByDate(dataScarico, tipo, valore) {
+  if (!dataScarico || !valore) return true;
+  
+  try {
+    const parts = dataScarico.split(' ')[0].split('/');
+    const scaricoDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    const filterDate = new Date(valore);
+    
+    if (tipo === 'dataDa') {
+      return scaricoDate >= filterDate;
+    } else if (tipo === 'dataA') {
+      return scaricoDate <= filterDate;
+    }
+  } catch (e) {
+    console.warn('Errore parsing data:', e);
+  }
+  
+  return true;
+}
+
+// Mostra tutti gli scarichi
+function showAllScarichi() {
+  filteredScarichi = [...allScarichi];
+  updateDisplayedScarichi();
+}
+
+// Aggiorna scarichi visualizzati
+function updateDisplayedScarichi() {
+  const noResultsElement = document.getElementById('noResults');
+  
+  if (filteredScarichi.length === 0) {
+    hideAllScarichi();
+    noResultsElement.style.display = 'block';
+    updateResultsCounter();
+    return;
+  }
+  
+  noResultsElement.style.display = 'none';
+  
+  requestAnimationFrame(() => {
+    allScarichi.forEach(scarico => {
+      const isVisible = filteredScarichi.includes(scarico);
+      
+      if (scarico.row) {
+        scarico.row.style.display = isVisible ? '' : 'none';
+      }
+      if (scarico.mobileCard) {
+        scarico.mobileCard.style.display = isVisible ? '' : 'none';
+      }
+    });
+  });
+  
+  updateResultsCounter();
+}
+
+// Nascondi tutti gli scarichi
+function hideAllScarichi() {
+  allScarichi.forEach(scarico => {
+    if (scarico.row) scarico.row.style.display = 'none';
+    if (scarico.mobileCard) scarico.mobileCard.style.display = 'none';
+  });
+}
+
+// Aggiorna contatore risultati
+function updateResultsCounter() {
+  const counter = document.getElementById('results-counter');
+  if (counter) {
+    const total = allScarichi.length;
+    const filtered = filteredScarichi.length;
+    counter.textContent = filtered === total 
+      ? `Totale: ${total} scarichi`
+      : `Trovati: ${filtered} di ${total} scarichi`;
+  }
+}
+
+// Reset filtri
+function resetFilters() {
+  const filterInputs = document.querySelectorAll('.filter-input-compact');
+  
+  filterInputs.forEach(input => {
+    input.value = '';
+    input.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.filter-group').forEach(group => {
+    group.classList.remove('has-active');
+  });
+  
+  requestAnimationFrame(() => {
+    showAllScarichi();
+    updateFilterUI([]);
+  });
+}
+
+// Export CSV
+function exportToCSV() {
+  if (filteredScarichi.length === 0) {
+    alert('Nessun dato da esportare');
+    return;
+  }
+  
+  const headers = ['Prodotto', 'Quantità', 'Note', 'Data', 'Utente'];
+  const csvContent = [
+    headers.join(','),
+    ...filteredScarichi.map(scarico => {
+      const cells = scarico.row.querySelectorAll('td');
+      return [
+        `"${cells[0]?.querySelector('span')?.textContent || ''}"`,
+        `"${cells[2]?.textContent?.trim() || ''}"`,
+        `"${cells[4]?.textContent?.trim() || ''}"`,
+        `"${cells[5]?.textContent?.replace(/[^\w\s:\/]/gi, '').trim() || ''}"`,
+        `"${cells[6]?.textContent?.replace(/[^\w\s]/gi, '').trim() || ''}"`
+      ].join(',');
+    })
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `log_scarichi_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  
+  showExportNotification();
+}
+
+// Notifica export
+function showExportNotification() {
+  const notification = document.createElement('div');
+  notification.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 86, 166, 0.3);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    ">
+      <i class="fas fa-check-circle"></i>
+      Export completato con successo!
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// Animazioni
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}
