@@ -1049,13 +1049,12 @@ def carico_merci():
                 stato = giacenza['stato']
             else:
                 # Prima di inserire una nuova giacenza, trova un magazzino_id valido
-                # Opzione 1: Prova a recuperare da giacenze esistenti per questo prodotto
-                cursor.execute("SELECT magazzino_id, stato FROM giacenze WHERE prodotto_id = %s LIMIT 1", (prodotto_id,))
+                # Opzione 1: Prova a recuperare magazzino_id da giacenze esistenti per questo prodotto
+                cursor.execute("SELECT magazzino_id FROM giacenze WHERE prodotto_id = %s LIMIT 1", (prodotto_id,))
                 info = cursor.fetchone()
-                # Opzione 2: Se non ci sono giacenze, usa il magazzino_id dalla tabella prodotti o un default
+                # Opzione 2: Se non ci sono giacenze, usa il primo magazzino disponibile nel sistema
                 if info and info['magazzino_id']:
                     magazzino_id = info['magazzino_id']
-                    stato = info['stato']
                 else:
                     # Fallback: Usa il primo magazzino disponibile nel sistema
                     cursor.execute("SELECT id FROM magazzini ORDER BY id LIMIT 1")
@@ -1063,7 +1062,10 @@ def carico_merci():
                     if not magazzino_result:
                         raise Exception("Nessun magazzino trovato nel sistema")
                     magazzino_id = magazzino_result['id']
-                    stato = 'in_magazzino'  # Default stato
+                
+                # Lo stato per un carico merci è sempre 'in_magazzino'
+                stato = 'in_magazzino'
+                
                 cursor.execute("""
                     INSERT INTO giacenze (prodotto_id, magazzino_id, ubicazione, stato, quantita, note)
                     VALUES (%s, %s, %s, %s, %s, %s)
