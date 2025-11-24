@@ -2,7 +2,7 @@
 DATABASE_CONFIG = {
     'host': 'localhost',
     'user': 'magazzino_webapp', 
-    'password': '1234',
+    'password': 'Emilian@21082007',
     'database': 'magazzino_db'
 }
 
