@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Gestione Soglie Notifiche - Stock Campospinoso{% endblock %}
+
+{% block head %}
+<style>
+  .threshold-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  
+  .threshold-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 86, 166, 0.15);
+  }
+  
+  .badge-active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .badge-inactive {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .product-select {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-6 pt-6 pb-6 w-full page-content" x-data="{ showAddModal: false, editMode: false, thresholdId: null, selectedProduct: '', productName: '', threshold: 10, active: true }">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+      <i class="fas fa-bell mr-3" style="color: #2256a7;"></i>
+      Gestione Soglie Notifiche
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">
+      Imposta le soglie minime per ricevere notifiche quando un prodotto scende sotto una certa quantità
+    </p>
+  </div>
+
+  <!-- Pulsante Aggiungi Nuova Soglia -->
+  <div class="mb-6">
+    <button @click="showAddModal = true" 
+            class="gradient-btn px-6 py-3 rounded-lg font-medium flex items-center text-white">
+      <i class="fas fa-plus mr-2"></i>
+      Aggiungi Nuova Soglia
+    </button>
+  </div>
+
+  <!-- Lista Soglie -->
+  <div class="glass-card rounded-xl p-6">
+    <h2 class="text-xl font-semibold mb-4 dark:text-white" style="color: #2256a7;">
+      <i class="fas fa-list mr-2"></i>Soglie Configurate
+    </h2>
+    
+    {% if soglie %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for soglia in soglie %}
+        <div class="threshold-card glass-card rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 dark:text-white text-sm">{{ soglia.nome_prodotto|format_db_string }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ soglia.codice_prodotto }}</p>
+            </div>
+            <span class="{% if soglia.notifica_attiva %}badge-active{% else %}badge-inactive{% endif %}">
+              {% if soglia.notifica_attiva %}Attiva{% else %}Disattivata{% endif %}
+            </span>
+          </div>
+          
+          <div class="mb-3">
+            <div class="flex items-center text-sm">
+              <i class="fas fa-chart-line mr-2 text-gray-400"></i>
+              <span class="text-gray-600 dark:text-gray-400">Soglia minima:</span>
+              <span class="ml-2 font-bold" style="color: #2256a7;">{{ soglia.soglia_minima }}</span>
+            </div>
+            <div class="flex items-center text-sm mt-2">
+              <i class="fas fa-box mr-2 text-gray-400"></i>
+              <span class="text-gray-600 dark:text-gray-400">Quantità attuale:</span>
+              <span class="ml-2 font-bold {% if soglia.quantita_attuale <= soglia.soglia_minima %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">
+                {{ soglia.quantita_attuale }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="flex space-x-2 mt-4">
+            <button onclick="editThreshold({{ soglia.id }}, '{{ soglia.codice_prodotto }}', '{{ soglia.nome_prodotto|format_db_string }}', {{ soglia.soglia_minima }}, {{ soglia.notifica_attiva|tojson }})"
+                    class="flex-1 px-3 py-2 text-xs font-medium rounded-lg text-white transition-all"
+                    style="background: linear-gradient(135deg, #2256a7, #1e4d96);">
+              <i class="fas fa-edit mr-1"></i>Modifica
+            </button>
+            <button onclick="toggleThreshold({{ soglia.id }}, {{ soglia.notifica_attiva|tojson }})"
+                    class="flex-1 px-3 py-2 text-xs font-medium rounded-lg text-white transition-all"
+                    style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+              <i class="fas fa-{% if soglia.notifica_attiva %}pause{% else %}play{% endif %} mr-1"></i>
+              {% if soglia.notifica_attiva %}Disattiva{% else %}Attiva{% endif %}
+            </button>
+            <button onclick="deleteThreshold({{ soglia.id }}, '{{ soglia.nome_prodotto|format_db_string }}')"
+                    class="px-3 py-2 text-xs font-medium rounded-lg text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-12">
+        <i class="fas fa-bell-slash text-5xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Nessuna Soglia Configurata</h3>
+        <p class="text-gray-500 dark:text-gray-400">Aggiungi la tua prima soglia per iniziare a ricevere notifiche</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal Aggiungi/Modifica Soglia -->
+  <div @keydown.escape.window="showAddModal = false">
+    
+    <div x-show="showAddModal" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+       style="display: none;">
+    
+    <div @click.away="showAddModal = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95"
+         class="glass-card rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-semibold dark:text-white" style="color: #2256a7;">
+          <i class="fas fa-bell mr-2"></i>
+          <span x-text="editMode ? 'Modifica Soglia' : 'Aggiungi Nuova Soglia'"></span>
+        </h3>
+        <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <form :action="editMode ? '{{ url_for('update_threshold') }}' : '{{ url_for('add_threshold') }}'" method="POST">
+        <input type="hidden" name="threshold_id" x-model="thresholdId">
+        
+        <!-- Selezione Prodotto -->
+        <div class="mb-4" x-show="!editMode">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-box mr-1"></i>Prodotto
+          </label>
+          <select name="codice_prodotto" x-model="selectedProduct" required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 dark:text-white">
+            <option value="">-- Seleziona un prodotto --</option>
+            {% for prodotto in prodotti %}
+              <option value="{{ prodotto.codice_prodotto }}" data-name="{{ prodotto.nome_prodotto|format_db_string }}">
+                {{ prodotto.codice_prodotto }} - {{ prodotto.nome_prodotto|format_db_string }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <!-- Nome prodotto (hidden in edit mode) -->
+        <div x-show="editMode" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-box mr-1"></i>Prodotto
+          </label>
+          <input type="text" x-model="productName" readonly
+                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white">
+          <input type="hidden" name="codice_prodotto" x-model="selectedProduct">
+        </div>
+        
+        <!-- Soglia Minima -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="fas fa-chart-line mr-1"></i>Soglia Minima
+          </label>
+          <input type="number" name="soglia_minima" x-model="threshold" min="0" required
+                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 dark:text-white"
+                 placeholder="Es: 10">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Verrai notificato quando la quantità scende sotto questo valore
+          </p>
+        </div>
+        
+        <!-- Stato Notifica -->
+        <div class="mb-6">
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" name="notifica_attiva" x-model="active" value="true"
+                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-400">
+            <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <i class="fas fa-bell mr-1"></i>Notifica attiva
+            </span>
+          </label>
+        </div>
+        
+        <!-- Pulsanti -->
+        <div class="flex space-x-3">
+          <button type="button" @click="showAddModal = false"
+                  class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <i class="fas fa-times mr-1"></i>Annulla
+          </button>
+          <button type="submit"
+                  class="flex-1 px-4 py-2 text-white rounded-lg font-medium"
+                  style="background: linear-gradient(135deg, #2256a7, #1e4d96);">
+            <i class="fas fa-save mr-1"></i>
+            <span x-text="editMode ? 'Aggiorna' : 'Aggiungi'"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function editThreshold(id, codice, nome, soglia, attiva) {
+    const modalData = Alpine.$data(document.querySelector('[x-data]'));
+    modalData.editMode = true;
+    modalData.thresholdId = id;
+    modalData.selectedProduct = codice;
+    modalData.productName = nome;
+    modalData.threshold = soglia;
+    modalData.active = attiva;
+    modalData.showAddModal = true;
+  }
+  
+  function toggleThreshold(id, currentState) {
+    if (confirm(`Sei sicuro di voler ${currentState ? 'disattivare' : 'attivare'} questa notifica?`)) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '{{ url_for("toggle_threshold") }}';
+      
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'threshold_id';
+      input.value = id;
+      
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+  
+  function deleteThreshold(id, nome) {
+    if (confirm(`Sei sicuro di voler eliminare la soglia per "${nome}"?`)) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '{{ url_for("delete_threshold") }}';
+      
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'threshold_id';
+      input.value = id;
+      
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
+</div>
+{% endblock %}

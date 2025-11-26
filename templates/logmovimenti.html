@@ -16,9 +16,7 @@
 .main-content-area > .sticky + .container .filter-container { margin-top: 0; }
 
 /* Transizioni base super semplici */
-body {
-  transition: background-color 0.2s ease;
-}
+/* body transition removed to prevent dark mode flash */
 
 /* Elementi base con transizioni minime */
 .filter-container,
@@ -52,10 +50,10 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-light);
-  border-radius: 1.5rem;
-  padding: 2.35rem 2rem 1.9rem; /* extra spazio top */
-  margin-top: 1.1rem; /* distacco dalla topbar */
-  margin-bottom: 2.5rem;
+  border-radius: 1.25rem;
+  padding: 1.75rem 1.5rem 1.25rem;
+  margin-top: 0.9rem;
+  margin-bottom: 1.75rem;
   position: relative;
   overflow: hidden;
 }
@@ -74,7 +72,7 @@ body {
 .filter-title {
   text-align: center;
   margin-top: 0.15rem; /* spinge verso il basso dal bordo superiore card */
-  margin-bottom: 1.6rem;
+  margin-bottom: 1.35rem;
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--accent-color);
@@ -85,50 +83,53 @@ body {
 }
 
 .filter-compact-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  justify-content: center;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  align-items: stretch;
 }
 
 .filter-group {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 0.75rem;
-  padding: 1rem;
-  width: 280px;
-  max-width: 280px;
+  padding: 0.85rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  text-align: left;
 }
 
 .filter-group-title {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--accent-color);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 /* Input e controlli con variabili CSS */
 .filter-input-compact {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.55rem 0.65rem;
   border: 1px solid var(--border-light);
   border-radius: 0.5rem;
   background: var(--bg-primary);
   font-size: 0.85rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.45rem;
   color: inherit;
+}
+
+.filter-input-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .notes-input-wrapper {
@@ -158,6 +159,7 @@ body {
 .notes-search-compact.filter-group {
   width: 100%;
   max-width: 100%;
+  grid-column: span 2;
 }
 
 .search-icon-compact {
@@ -233,21 +235,20 @@ body {
 /* Azioni filtro compatte */
 .filter-actions-compact {
   display: flex;
-  gap: 1rem;
+  gap: 0.85rem;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
   border-top: 1px solid var(--border-light);
-  min-height: 60px;
 }
 
 .filter-actions-compact > div:last-child {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .filter-actions-compact > div:first-child {
@@ -326,12 +327,44 @@ body {
   border-color: rgba(120, 120, 120, 0.6) !important;
 }
 
+/* Badge movimento dark mode */
+.dark .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+}
+.dark .text-green-800 {
+  color: #86efac !important;
+}
+.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+.dark .text-red-800 {
+  color: #fca5a5 !important;
+}
+.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+.dark .text-blue-800 {
+  color: #93c5fd !important;
+}
+.dark .bg-yellow-100 {
+  background-color: rgba(234, 179, 8, 0.2) !important;
+}
+.dark .text-yellow-800 {
+  color: #fde047 !important;
+}
+.dark .bg-gray-100 {
+  background-color: rgba(107, 114, 128, 0.2) !important;
+}
+.dark .text-gray-800 {
+  color: #d1d5db !important;
+}
+
 /* Responsive compatto */
 @media (max-width: 768px) {
   .filter-compact-grid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
-    justify-items: center;
+    justify-items: stretch;
   }
   
   .filter-container {
@@ -358,8 +391,11 @@ body {
   
   .filter-group {
     padding: 0.75rem;
-    max-width: 300px;
     width: 100%;
+  }
+
+  .notes-search-compact.filter-group {
+    grid-column: span 1;
   }
   
   .filter-title {
@@ -534,6 +570,8 @@ body {
           <option value="">Tutti i tipi</option>
           <option value="carico">Carico</option>
           <option value="scarico">Scarico</option>
+          <option value="trasferimento">Trasferimento</option>
+          <option value="modifica">Modifica</option>
         </select>
       </div>
       
@@ -543,16 +581,18 @@ body {
           <i class="fas fa-calculator"></i>
           Quantità
         </div>
-        <input type="number" 
-               id="filterQuantitaMin" 
-               class="filter-input-compact " 
-               placeholder="Min..."
-               min="0">
-        <input type="number" 
-               id="filterQuantitaMax" 
-               class="filter-input-compact " 
-               placeholder="Max..."
-               min="0">
+         <div class="filter-input-pair">
+           <input type="number" 
+             id="filterQuantitaMin" 
+             class="filter-input-compact " 
+             placeholder="Min..."
+             min="0">
+           <input type="number" 
+             id="filterQuantitaMax" 
+             class="filter-input-compact " 
+             placeholder="Max..."
+             min="0">
+         </div>
       </div>
       
       <!-- Filtro Ubicazione -->
@@ -601,14 +641,16 @@ body {
           <i class="fas fa-calendar-alt"></i>
           Data
         </div>
-        <input type="date" 
-               id="filterDataDa" 
-               class="filter-input-compact "
-               title="Data da">
-        <input type="date" 
-               id="filterDataA" 
-               class="filter-input-compact "
-               title="Data a">
+         <div class="filter-input-pair">
+           <input type="date" 
+             id="filterDataDa" 
+             class="filter-input-compact "
+             title="Data da">
+           <input type="date" 
+             id="filterDataA" 
+             class="filter-input-compact "
+             title="Data a">
+         </div>
       </div>
       
       <!-- Ricerca nelle Note -->
@@ -714,11 +756,32 @@ body {
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                  {% if movimento.da_magazzino %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
-                  {% if movimento.da_magazzino %}<i class="fas fa-arrow-down mr-1"></i>{% else %}<i class="fas fa-arrow-up mr-1"></i>{% endif %}
-                  {{ 'Trasferimento' if movimento.da_magazzino and movimento.a_magazzino else ('Scarico' if movimento.da_magazzino else 'Carico') }}
+                {% if movimento.tipo_movimento == 'CARICO' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="fas fa-arrow-up mr-1"></i>
+                  Carico
                 </span>
+                {% elif movimento.tipo_movimento == 'SCARICO' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  <i class="fas fa-arrow-down mr-1"></i>
+                  Scarico
+                </span>
+                {% elif movimento.tipo_movimento == 'TRASFERIMENTO' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <i class="fas fa-exchange-alt mr-1"></i>
+                  Trasferimento
+                </span>
+                {% elif movimento.tipo_movimento == 'MODIFICA' %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  <i class="fas fa-edit mr-1"></i>
+                  Modifica
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <i class="fas fa-question mr-1"></i>
+                  Non specificato
+                </span>
+                {% endif %}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
                 {{ movimento.quantita or 0 }}
@@ -758,11 +821,27 @@ body {
         <div class="mobile-table-card  movimento-row">
           <div class="mobile-table-header">
             <span>{{ movimento.nome_prodotto or 'N/A' }}</span>
-            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium
-              {% if movimento.da_magazzino %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
-              {% if movimento.da_magazzino %}<i class="fas fa-arrow-down mr-1"></i>{% else %}<i class="fas fa-arrow-up mr-1"></i>{% endif %}
-              {{ 'Trasferimento' if movimento.da_magazzino and movimento.a_magazzino else ('Scarico' if movimento.da_magazzino else 'Carico') }}
+            {% if movimento.tipo_movimento == 'CARICO' %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+              <i class="fas fa-arrow-up mr-1"></i>Carico
             </span>
+            {% elif movimento.tipo_movimento == 'SCARICO' %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+              <i class="fas fa-arrow-down mr-1"></i>Scarico
+            </span>
+            {% elif movimento.tipo_movimento == 'TRASFERIMENTO' %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+              <i class="fas fa-exchange-alt mr-1"></i>Trasferimento
+            </span>
+            {% elif movimento.tipo_movimento == 'MODIFICA' %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+              <i class="fas fa-edit mr-1"></i>Modifica
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+              <i class="fas fa-question mr-1"></i>Non specificato
+            </span>
+            {% endif %}
           </div>
           
           <div class="mobile-table-content">
@@ -860,13 +939,8 @@ function cacheMovimenti() {
 
 // Determina il tipo di movimento
 function determineMovementType(movimento) {
-  if (movimento.da_magazzino && movimento.a_magazzino) {
-    return 'Trasferimento';
-  } else if (movimento.da_magazzino) {
-    return 'Scarico';
-  } else {
-    return 'Carico';
-  }
+  // Usa il campo tipo_movimento dal database
+  return movimento.tipo_movimento || 'Non specificato';
 }
 
 // Inizializzazione filtri con debounce ottimizzato
@@ -914,6 +988,10 @@ function applyFilters() {
         case 'text':
           return movimento.data[filter.field].includes(filter.value);
         case 'select':
+          // Per il filtro movimento, usa confronto esatto invece di includes
+          if (filter.field === 'movimento') {
+            return movimento.data[filter.field] === filter.value;
+          }
           return movimento.data[filter.field].includes(filter.value);
         case 'number':
           if (filter.field === 'quantitaMin') {

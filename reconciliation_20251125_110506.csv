@@ -1,0 +1,136 @@
+Codice,Descrizione,Fonte_AS400,Quantita_AS400,Quantita_WebApp,Differenza,Status,Magazzino_Web,Stato,Ubicazione,Note
+95413,,Solo_WebApp,0,1245,1245,⚠️ WEBAPP +1245,farmacia,"baia_uscita, in_magazzino","-, 15A",*Luparelli guaste da smaltire
+95950,,Solo_WebApp,0,92,92,⚠️ WEBAPP +92,farmacia,"baia_uscita, in_magazzino","-, 6B",*Luparelli guaste da smaltire | *batteria per etichette ID.TAG
+95757,,Solo_WebApp,0,68,68,⚠️ WEBAPP +68,farmacia,in_magazzino,12A,
+95987,,Solo_WebApp,0,66,66,⚠️ WEBAPP +66,grossisti,in_magazzino,1B,
+95778,,Solo_WebApp,0,62,62,⚠️ WEBAPP +62,grossisti,in_magazzino,"1C, 1E, 1F",
+95547,,Solo_WebApp,0,57,57,⚠️ WEBAPP +57,grossisti,in_magazzino,12A,
+95650,,Solo_WebApp,0,48,48,⚠️ WEBAPP +48,grossisti,"baia_uscita, in_magazzino","-, 13B",*Nelly
+95140,,Solo_WebApp,0,46,46,⚠️ WEBAPP +46,farmacia,in_magazzino,15B,da 8mm - nella stessa ubicazione presenti le clip
+95649,,Solo_WebApp,0,43,43,⚠️ WEBAPP +43,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly
+95653,,Solo_WebApp,0,43,43,⚠️ WEBAPP +43,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly
+95652,,Solo_WebApp,0,42,42,⚠️ WEBAPP +42,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly
+96215,,Solo_WebApp,0,35,35,⚠️ WEBAPP +35,farmacia,"1, 2, in_magazzino","2E, 4D, in_preparazi, in_utilizzo, spedito",
+94906,,Solo_WebApp,0,33,33,⚠️ WEBAPP +33,farmacia,in_magazzino,6B,VENDIBILI SOLO 25
+95745,,Solo_WebApp,0,33,33,⚠️ WEBAPP +33,grossisti,in_magazzino,"1D, 5C",
+95638,,Solo_WebApp,0,30,30,⚠️ WEBAPP +30,farmacia,"1, 2, baia_uscita, in_magazzino, spedito","-, 14E, 4E, 6a, 7A, 7b, 8c, in_preparazi, spedito",*Rotti | *rotto | *uso esclusivo per Cosmofarma | PharmExpo
+95774,,Solo_WebApp,0,29,29,⚠️ WEBAPP +29,grossisti,in_magazzino,"1A, 1C",
+95183,,Solo_WebApp,0,24,24,⚠️ WEBAPP +24,farmacia,"2, in_magazzino","11D, spedito",
+95632,,Solo_WebApp,0,23,23,⚠️ WEBAPP +23,grossisti,in_magazzino,2B,
+95637,,Solo_WebApp,0,21,21,⚠️ WEBAPP +21,farmacia,in_magazzino,"5A, 5E, 6E, 6a, 8D, 8E, 9F",
+95803,,Solo_WebApp,0,21,21,⚠️ WEBAPP +21,farmacia,"1, baia_uscita, in_magazzino, spedito","10D, baia_uscita, in_preparazi",*GUASTO (ufficio Mirko) | *Sant'Innocenzo
+95097,,Solo_WebApp,0,20,20,⚠️ WEBAPP +20,grossisti,in_magazzino,10E,
+95974,,Solo_WebApp,0,20,20,⚠️ WEBAPP +20,farmacia,in_magazzino,12A,TRASFERIMENTO DIRETTO - STAMPANTI SENZA RIBBON
+94997,,Solo_WebApp,0,19,19,⚠️ WEBAPP +19,farmacia,"1, baia_uscita, in_magazzino","-, 13D, 2B, 2C, in_preparazi",Guasta chiamare Epson
+96075,,Solo_WebApp,0,19,19,⚠️ WEBAPP +19,farmacia,"1, in_magazzino","14C, 4C, 6d, spedito",
+96219,,Solo_WebApp,0,19,19,⚠️ WEBAPP +19,farmacia,"1, in_magazzino","10C, spedito",
+95634,,Solo_WebApp,0,18,18,⚠️ WEBAPP +18,grossisti,in_magazzino,13D,
+96076,,Solo_WebApp,0,18,18,⚠️ WEBAPP +18,farmacia,in_magazzino,9B,
+94625,,Solo_WebApp,0,17,17,⚠️ WEBAPP +17,grossisti,in_magazzino,2D,
+95952,,Solo_WebApp,0,17,17,⚠️ WEBAPP +17,farmacia,"1, in_magazzino, spedito","15c, 2a, 4a, 5A, 5B, in_preparazi, laboratorio",*Valvo | Comunali Pistoia 1; 3; 4 | Sant'agata Catania(no offerta - deve rientrare quella guasta)
+95822,,Solo_WebApp,0,15,15,⚠️ WEBAPP +15,farmacia,"1, 2, in_magazzino","11D, spedito",
+94881,,Solo_WebApp,0,14,14,⚠️ WEBAPP +14,farmacia,"1, 3, in_magazzino, spedito","11C, baia_uscita, spedito",*Farmacia Amoretti (no offerta) | PharmExpo
+95944,,Solo_WebApp,0,14,14,⚠️ WEBAPP +14,farmacia,in_magazzino,"11F, 12F",
+95651,,Solo_WebApp,0,13,13,⚠️ WEBAPP +13,grossisti,in_magazzino,13B,* + cavi + alimentatore
+95032,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,12B,
+95633,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,5A,
+95788,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,6B,
+95871,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,9B,
+95932,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,"10F, 13E, 13F",
+94995,,Solo_WebApp,0,11,11,⚠️ WEBAPP +11,farmacia,"1, 2, altro, in_magazzino, spedito","-, 12B, baia_uscita, in_utilizzo, spedito",*PharmaExpo | S.Paolo (no offerta) | lorenzo | ufficio ex giorgia
+95081,,Solo_WebApp,0,11,11,⚠️ WEBAPP +11,farmacia,in_magazzino,15d,
+94308,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,grossisti,in_magazzino,9D,
+95050,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,grossisti,in_magazzino,12E,
+95689,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,farmacia,"in_magazzino, spedito",11C,*PharmaExpo
+95792,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,grossisti,in_magazzino,13A,
+95828,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,farmacia,"in_magazzino, laboratorio, spedito","13C, 3E, 6a",Libarna (GUASTO) | PharmExpo | PharmNatur Stradella(no offerta)
+95973,,Solo_WebApp,0,10,10,⚠️ WEBAPP +10,farmacia,in_magazzino,10B,NO TRASFERIMENTO DIRETTO – STAMPANTI CON RIBBON
+96138,,Solo_WebApp,0,9,9,⚠️ WEBAPP +9,farmacia,in_magazzino,5D,
+94967,,Solo_WebApp,0,8,8,⚠️ WEBAPP +8,farmacia,in_magazzino,10C,
+94908,,Solo_WebApp,0,7,7,⚠️ WEBAPP +7,farmacia,in_magazzino,"14D, 3B, 3C, 3D",
+94909,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,in_magazzino,6B,
+94911,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,"1, in_magazzino","10B, baia_uscita",
+95508,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,"1, 2, spedito",spedito,*PharmaExpo
+95548,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,in_magazzino,11E,
+95644,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,in_magazzino,9E,
+95645,,Solo_WebApp,0,6,6,⚠️ WEBAPP +6,farmacia,in_magazzino,"12D, 9D",
+95254,,Solo_WebApp,0,5,5,⚠️ WEBAPP +5,farmacia,in_magazzino,13D,
+95642,,Solo_WebApp,0,5,5,⚠️ WEBAPP +5,farmacia,in_magazzino,9E,
+95643,,Solo_WebApp,0,5,5,⚠️ WEBAPP +5,farmacia,in_magazzino,9E,
+95726,,Solo_WebApp,0,5,5,⚠️ WEBAPP +5,farmacia,"in_magazzino, in_utilizzo","-, 12B",*test cristian
+95994,,Solo_WebApp,0,5,5,⚠️ WEBAPP +5,farmacia,in_magazzino,9B,*dentro ad un'unica busta
+94859,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,12A,TRASFERIMENTO DIRETTO - STAMPANTI SENZA RIBBON
+94874,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,"1, in_magazzino","7A, 8A, laboratorio",
+94882,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,"1, in_magazzino","11C, spedito",
+95151,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,"1, altro, in_magazzino","-, 11C, 7D, spedito",*Cosmofarma | *TEST MATTEO server campospinoso | *rientrati
+95176,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,9B,
+95654,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,grossisti,in_magazzino,13B,* + cavi + alimentatore
+95676,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,9B,
+95681,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,12C,
+95682,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,12C,
+95711,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,9B,
+95834,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,12C,*per nuova stampante Multimeds
+94624,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,grossisti,in_magazzino,2D,
+94884,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,11D,
+95052,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,11E,
+95167,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,"altro, in_magazzino, in_utilizzo","-, 15A",luca | sala riunioni
+95281,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,9D,
+95305,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,7D,*solo per Cosmofarma
+95412,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,15A,
+95592,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,9B,1 pz ha l'imballo riciclato
+95748,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,9B,
+95876,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,"in_magazzino, laboratorio","-, 15c",*guasto ex Linfa Oberdan da verificare
+95947,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,3C,*garanzia 12mesi - PROMO COSMOFARMA
+96046,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,"baia_uscita, laboratorio",15c,PC guasto Farmacia Milano
+94910,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,altro,6B,
+94966,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,"IN_MAGAZZINO, baia_uscita","-, 10D",Rientrato da RHO 3 - guasto
+95049,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,grossisti,in_magazzino,11A,
+95242,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11E,*dentro al 95578
+95268,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11D,
+95272,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,9B,
+95273,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,9B,
+95409,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,"10B, 15A",ID TAG ( non prelevare per altro ) | Id Tag ( Non Prelevare Per Altro )
+95512,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,12D,
+95578,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11E,"*vendere assieme al 0095242, si trova già dentro alla scatola"
+95601,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,12D,
+95608,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,9C,
+95641,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,12C,
+95646,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,grossisti,"altro, in_magazzino","-, 8B",test matteo
+95680,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,10A,
+95953,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,9B,
+96062,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,"altro, in_magazzino","-, 7B",sala riunioni
+96081,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,8B,
+245,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,10D,
+564,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+94838,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,11C,
+94963,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+94964,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95001,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,11D,
+95136,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,15A,
+95195,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,11E,
+95196,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95252,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95257,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95258,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95294,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95314,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,baia_uscita,
+95378,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,11D,
+95439,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95442,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95585,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,10B,
+95609,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95625,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95663,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95675,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,spedito,
+95678,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95749,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,7A,
+95770,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,altro,-,sottoscala
+95776,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,8B,
+95780,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95829,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,spedito,
+95882,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,8B,
+95949,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,baia_uscita,-,*ex monitor Poce guasto - verificare
+96074,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,,laboratorio,farmacia,
+96142,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,laboratorio,
+96221,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,baia_uscita,
+96222,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,1,baia_uscita,

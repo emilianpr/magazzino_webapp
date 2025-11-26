@@ -81,7 +81,7 @@ if(darkMode) document.documentElement.classList.add('dark')"'''
             # Aggiungere transition al body CSS esistente
             updated_body_css = re.sub(
                 r'(\s*body\s*\{[^}]+)(background-color:\s*[^;]+;)([^}]*\})',
-                r'\1\2\n      color: var(--text-primary);\n      transition: background-color 0.3s ease, color 0.3s ease;\3',
+                r'\1\2\n      color: var(--text-primary);\3',
                 original_body_css
             )
             

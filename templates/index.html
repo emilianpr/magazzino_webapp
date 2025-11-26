@@ -25,7 +25,7 @@
   --text-secondary: #d1d5db;
 }
 
-/* Dashboard card icons */
+/* Dashboard card icons - ottimizzato con effetti GPU-friendly */
 .dashboard-card-icon {
   display: flex;
   align-items: center;
@@ -37,40 +37,47 @@
   color: #0056a6;
   font-size: 2.5rem;
   margin-bottom: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,86,166,0.08);
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  will-change: transform;
+}
+
+.glass-card:hover .dashboard-card-icon {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
 .dark .dashboard-card-icon {
   background: linear-gradient(135deg, rgba(96, 165, 250, 0.3) 0%, rgba(37, 99, 235, 0.5) 100%);
   color: var(--accent-color);
-  box-shadow: 0 4px 16px 0 rgba(96, 165, 250, 0.3);
 }
 
-/* Floating buttons */
+/* Floating buttons - con effetto scale GPU-friendly */
 .floating-btn {
-  box-shadow: 0 10px 15px -3px rgba(0, 86, 166, 0.3), 0 4px 6px -2px rgba(0, 86, 166, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 86, 166, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform;
 }
 
 .floating-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 86, 166, 0.3), 0 10px 10px -5px rgba(0, 86, 166, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 86, 166, 0.3);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.floating-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .dark .floating-btn {
-  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 .dark .floating-btn:hover {
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+  border-color: rgba(96, 165, 250, 0.5);
 }
 
-/* Filter toggle */
-.filter-toggle {
-  transition: all 0.3s ease;
-}
-
+/* Filter toggle - ottimizzato per performance */
 .filter-toggle.active {
   background-color: var(--accent-color);
   color: white;
@@ -78,28 +85,50 @@
 
 .dark .filter-toggle.active {
   background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
-  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
 }
 
-/* Table row hover */
+/* Table row hover - ottimizzato con accenti colorati */
+tbody tr {
+  transition: background-color 0.15s ease, border-left 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
 .table-row-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 86, 166, 0.1), 0 2px 4px -1px rgba(0, 86, 166, 0.06);
-  background: #e3f2fd;
-  border-radius: 1rem;
+  background: #f0f8ff;
+  border-left-color: #0056a6;
 }
 
 .dark .table-row-hover:hover {
-  background: var(--bg-secondary);
-  box-shadow: var(--shadow-light);
+  background: rgba(0, 0, 0, 0.95);
+  border-left-color: #60a5fa;
 }
 
-/* Badge styling */
+/* Badge styling - con animazione leggera */
 .badge {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 9999px;
-  transition: all 0.2s ease;
+  transition: transform 0.15s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.status-active .badge:before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 4px;
+  animation: subtle-pulse 2s ease-in-out infinite;
 }
 
 .status-active {
@@ -132,13 +161,29 @@
   color: #ef4444;
 }
 
-/* Edit forms */
+/* Edit forms con animazione */
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .edit-form {
   display: none;
 }
 
 .edit-form.active {
   display: table-row;
+  animation: slideDownFadeIn 0.3s ease forwards;
+}
+
+.edit-form.active td {
+  animation: slideDownFadeIn 0.3s ease forwards;
 }
 
 .edit-input {
@@ -149,13 +194,11 @@
   font-size: 0.875rem;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: all 0.2s ease;
 }
 
 .edit-input:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
 }
 
 .dark .edit-input {
@@ -166,7 +209,6 @@
 
 .dark .edit-input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
 }
 
 /* Spazio sotto la topbar (uniforma con altre pagine) */
@@ -201,7 +243,6 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 .ubicazione-option:hover { border-color: #0056a6; background-color: #f0f8ff; }
 .ubicazione-option.selected { border-color: #0056a6; background-color: #e3f2fd; }
@@ -212,6 +253,15 @@
 .dark .ubicazione-option:hover { background-color:#0f172a; border-color:#2563eb; }
 .dark .ubicazione-option.selected { background-color: rgba(37,99,235,0.15); border-color:#3b82f6; }
 @supports (padding: max(0px)) { .modal-content { padding-bottom: max(24px, env(safe-area-inset-bottom)); } }
+
+/* Edit form - nascosto di default */
+tr.edit-form {
+  display: none;
+}
+
+tr.edit-form.active {
+  display: table-row;
+}
 
 /* Mobile responsive */
 @media (max-width: 768px) {
@@ -252,8 +302,13 @@
   }
   
   .mobile-filters button {
-    background-color: #2256a7;
-    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #2256a7 0%, #1e4a8c 100%);
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  
+  .mobile-filters button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
   }
   
   .mobile-filters button:hover {
@@ -308,13 +363,29 @@
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s ease;
   }
 
   .mobile-giacenza-item:hover {
     border-color: rgba(34, 86, 167, 0.25);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Animazione apertura form mobile */
+  @keyframes expandIn {
+    from {
+      opacity: 0;
+      max-height: 0;
+      transform: scaleY(0.9);
+    }
+    to {
+      opacity: 1;
+      max-height: 500px;
+      transform: scaleY(1);
+    }
+  }
+
+  .mobile-edit-opening {
+    animation: expandIn 0.3s ease forwards;
+    transform-origin: top;
   }
 
   .dark .mobile-giacenza-item {
@@ -413,7 +484,6 @@
     border-radius: 8px;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: all 0.2s ease;
     border: 1px solid;
     display: flex;
     align-items: center;
@@ -504,7 +574,6 @@
     color: #374151;
     border: none;
     background: none;
-    transition: all 0.2s ease;
   }
 
   .mobile-menu-item:hover {
@@ -624,14 +693,10 @@
                   {% endfor %}
                 </select>
                 
-                <div class="flex space-x-2">
+                <div class="flex justify-center">
                   <button type="button" onclick="window.location='{{ url_for('index') }}'"
-                          class="flex-1 py-2 border rounded-lg text-sm bg-blue-25 dark:bg-gray-700 dark:border-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-600" style="border-color: rgba(34, 86, 167, 0.3); color: #2256a7;">
-                    Reset
-                  </button>
-                  <button type="submit" 
-                          class="flex-1 py-2 text-white rounded-lg text-sm dark:bg-blue-700 dark:hover:bg-blue-800" style="background-color: #2256a7;">
-                    Applica
+                          class="w-full py-2 border rounded-lg text-sm bg-blue-25 dark:bg-gray-700 dark:border-blue-600 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-600" style="border-color: rgba(34, 86, 167, 0.3); color: #2256a7;">
+                    <i class="fas fa-undo mr-2"></i>Reset Filtri
                   </button>
                 </div>
               </div>
@@ -748,11 +813,7 @@
             <div class="flex justify-end space-x-3 mt-6">
               <button type="button" onclick="window.location='{{ url_for('index') }}'"
                       class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
-                <i class="fas fa-undo mr-2"></i>Reset
-              </button>
-              <button type="submit"
-                      class="px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2" style="background-color: #2256a7;">
-                <i class="fas fa-check mr-2"></i>Applica
+                <i class="fas fa-undo mr-2"></i>Reset Filtri
               </button>
             </div>
           </form>
@@ -761,12 +822,12 @@
 
       <!-- Desktop Table -->
       <div class="desktop-table glass-card rounded-2xl overflow-x-auto w-full hidden md:block">
-        <div class="px-6 py-4 border-b bg-blue-25 dark:bg-gray-800 dark:border-blue-600 rounded-t-2xl" style="border-color: rgba(34, 86, 167, 0.2);">
+        <div class="px-6 py-4 border-b dark:bg-gray-800 rounded-t-2xl">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold dark:text-blue-300" style="color: #2256a7;">
+            <h2 class="text-xl font-semibold">
               <i class="fas fa-boxes mr-2"></i>Stock Campospinoso - Giacenze
             </h2>
-            <div class="text-sm dark:text-blue-400" style="color: #2256a7;">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
               Visualizza tutti i prodotti in magazzino
             </div>
           </div>
@@ -832,17 +893,17 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap" id="stato-{{ g.id }}">
                     {% if g.stato == 'ATTIVO' %}
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" data-state-raw="{{ g.stato|lower }}">
                         <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                         {{ g.stato|format_db_string }}
                       </span>
                     {% elif g.stato == 'IN_ARRIVO' %}
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" data-state-raw="{{ g.stato|lower }}">
                         <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
                         {{ g.stato|format_db_string }}
                       </span>
                     {% else %}
-                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" data-state-raw="{{ g.stato|lower }}">
                         <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
                         {{ g.stato|format_db_string }}
                       </span>
@@ -882,7 +943,7 @@
                 </tr>
                 
                 <!-- Form di modifica inline (nascosto di default) -->
-                <tr class="edit-form bg-blue-25 dark:bg-gray-800" id="edit-form-{{ g.id }}">
+                <tr class="edit-form bg-gray-50 dark:bg-gray-800" id="edit-form-{{ g.id }}">
                   <td colspan="8" class="px-6 py-4">
                     <form id="edit-form-{{ g.id }}-form" class="space-y-4">
                       <input type="hidden" name="giacenza_id" value="{{ g.id }}">
@@ -913,7 +974,7 @@
                         </div>
                       </div>
                       <div class="flex justify-end space-x-3 mt-4">
-                        <button type="button" class="cancel-edit-btn px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" data-id="{{ g.id }}">
+                        <button type="button" class="cancel-edit-btn px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600" data-id="{{ g.id }}">
                           <i class="fas fa-times mr-1"></i>Annulla
                         </button>
                         <button type="button" class="submit-edit-btn px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium" data-id="{{ g.id }}">
@@ -967,7 +1028,7 @@
                 <div class="mobile-giacenza-detail">
                   <div class="mobile-giacenza-detail-label">Stato</div>
                   <div class="mobile-giacenza-detail-value" id="mobile-stato-{{ g.id }}">
-                    <span class="badge {% if g.stato == 'ATTIVO' %}status-active{% elif g.stato == 'IN_ARRIVO' %}status-inactive{% else %}status-warning{% endif %}">
+                    <span class="badge {% if g.stato == 'ATTIVO' %}status-active{% elif g.stato == 'IN_ARRIVO' %}status-inactive{% else %}status-warning{% endif %}" data-state-raw="{{ g.stato|lower }}">
                       {{ g.stato|format_db_string }}
                     </span>
                   </div>
@@ -1199,6 +1260,20 @@
       // Hover effects disabilitati per migliorare performance dark mode
     });
 
+    // Aggiungi effetto di entrata alle stats cards
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.glass-card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 50 * index);
+      });
+    });
+
     // Simulate loading for demo purposes
     setTimeout(() => {
       document.querySelectorAll('.animate-pulse').forEach(el => {
@@ -1283,6 +1358,135 @@
       }
     }
 
+    // Funzione per filtrare la tabella in tempo reale
+    function filterTable() {
+      const filtroCodice = document.getElementById('filtro_codice')?.value.toLowerCase().trim() || '';
+      const filtroNome = document.getElementById('filtro_nome')?.value.toLowerCase().trim() || '';
+      const filtroMagazzino = document.getElementById('filtro_magazzino')?.value.toLowerCase().trim() || '';
+      const filtroStato = document.getElementById('filtro_stato')?.value.toLowerCase().trim() || '';
+      const filtroUbicazione = document.getElementById('filtro_ubicazione')?.value.toLowerCase().trim() || '';
+      const filtroNote = document.getElementById('filtro_note')?.value.toLowerCase().trim() || '';
+      
+      // Filtra righe desktop
+      const desktopRows = document.querySelectorAll('.desktop-table tbody tr[id^="row-"]');
+      const normalizedFiltroStato = filtroStato.replace(/\s+/g, '_');
+      desktopRows.forEach(row => {
+        const codice = row.querySelector('td:nth-child(1) span')?.textContent.toLowerCase() || '';
+        const nome = row.querySelector('td:nth-child(2) div')?.textContent.toLowerCase() || '';
+        const magazzino = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
+        const ubicazione = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+        const statoElement = row.querySelector('td:nth-child(5) span');
+        const statoRaw = statoElement?.dataset.stateRaw || '';
+        const statoDisplay = statoElement?.textContent.toLowerCase() || '';
+        const stato = statoRaw ? statoRaw.toLowerCase() : statoDisplay;
+        const note = row.querySelector('td:nth-child(7) div')?.textContent.toLowerCase() || '';
+        
+        const matchCodice = !filtroCodice || codice.includes(filtroCodice);
+        const matchNome = !filtroNome || nome.includes(filtroNome);
+        const matchMagazzino = !filtroMagazzino || magazzino.includes(filtroMagazzino);
+        const matchStato = !normalizedFiltroStato || stato.includes(normalizedFiltroStato);
+        const matchUbicazione = !filtroUbicazione || ubicazione.includes(filtroUbicazione);
+        const matchNote = !filtroNote || note.includes(filtroNote);
+        
+        const editForm = document.getElementById('edit-form-' + row.id.replace('row-', ''));
+        
+        if (matchCodice && matchNome && matchMagazzino && matchStato && matchUbicazione && matchNote) {
+          row.style.display = '';
+          // Mostra anche il form di edit se è attivo
+          if (editForm && editForm.classList.contains('active')) {
+            editForm.style.display = '';
+          }
+        } else {
+          // Se la riga non matcha il filtro, nascondi sia riga che form
+          row.style.display = 'none';
+          if (editForm) {
+            editForm.style.display = 'none';
+            // Se il form era attivo, chiudilo
+            if (editForm.classList.contains('active')) {
+              const rowId = row.id.replace('row-', '');
+              cancelEdit(rowId);
+            }
+          }
+        }
+      });
+      
+      // Filtra card mobile
+      const mobileCards = document.querySelectorAll('.mobile-giacenza-item');
+      mobileCards.forEach(card => {
+        const cardId = card.id.replace('mobile-card-', '');
+        const codice = card.querySelector('.mobile-giacenza-code')?.textContent.toLowerCase() || '';
+        const nome = card.querySelector('.mobile-giacenza-title')?.textContent.toLowerCase() || '';
+        const magazzino = card.querySelector('.mobile-giacenza-detail-value')?.textContent.toLowerCase() || '';
+        const ubicazione = document.getElementById('mobile-ubicazione-' + cardId)?.textContent.toLowerCase() || '';
+        const statoElement = document.getElementById('mobile-stato-' + cardId)?.querySelector('span');
+        const statoRaw = statoElement?.dataset.stateRaw || '';
+        const statoDisplay = statoElement?.textContent.toLowerCase() || '';
+        const stato = statoRaw ? statoRaw.toLowerCase() : statoDisplay;
+        const note = document.getElementById('mobile-note-display-' + cardId)?.textContent.toLowerCase() || '';
+        
+        const matchCodice = !filtroCodice || codice.includes(filtroCodice);
+        const matchNome = !filtroNome || nome.includes(filtroNome);
+        const matchMagazzino = !filtroMagazzino || magazzino.includes(filtroMagazzino);
+        const matchStato = !normalizedFiltroStato || stato.includes(normalizedFiltroStato);
+        const matchUbicazione = !filtroUbicazione || ubicazione.includes(filtroUbicazione);
+        const matchNote = !filtroNote || note.includes(filtroNote);
+        
+        if (matchCodice && matchNome && matchMagazzino && matchStato && matchUbicazione && matchNote) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Aggiorna il contatore dopo il filtro
+      updateTotalCounter();
+    }
+
+    // Aggiungi event listeners ai campi filtro per filtraggio real-time
+    document.addEventListener('DOMContentLoaded', () => {
+      // Desktop filters
+      const desktopFilters = ['filtro_codice', 'filtro_nome', 'filtro_magazzino', 'filtro_stato', 'filtro_ubicazione', 'filtro_note'];
+      desktopFilters.forEach(filterId => {
+        const filterElement = document.getElementById(filterId);
+        if (filterElement) {
+          if (filterElement.tagName === 'SELECT') {
+            filterElement.addEventListener('change', filterTable);
+          } else {
+            filterElement.addEventListener('input', filterTable);
+          }
+        }
+      });
+      
+      // Mobile filters - trova i campi nel form mobile
+      const mobileForm = document.querySelector('.mobile-filters form');
+      if (mobileForm) {
+        const mobileInputs = mobileForm.querySelectorAll('input[name^="filtro_"], select[name^="filtro_"]');
+        mobileInputs.forEach(input => {
+          if (input.tagName === 'SELECT') {
+            input.addEventListener('change', () => {
+              // Sincronizza con desktop e filtra
+              const name = input.name;
+              const desktopInput = document.getElementById(name);
+              if (desktopInput) {
+                desktopInput.value = input.value;
+              }
+              filterTable();
+            });
+          } else {
+            input.addEventListener('input', () => {
+              // Sincronizza con desktop e filtra
+              const name = input.name;
+              const desktopInput = document.getElementById(name);
+              if (desktopInput) {
+                desktopInput.value = input.value;
+              }
+              filterTable();
+            });
+          }
+        });
+      }
+    });
+
     // Inizializza l'osservatore quando la pagina è caricata
     document.addEventListener('DOMContentLoaded', () => {
       updateTotalCounter();
@@ -1304,11 +1508,26 @@
       });
     }
 
-    // Funzione per attivare la modalità modifica
+    // Funzione per attivare la modalità modifica con animazione
     function editRow(id, ubicazione, stato, quantita, note) {
-      // Nascondi la riga normale e mostra il form di modifica
-      document.getElementById(`row-${id}`).style.display = 'none';
-      document.getElementById(`edit-form-${id}`).classList.add('active');
+      const row = document.getElementById(`row-${id}`);
+      const editForm = document.getElementById(`edit-form-${id}`);
+      
+      // Fade out della riga normale
+      row.style.transition = 'opacity 0.15s ease';
+      row.style.opacity = '0';
+      
+      setTimeout(() => {
+        // Nascondi la riga normale e mostra il form di modifica
+        row.style.display = 'none';
+        editForm.classList.add('active');
+        editForm.style.display = ''; // Forza visualizzazione anche con filtri attivi
+        
+        // Scroll smooth verso il form
+        setTimeout(() => {
+          editForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }, 150);
       
       // Disabilita tutti gli altri pulsanti di modifica
       document.querySelectorAll('[id^="edit-btn-"]').forEach(btn => {
@@ -1317,11 +1536,29 @@
       });
     }
     
-    // Funzione per annullare la modifica
+    // Funzione per annullare la modifica con animazione
     function cancelEdit(id) {
-      // Mostra la riga normale e nascondi il form di modifica
-      document.getElementById(`row-${id}`).style.display = 'table-row';
-      document.getElementById(`edit-form-${id}`).classList.remove('active');
+      const row = document.getElementById(`row-${id}`);
+      const editForm = document.getElementById(`edit-form-${id}`);
+      
+      // Fade out del form
+      editForm.style.transition = 'opacity 0.15s ease';
+      editForm.style.opacity = '0';
+      
+      setTimeout(() => {
+        // Nascondi il form e mostra la riga normale
+        editForm.classList.remove('active');
+        editForm.style.opacity = '';
+        editForm.style.transition = '';
+        
+        row.style.display = 'table-row';
+        row.style.opacity = '0';
+        row.style.transition = 'opacity 0.2s ease';
+        
+        setTimeout(() => {
+          row.style.opacity = '1';
+        }, 10);
+      }, 150);
       
       // Riabilita tutti i pulsanti di modifica
       document.querySelectorAll('[id^="edit-btn-"]').forEach(btn => {
@@ -1346,7 +1583,14 @@
 
     // Funzione per sottomettere la modifica
     function submitEdit(id) {
+      console.log('submitEdit chiamato con id:', id);
       const form = document.getElementById(`edit-form-${id}-form`);
+      console.log('Form trovato:', form);
+      if (!form) {
+        console.error('Form non trovato! ID cercato: edit-form-' + id + '-form');
+        alert('Errore: form di modifica non trovato');
+        return;
+      }
       const formData = new FormData(form);
       
       const data = {
@@ -1355,6 +1599,7 @@
         quantita: formData.get('quantita'),
         note: formData.get('note')
       };
+      console.log('Dati da inviare:', data);
       
       // Invia richiesta di modifica
       fetch(`/modifica_giacenza/${id}`, {
@@ -1365,15 +1610,28 @@
         body: new URLSearchParams(data)
       })
       .then(response => {
-        if (response.headers.get('content-type')?.includes('application/json')) {
-          return response.json();
-        } else {
-          // Redirect normale
-          window.location.reload();
-        }
+        console.log('Response status:', response.status);
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        return response.text().then(text => {
+          console.log('Response body preview:', text.substring(0, 200));
+          
+          if (contentType?.includes('application/json')) {
+            return JSON.parse(text);
+          } else {
+            // Redirect normale - ricarica la pagina
+            window.location.reload();
+            return null;
+          }
+        });
       })
       .then(data => {
-        if (data && data.need_compensation) {
+        console.log('Data ricevuta:', data);
+        if (data && data.error) {
+          // Errore dal server - mostra messaggio e NON refreshare
+          alert(data.message);
+        } else if (data && data.need_compensation) {
           // Mostra modal di compensazione
           showCompensazioneModal(data);
         }
@@ -1635,11 +1893,55 @@
       }
     });
 
+    // Funzione helper per animare apertura mobile
+    function editMobileRow(id, ubicazione, stato, quantita, note) {
+      const viewElement = document.getElementById(`mobile-view-${id}`);
+      const editElement = document.getElementById(`mobile-edit-${id}`);
+      
+      // Fade out vista normale
+      viewElement.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+      viewElement.style.opacity = '0';
+      viewElement.style.transform = 'translateX(-10px)';
+      
+      setTimeout(() => {
+        viewElement.style.display = 'none';
+        editElement.style.display = 'block';
+        editElement.classList.add('mobile-edit-opening');
+        
+        // Scroll smooth verso il form
+        setTimeout(() => {
+          editElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      }, 150);
+    }
+    
     // Funzioni per la modifica mobile
     function cancelMobileEdit(id) {
-      // Mostra la vista normale e nascondi il form di modifica
-      document.getElementById(`mobile-view-${id}`).style.display = 'block';
-      document.getElementById(`mobile-edit-${id}`).style.display = 'none';
+      const viewElement = document.getElementById(`mobile-view-${id}`);
+      const editElement = document.getElementById(`mobile-edit-${id}`);
+      
+      // Fade out form
+      editElement.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+      editElement.style.opacity = '0';
+      editElement.style.transform = 'translateX(10px)';
+      
+      setTimeout(() => {
+        editElement.style.display = 'none';
+        editElement.classList.remove('mobile-edit-opening');
+        editElement.style.opacity = '';
+        editElement.style.transform = '';
+        editElement.style.transition = '';
+        
+        viewElement.style.display = 'block';
+        viewElement.style.opacity = '0';
+        viewElement.style.transform = 'translateX(10px)';
+        
+        setTimeout(() => {
+          viewElement.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+          viewElement.style.opacity = '1';
+          viewElement.style.transform = 'translateX(0)';
+        }, 10);
+      }, 150);
       
       // Riabilita tutti i pulsanti di modifica mobile
       document.querySelectorAll('[id^="mobile-edit-btn-"]').forEach(btn => {
@@ -1697,7 +1999,10 @@
         }
       })
       .then(responseData => {
-        if (responseData && responseData.need_compensation) {
+        if (responseData && responseData.error) {
+          // Errore dal server
+          showMobileToast(responseData.message, 'error');
+        } else if (responseData && responseData.need_compensation) {
           // Mostra modal di compensazione
           showCompensazioneModal(responseData);
         }

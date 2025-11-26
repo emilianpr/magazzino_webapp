@@ -291,8 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (map[value]) {
       hiddenId.value = map[value];
       suggestionsDiv.classList.add('hidden');
-      // Trigger aggiornamento quantità
-      updateQuantitaDisponibile();
+      // Trigger aggiornamento ubicazioni e quantità
+      updateUbicazioni();
     } else {
       hiddenId.value = '';
       showSuggestions(value);
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
       input.value = text;
       hiddenId.value = id;
       suggestionsDiv.classList.add('hidden');
-      updateQuantitaDisponibile();
+      updateUbicazioni();
     }
   });
 
@@ -357,6 +357,43 @@ document.addEventListener('DOMContentLoaded', function() {
       suggestionsDiv.classList.add('hidden');
     }
   });
+
+  // Funzione per aggiornare le ubicazioni disponibili per il prodotto selezionato
+  function updateUbicazioni() {
+    const prodottoId = hiddenId.value;
+    const ubicazioneSelect = document.getElementById('ubicazione');
+    
+    if (!prodottoId) {
+      // Reset ubicazioni se nessun prodotto selezionato
+      ubicazioneSelect.innerHTML = '<option value="">-- Seleziona prima un prodotto --</option>';
+      ubicazioneSelect.disabled = true;
+      return;
+    }
+
+    // Carica ubicazioni per il prodotto specifico
+    fetch(`/api/ubicazioni_prodotto/${prodottoId}`)
+      .then(response => response.json())
+      .then(data => {
+        ubicazioneSelect.innerHTML = '<option value="">-- Tutte le ubicazioni --</option>';
+        if (data.ubicazioni && data.ubicazioni.length > 0) {
+          data.ubicazioni.forEach(ub => {
+            const option = document.createElement('option');
+            option.value = ub.ubicazione;
+            option.textContent = `${ub.ubicazione} (Qnt: ${ub.quantita})`;
+            ubicazioneSelect.appendChild(option);
+          });
+          ubicazioneSelect.disabled = false;
+        } else {
+          ubicazioneSelect.innerHTML = '<option value="">-- Nessuna ubicazione disponibile --</option>';
+          ubicazioneSelect.disabled = true;
+        }
+        updateQuantitaDisponibile();
+      })
+      .catch(() => {
+        ubicazioneSelect.innerHTML = '<option value="">-- Errore caricamento ubicazioni --</option>';
+        ubicazioneSelect.disabled = true;
+      });
+  }
 
   // Funzione per aggiornare quantità disponibile
   function updateQuantitaDisponibile() {

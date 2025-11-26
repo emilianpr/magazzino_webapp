@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask_compress import Compress
 import mysql.connector
 from mysql.connector import Error
 from database_connection import connect_to_database
@@ -15,6 +16,17 @@ from magazzino_reconciliation import process_uploaded_files, get_webapp_api_resp
 
 
 app = Flask(__name__)
+
+# Performance: enable gzip compression and static caching
+app.config.setdefault('COMPRESS_ALGORITHM', 'gzip')
+app.config.setdefault('COMPRESS_LEVEL', 6)
+app.config.setdefault('COMPRESS_MIN_SIZE', 1024)
+app.config.setdefault('COMPRESS_MIMETYPES', [
+    'text/html', 'text/css', 'text/plain', 'application/json',
+    'application/javascript', 'text/javascript', 'image/svg+xml'
+])
+app.config.setdefault('SEND_FILE_MAX_AGE_DEFAULT', 86400)  # 1 day for static assets
+Compress(app)
 
 # Carica la configurazione Flask da config_local.py o variabile d'ambiente
 try:
@@ -33,7 +45,7 @@ MAINTENANCE_MODE = False
 
 # Personalizza il messaggio dell'operazione in corso
 # Cambia questo testo per descrivere l'operazione specifica
-MAINTENANCE_MESSAGE = "Migrazione del magazzino su macchina virtuale in corso, il database non è accessibile."
+MAINTENANCE_MESSAGE = "Aggiornamento alla Beta v1.4 - Tempo stimato: 1 ora"
 
 # Before request handler per controllare la manutenzione
 @app.before_request
@@ -138,6 +150,27 @@ def inject_app_version():
             pass
     return dict(app_version=version)
 
+# API endpoint to get ubicazioni with quantities for a given prodotto_id
+@app.route("/api/ubicazioni_prodotto/<int:prodotto_id>")
+def api_ubicazioni_prodotto(prodotto_id):
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT ubicazione, SUM(quantita) as quantita
+            FROM giacenze 
+            WHERE prodotto_id = %s AND stato = 'in_magazzino' AND ubicazione IS NOT NULL AND ubicazione != ''
+            GROUP BY ubicazione
+            HAVING SUM(quantita) > 0
+            ORDER BY ubicazione
+        """, (prodotto_id,))
+        ubicazioni = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({'ubicazioni': ubicazioni})
+    except Exception as e:
+        return jsonify({'ubicazioni': [], 'error': str(e)}), 500
+
 # API endpoint to get ubicazioni for a given prodotto_id
 @app.route("/api/ubicazioni/<int:prodotto_id>")
 def api_ubicazioni(prodotto_id):
@@ -212,8 +245,8 @@ def index():
             query += " AND m.nome LIKE %s"
             params.append(f"%{filtro_magazzino}%")
         if filtro_stato:
-            query += " AND g.stato LIKE %s"
-            params.append(f"%{filtro_stato}%")
+            query += " AND TRIM(UPPER(g.stato)) = TRIM(UPPER(%s))"
+            params.append(filtro_stato)
         if filtro_ubicazione:
             query += " AND g.ubicazione LIKE %s"
             params.append(f"%{filtro_ubicazione}%")
@@ -226,12 +259,19 @@ def index():
 
         cursor.execute(query, params)
         giacenze = cursor.fetchall()
+        
+        # Debug: mostra info filtro nella pagina
+        if filtro_stato and len(giacenze) == 0:
+            # Controlla quante giacenze hanno quello stato nel DB
+            cursor.execute("SELECT COUNT(*) as cnt FROM giacenze WHERE TRIM(UPPER(stato)) = TRIM(UPPER(%s))", (filtro_stato,))
+            count_stato = cursor.fetchone()['cnt']
+            flash(f"DEBUG: Filtro '{filtro_stato}' - Trovate {count_stato} giacenze con questo stato nel DB, ma 0 dopo filtri combinati", "info")
 
         # Query per opzioni filtro magazzino, stato e ubicazione
         cursor.execute("SELECT DISTINCT nome FROM magazzini ORDER BY nome ASC")
         magazzini_opzioni = [row['nome'] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT stato FROM giacenze ORDER BY stato ASC")
+        cursor.execute("SELECT DISTINCT stato FROM giacenze WHERE stato IS NOT NULL ORDER BY stato ASC")
         stati_opzioni = [row['stato'] for row in cursor.fetchall()]
 
         cursor.execute("SELECT DISTINCT ubicazione FROM giacenze ORDER BY ubicazione ASC")
@@ -321,12 +361,22 @@ def movimento():
                 if result and result.get('magazzino_id'):
                     a_magazzino_id = result['magazzino_id']
 
-            # Inserimento movimento (ora con user_id)
+            # Inserimento movimento (ora con user_id e tipo_movimento)
+            # Determina il tipo di movimento basandosi sugli stati
+            if not da_stato and a_stato == 'IN_MAGAZZINO':
+                tipo_mov = 'CARICO'
+            elif da_stato == 'IN_MAGAZZINO' and a_stato != 'IN_MAGAZZINO':
+                tipo_mov = 'SCARICO'
+            elif da_stato == 'IN_MAGAZZINO' and a_stato == 'IN_MAGAZZINO':
+                tipo_mov = 'TRASFERIMENTO'
+            else:
+                tipo_mov = 'TRASFERIMENTO'  # default per altri casi
+            
             cursor.execute("""
                 INSERT INTO movimenti (
-                    prodotto_id, da_magazzino_id, a_magazzino_id, da_ubicazione, a_ubicazione, quantita, note, user_id, stato
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (prodotto_id, da_magazzino_id, a_magazzino_id, da_ubicazione, a_ubicazione, quantita, note, user_id, a_stato))
+                    prodotto_id, da_magazzino_id, a_magazzino_id, da_ubicazione, a_ubicazione, quantita, note, user_id, stato, tipo_movimento
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (prodotto_id, da_magazzino_id, a_magazzino_id, da_ubicazione, a_ubicazione, quantita, note, user_id, a_stato, tipo_mov))
             conn.commit()
 
             # Aggiorna giacenza di partenza
@@ -391,9 +441,6 @@ def movimento():
                     """, (prodotto_id, a_magazzino_id, a_ubicazione, a_stato, quantita, note))
                 conn.commit()
                 giacenza_updated = True
-
-            cursor.close()
-            conn.close()
 
             if giacenza_updated:
                 flash("Movimento e giacenza aggiornati con successo.", "success")
@@ -541,14 +588,14 @@ def logout():
 def register():
     # Controlla se l'utente è loggato e se è admin
     if 'user_id' not in session or not session.get('is_admin', False):
-        flash('Accesso negato: solo admin può registrare nuovi utenti.', 'error')
+        flash('Accesso negato: solo admin può gestire gli utenti.', 'error')
         return redirect(url_for('login'))
 
     utenti = []
     try:
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT username, is_admin FROM utenti ORDER BY username ASC")
+        cursor.execute("SELECT id, username, is_admin FROM utenti ORDER BY username ASC")
         utenti = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -557,37 +604,475 @@ def register():
         flash(f"Errore nel recupero utenti: {e}", "error")
 
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
+        action = request.form.get('action')
+        
+        if action == 'add_user':
+            username = request.form.get('username')
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirm_password')
+            is_admin = 1 if request.form.get('is_admin') == 'on' else 0
 
-        if not username or not password or not confirm_password:
-            flash('Tutti i campi sono obbligatori.', 'error')
+            if not username or not password or not confirm_password:
+                flash('Tutti i campi sono obbligatori.', 'error')
+                return redirect(url_for('register'))
+
+            if password != confirm_password:
+                flash('Le password non coincidono.', 'error')
+                return redirect(url_for('register'))
+
+            password_hash = generate_password_hash(password)
+
+            try:
+                conn = connect_to_database()
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO utenti (username, password_hash, is_admin) VALUES (%s, %s, %s)", 
+                             (username, password_hash, is_admin))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                flash(f'Utente {username} aggiunto con successo.', 'success')
+                return redirect(url_for('register'))
+            except mysql.connector.IntegrityError:
+                flash('Username già esistente. Scegli un altro username.', 'error')
+                return redirect(url_for('register'))
+            except Exception as e:
+                flash(f'Errore durante la registrazione: {e}', 'error')
+                return redirect(url_for('register'))
+                
+        elif action == 'delete_user':
+            user_id = request.form.get('user_id')
+            
+            # Non permettere l'eliminazione dell'utente corrente
+            if int(user_id) == session.get('user_id'):
+                flash('Non puoi eliminare il tuo account mentre sei loggato.', 'error')
+                return redirect(url_for('register'))
+            
+            try:
+                conn = connect_to_database()
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("SELECT username FROM utenti WHERE id = %s", (user_id,))
+                user = cursor.fetchone()
+                
+                if user:
+                    cursor.execute("DELETE FROM utenti WHERE id = %s", (user_id,))
+                    conn.commit()
+                    flash(f'Utente {user["username"]} eliminato con successo.', 'success')
+                
+                cursor.close()
+                conn.close()
+            except Exception as e:
+                flash(f'Errore durante l\'eliminazione: {e}', 'error')
+            
+            return redirect(url_for('register'))
+            
+        elif action == 'toggle_admin':
+            user_id = request.form.get('user_id')
+            new_status = request.form.get('new_status')
+            
+            try:
+                conn = connect_to_database()
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("SELECT username FROM utenti WHERE id = %s", (user_id,))
+                user = cursor.fetchone()
+                
+                if user:
+                    cursor.execute("UPDATE utenti SET is_admin = %s WHERE id = %s", (new_status, user_id))
+                    conn.commit()
+                    status_text = "amministratore" if int(new_status) == 1 else "utente normale"
+                    flash(f'{user["username"]} è ora {status_text}.', 'success')
+                
+                cursor.close()
+                conn.close()
+            except Exception as e:
+                flash(f'Errore durante l\'aggiornamento: {e}', 'error')
+            
             return redirect(url_for('register'))
 
-        if password != confirm_password:
-            flash('Le password non coincidono.', 'error')
-            return redirect(url_for('register'))
+    return render_template('register.html', utenti=utenti, current_user_id=session.get('user_id'))
 
-        password_hash = generate_password_hash(password)
 
-        try:
-            conn = connect_to_database()
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO utenti (username, password_hash) VALUES (%s, %s)", (username, password_hash))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            flash('Registrazione avvenuta con successo. Effettua il login.', 'success')
-            return redirect(url_for('register'))
-        except mysql.connector.IntegrityError:
-            flash('Username già esistente. Scegli un altro username.', 'error')
-            return redirect(url_for('register'))
-        except Exception as e:
-            flash(f'Errore durante la registrazione: {e}', 'error')
-            return redirect(url_for('register'))
+# ========================================
+# GESTIONE SOGLIE E NOTIFICHE
+# ========================================
 
-    return render_template('register.html', utenti=utenti)
+@app.route('/api/soglie_data')
+def api_soglie_data():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Recupera tutti i prodotti per il dropdown
+        cursor.execute("""
+            SELECT DISTINCT codice_prodotto, nome_prodotto 
+            FROM prodotti 
+            ORDER BY nome_prodotto
+        """)
+        prodotti = cursor.fetchall()
+        
+        # Recupera tutte le soglie configurate con quantità attuale
+        cursor.execute("""
+            SELECT 
+                pt.id,
+                pt.codice_prodotto,
+                pt.nome_prodotto,
+                pt.soglia_minima,
+                pt.notifica_attiva,
+                COALESCE(SUM(g.quantita), 0) as quantita_attuale
+            FROM product_thresholds pt
+            LEFT JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            GROUP BY pt.id, pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, pt.notifica_attiva
+            ORDER BY pt.nome_prodotto
+        """)
+        soglie = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'soglie': soglie, 'prodotti': prodotti})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/gestione_soglie')
+def gestione_soglie():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login per accedere.', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Recupera tutti i prodotti per il dropdown
+        cursor.execute("""
+            SELECT DISTINCT codice_prodotto, nome_prodotto 
+            FROM prodotti 
+            ORDER BY nome_prodotto
+        """)
+        prodotti = cursor.fetchall()
+        
+        # Recupera tutte le soglie configurate con quantità attuale
+        cursor.execute("""
+            SELECT 
+                pt.id,
+                pt.codice_prodotto,
+                pt.nome_prodotto,
+                pt.soglia_minima,
+                pt.notifica_attiva,
+                COALESCE(SUM(g.quantita), 0) as quantita_attuale
+            FROM product_thresholds pt
+            LEFT JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            GROUP BY pt.id, pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, pt.notifica_attiva
+            ORDER BY pt.nome_prodotto
+        """)
+        soglie = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return render_template('gestione_soglie.html', soglie=soglie, prodotti=prodotti)
+    except Exception as e:
+        flash(f'Errore nel caricamento delle soglie: {e}', 'error')
+        return redirect(url_for('index'))
+
+
+@app.route('/add_threshold', methods=['POST'])
+def add_threshold():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login.', 'error')
+        return redirect(url_for('login'))
+    
+    codice_prodotto = request.form.get('codice_prodotto')
+    soglia_minima = request.form.get('soglia_minima')
+    notifica_attiva = request.form.get('notifica_attiva') == 'true'
+    
+    if not codice_prodotto or not soglia_minima:
+        flash('Tutti i campi sono obbligatori.', 'error')
+        return redirect(request.referrer or url_for('index'))
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Recupera il nome del prodotto
+        cursor.execute("SELECT nome_prodotto FROM prodotti WHERE codice_prodotto = %s", (codice_prodotto,))
+        prodotto = cursor.fetchone()
+        
+        if not prodotto:
+            flash('Prodotto non trovato.', 'error')
+            return redirect(request.referrer or url_for('index'))
+        
+        # Inserisci la soglia
+        cursor.execute("""
+            INSERT INTO product_thresholds (codice_prodotto, nome_prodotto, soglia_minima, notifica_attiva)
+            VALUES (%s, %s, %s, %s)
+        """, (codice_prodotto, prodotto['nome_prodotto'], soglia_minima, notifica_attiva))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        flash('Soglia aggiunta con successo!', 'success')
+        
+        # Controlla immediatamente se va generata una notifica
+        check_and_create_notifications()
+        
+    except mysql.connector.IntegrityError:
+        flash('Esiste già una soglia per questo prodotto.', 'error')
+    except Exception as e:
+        flash(f'Errore durante l\'aggiunta della soglia: {e}', 'error')
+    
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/update_threshold', methods=['POST'])
+def update_threshold():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login.', 'error')
+        return redirect(url_for('login'))
+    
+    threshold_id = request.form.get('threshold_id')
+    soglia_minima = request.form.get('soglia_minima')
+    notifica_attiva = request.form.get('notifica_attiva') == 'true'
+    
+    if not threshold_id or not soglia_minima:
+        flash('Dati mancanti.', 'error')
+        return redirect(request.referrer or url_for('index'))
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE product_thresholds 
+            SET soglia_minima = %s, notifica_attiva = %s
+            WHERE id = %s
+        """, (soglia_minima, notifica_attiva, threshold_id))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        flash('Soglia aggiornata con successo!', 'success')
+        
+        # Controlla se va generata una notifica
+        check_and_create_notifications()
+        
+    except Exception as e:
+        flash(f'Errore durante l\'aggiornamento: {e}', 'error')
+    
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/toggle_threshold', methods=['POST'])
+def toggle_threshold():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login.', 'error')
+        return redirect(url_for('login'))
+    
+    threshold_id = request.form.get('threshold_id')
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE product_thresholds 
+            SET notifica_attiva = NOT notifica_attiva
+            WHERE id = %s
+        """, (threshold_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        flash('Stato notifica aggiornato!', 'success')
+    except Exception as e:
+        flash(f'Errore: {e}', 'error')
+    
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/delete_threshold', methods=['POST'])
+def delete_threshold():
+    if 'user_id' not in session:
+        flash('Devi effettuare il login.', 'error')
+        return redirect(url_for('login'))
+    
+    threshold_id = request.form.get('threshold_id')
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM product_thresholds WHERE id = %s", (threshold_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        flash('Soglia eliminata con successo!', 'success')
+    except Exception as e:
+        flash(f'Errore durante l\'eliminazione: {e}', 'error')
+    
+    return redirect(request.referrer or url_for('index'))
+
+
+def check_and_create_notifications():
+    """
+    Funzione che controlla tutte le soglie attive e crea notifiche
+    per i prodotti che sono sotto la soglia minima
+    """
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Trova tutti i prodotti sotto soglia
+        cursor.execute("""
+            SELECT 
+                pt.codice_prodotto,
+                pt.nome_prodotto,
+                pt.soglia_minima,
+                COALESCE(SUM(g.quantita), 0) as quantita_attuale,
+                m.nome as magazzino
+            FROM product_thresholds pt
+            LEFT JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            LEFT JOIN magazzini m ON g.magazzino_id = m.id
+            WHERE pt.notifica_attiva = TRUE
+            GROUP BY pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, m.nome
+            HAVING quantita_attuale <= pt.soglia_minima
+        """)
+        
+        prodotti_sotto_soglia = cursor.fetchall()
+        
+        for prodotto in prodotti_sotto_soglia:
+            # Controlla se esiste già una notifica non visualizzata per questo prodotto
+            cursor.execute("""
+                SELECT id FROM notifications 
+                WHERE codice_prodotto = %s AND visualizzata = FALSE
+                LIMIT 1
+            """, (prodotto['codice_prodotto'],))
+            
+            existing = cursor.fetchone()
+            
+            if not existing:
+                # Crea nuova notifica
+                cursor.execute("""
+                    INSERT INTO notifications 
+                    (codice_prodotto, nome_prodotto, quantita_attuale, soglia_minima, magazzino)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    prodotto['codice_prodotto'],
+                    prodotto['nome_prodotto'],
+                    prodotto['quantita_attuale'],
+                    prodotto['soglia_minima'],
+                    prodotto.get('magazzino', 'N/A')
+                ))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+    except Exception as e:
+        print(f"Errore nel controllo soglie: {e}")
+
+
+@app.route('/notifications')
+def notifications():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Recupera notifiche non visualizzate
+        cursor.execute("""
+            SELECT 
+                id,
+                codice_prodotto,
+                nome_prodotto,
+                quantita_attuale,
+                soglia_minima,
+                magazzino,
+                data_notifica
+            FROM notifications
+            WHERE visualizzata = FALSE
+            ORDER BY data_notifica DESC
+        """)
+        
+        notifiche = cursor.fetchall()
+        
+        # Converti datetime in stringa per JSON
+        for n in notifiche:
+            if n.get('data_notifica'):
+                n['data_notifica'] = n['data_notifica'].strftime('%Y-%m-%d %H:%M:%S')
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'count': len(notifiche),
+            'notifications': notifiche
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/mark_notification_read/<int:notification_id>', methods=['POST'])
+def mark_notification_read(notification_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE notifications 
+            SET visualizzata = TRUE, data_visualizzazione = NOW()
+            WHERE id = %s
+        """, (notification_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/mark_all_notifications_read', methods=['POST'])
+def mark_all_notifications_read():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE notifications 
+            SET visualizzata = TRUE, data_visualizzazione = NOW()
+            WHERE visualizzata = FALSE
+        """)
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/esporta_magazzino')
 def esporta_magazzino():
@@ -744,25 +1229,48 @@ def logmovimenti():
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
         
-        # Recupera movimenti
+        # Recupera movimenti unificati da entrambe le tabelle
         cursor.execute("""
             SELECT 
                 mv.data_ora,
-                u.username,
-                p.nome_prodotto,
-                m1.nome AS da_magazzino,
-                m2.nome AS a_magazzino,
-                mv.da_ubicazione,
-                mv.a_ubicazione,
+                u.username COLLATE utf8mb4_unicode_ci AS username,
+                p.nome_prodotto COLLATE utf8mb4_unicode_ci AS nome_prodotto,
+                m1.nome COLLATE utf8mb4_unicode_ci AS da_magazzino,
+                m2.nome COLLATE utf8mb4_unicode_ci AS a_magazzino,
+                mv.da_ubicazione COLLATE utf8mb4_unicode_ci AS da_ubicazione,
+                mv.a_ubicazione COLLATE utf8mb4_unicode_ci AS a_ubicazione,
                 mv.quantita,
-                mv.note,
-                mv.stato
+                mv.note COLLATE utf8mb4_unicode_ci AS note,
+                mv.stato COLLATE utf8mb4_unicode_ci AS stato,
+                mv.tipo_movimento COLLATE utf8mb4_unicode_ci AS tipo_movimento
             FROM movimenti mv
             LEFT JOIN utenti u ON mv.user_id = u.id
             LEFT JOIN prodotti p ON mv.prodotto_id = p.id
             LEFT JOIN magazzini m1 ON mv.da_magazzino_id = m1.id
             LEFT JOIN magazzini m2 ON mv.a_magazzino_id = m2.id
-            ORDER BY mv.data_ora DESC
+            
+            UNION ALL
+            
+            SELECT 
+                ls.data_ora,
+                u.username COLLATE utf8mb4_unicode_ci AS username,
+                p.nome_prodotto COLLATE utf8mb4_unicode_ci AS nome_prodotto,
+                NULL AS da_magazzino,
+                NULL AS a_magazzino,
+                NULL AS da_ubicazione,
+                NULL AS a_ubicazione,
+                ls.quantita,
+                CONCAT('Tipo scarico: ', COALESCE(ls.tipo_scarico, ''), 
+                       CASE WHEN ls.note IS NOT NULL AND ls.note != '' 
+                            THEN CONCAT(' - ', ls.note) 
+                            ELSE '' END) COLLATE utf8mb4_unicode_ci AS note,
+                NULL AS stato,
+                'SCARICO' COLLATE utf8mb4_unicode_ci AS tipo_movimento
+            FROM log_scarichi ls
+            LEFT JOIN utenti u ON ls.user_id = u.id
+            LEFT JOIN prodotti p ON ls.prodotto_id = p.id
+            
+            ORDER BY data_ora DESC
         """)
         movimenti = cursor.fetchall()
         
@@ -860,6 +1368,10 @@ def scaricomerce():
                 
                 conn.commit()
                 flash("Scarico effettuato con successo.", "success")
+                
+                # Controlla soglie dopo lo scarico
+                check_and_create_notifications()
+                
             cursor.close()
             conn.close()
         except Exception as e:
@@ -963,31 +1475,8 @@ def scarico_merce_non_in_magazzino():
 
 @app.route('/logscarico')
 def logscarico():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    try:
-        conn = connect_to_database()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT 
-                ls.data_ora,
-                u.username,
-                p.nome_prodotto AS prodotto,
-                ls.quantita,
-                ls.note,
-                ls.tipo_scarico
-            FROM log_scarichi ls
-            LEFT JOIN utenti u ON ls.user_id = u.id
-            LEFT JOIN prodotti p ON ls.prodotto_id = p.id
-            ORDER BY ls.data_ora DESC
-        """)
-        scarichi = cursor.fetchall()
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        scarichi = []
-        flash(f"Errore nel recupero dei log scarichi: {e}", "error")
-    return render_template("logscarico.html", scarichi=scarichi)
+    # Redirect alla pagina unificata logmovimenti
+    return redirect(url_for('logmovimenti'))
 
 @app.route('/carico_merci', methods=['GET', 'POST'])
 def carico_merci():
@@ -1063,8 +1552,8 @@ def carico_merci():
                         raise Exception("Nessun magazzino trovato nel sistema")
                     magazzino_id = magazzino_result['id']
                 
-                # Lo stato per un carico merci è sempre 'in_magazzino'
-                stato = 'in_magazzino'
+                # Lo stato per un carico merci è sempre 'IN_MAGAZZINO' (maiuscolo per coerenza)
+                stato = 'IN_MAGAZZINO'
                 
                 cursor.execute("""
                     INSERT INTO giacenze (prodotto_id, magazzino_id, ubicazione, stato, quantita, note)
@@ -1073,8 +1562,8 @@ def carico_merci():
 
             # Log movimento carico
             cursor.execute("""
-                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, tipo_movimento)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 prodotto_id,
                 quantita,
@@ -1082,13 +1571,18 @@ def carico_merci():
                 session.get('user_id'),
                 stato,
                 ubicazione,
-                magazzino_id
+                magazzino_id,
+                'CARICO'
             ))
 
             conn.commit()
             cursor.close()
             conn.close()
             flash('Carico effettuato con successo!', 'success')
+            
+            # Controlla soglie dopo il carico (potrebbe aver riportato sopra soglia)
+            check_and_create_notifications()
+            
             return redirect(url_for('carico_merci'))
 
         except Exception as e:
@@ -1103,6 +1597,8 @@ def carico_merci():
 
 @app.route('/modifica_giacenza/<int:giacenza_id>', methods=['POST'])
 def modifica_giacenza(giacenza_id):
+    from flask import jsonify
+    
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
@@ -1134,11 +1630,13 @@ def modifica_giacenza(giacenza_id):
         
         quantita_originale = giacenza_originale['quantita']
         differenza_quantita = quantita_nuova - quantita_originale
+        stato_originale = giacenza_originale['stato']
         
-        # Se c'è una differenza di quantità, serve compensazione
-        if differenza_quantita != 0:
-            if differenza_quantita > 0:  # Aumento quantità - serve prelievo da magazzino
-                # Solo giacenze dello stesso prodotto con quantità disponibile
+        # Compensazione necessaria se:
+        # La giacenza originale NON è in magazzino (stato != 'IN_MAGAZZINO') E c'è una variazione di quantità
+        if differenza_quantita != 0 and stato_originale != 'IN_MAGAZZINO':
+            if differenza_quantita > 0:
+                # Aumento quantità fuori magazzino - serve prelievo dal magazzino
                 cursor.execute("""
                     SELECT g.id, g.ubicazione, g.quantita, m.nome as magazzino_nome
                     FROM giacenze g 
@@ -1150,10 +1648,18 @@ def modifica_giacenza(giacenza_id):
                 
                 quantita_totale_disponibile = sum(g['quantita'] for g in giacenze_magazzino)
                 if quantita_totale_disponibile < differenza_quantita:
-                    flash(f'Quantità disponibile in magazzino insufficiente. Disponibili: {quantita_totale_disponibile}, Richiesti: {differenza_quantita}', 'error')
-                    return redirect(url_for('index'))
-            else:  # Diminuzione quantità - restituzione, mostra tutte le ubicazioni
-                # Tutte le ubicazioni disponibili nel magazzino + giacenze esistenti dello stesso prodotto
+                    return jsonify({
+                        'error': True,
+                        'message': f'Quantità disponibile in magazzino insufficiente. Disponibili: {quantita_totale_disponibile}, Richiesti: {differenza_quantita}'
+                    })
+                
+                if not giacenze_magazzino:
+                    return jsonify({
+                        'error': True,
+                        'message': 'Non ci sono giacenze di questo prodotto in magazzino da cui prelevare.'
+                    })
+            else:
+                # Diminuzione quantità fuori magazzino - serve restituzione
                 cursor.execute("""
                     SELECT DISTINCT
                         COALESCE(g.id, -1) as id,
@@ -1176,7 +1682,6 @@ def modifica_giacenza(giacenza_id):
                 giacenze_magazzino = cursor.fetchall()
             
             # Ritorna JSON con le opzioni di compensazione
-            from flask import jsonify
             return jsonify({
                 'need_compensation': True,
                 'differenza': differenza_quantita,
@@ -1199,7 +1704,7 @@ def modifica_giacenza(giacenza_id):
                 }
             })
         
-        # Nessuna differenza di quantità - aggiorna normalmente
+        # Aggiorna la giacenza direttamente (tutti gli altri casi)
         cursor.execute("""
             UPDATE giacenze 
             SET ubicazione = %s, stato = %s, quantita = %s, note = %s 
@@ -1208,8 +1713,8 @@ def modifica_giacenza(giacenza_id):
         
         # Log del movimento di modifica
         cursor.execute("""
-            INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, tipo_movimento)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             giacenza_originale['prodotto_id'],
             quantita_nuova,
@@ -1217,11 +1722,15 @@ def modifica_giacenza(giacenza_id):
             session.get('user_id'),
             stato,
             ubicazione,
-            giacenza_originale['magazzino_id']
+            giacenza_originale['magazzino_id'],
+            'MODIFICA'
         ))
         
         conn.commit()
         flash('Giacenza modificata con successo.', 'success')
+        
+        # Controlla soglie dopo la modifica
+        check_and_create_notifications()
         
     except Exception as e:
         flash(f'Errore durante la modifica: {e}', 'error')
@@ -1305,8 +1814,8 @@ def conferma_modifica_giacenza():
             
             # Log movimento
             cursor.execute("""
-                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id, tipo_movimento)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 giacenza_originale['prodotto_id'],
                 abs(differenza),
@@ -1316,7 +1825,8 @@ def conferma_modifica_giacenza():
                 ubicazione_destinazione,
                 giacenza_originale['magazzino_id'],
                 form_data['ubicazione'],
-                giacenza_originale['magazzino_id']
+                giacenza_originale['magazzino_id'],
+                'MODIFICA'
             ))
             
         else:  # Ubicazione esistente
@@ -1330,8 +1840,8 @@ def conferma_modifica_giacenza():
             
             # Log movimento
             cursor.execute("""
-                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id, tipo_movimento)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 giacenza_originale['prodotto_id'],
                 abs(differenza),
@@ -1341,7 +1851,8 @@ def conferma_modifica_giacenza():
                 form_data['ubicazione'],
                 giacenza_originale['magazzino_id'],
                 giacenza_compensazione['ubicazione'],
-                giacenza_compensazione['magazzino_id']
+                giacenza_compensazione['magazzino_id'],
+                'MODIFICA'
             ))
         
         conn.commit()
@@ -1527,8 +2038,8 @@ def rientro_merce():
             cursor.execute("""
                 INSERT INTO movimenti (
                     prodotto_id, quantita, note, user_id, stato,
-                    a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    a_ubicazione, a_magazzino_id, da_ubicazione, da_magazzino_id, tipo_movimento
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 sorgente['prodotto_id'],
                 quantita_da_rientrare,
@@ -1538,7 +2049,8 @@ def rientro_merce():
                 destinazione['ubicazione'],
                 destinazione.get('magazzino_id'),
                 sorgente.get('ubicazione'),
-                sorgente.get('magazzino_id')
+                sorgente.get('magazzino_id'),
+                'TRASFERIMENTO'
             ))
             conn.commit()
             flash('Rientro effettuato con successo.', 'success')
@@ -1726,15 +2238,17 @@ def aggiorna_giacenza_rapida(giacenza_id):
             quantita_movimento = abs(differenza)
             
             cursor.execute("""
-                INSERT INTO movimenti (prodotto_id, tipo_movimento, quantita, ubicazione, note, data_movimento, utente)
-                VALUES (%s, %s, %s, %s, %s, NOW(), %s)
+                INSERT INTO movimenti (prodotto_id, quantita, note, user_id, stato, a_ubicazione, a_magazzino_id, tipo_movimento)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 giacenza['prodotto_id'],
-                tipo_movimento,
                 quantita_movimento,
+                f"Modifica rapida mobile: {quantita_originale} → {nuova_quantita} ({'carico' if differenza > 0 else 'scarico'})",
+                session.get('user_id'),
+                'IN_MAGAZZINO',
                 giacenza['ubicazione'],
-                f"Modifica rapida mobile: {quantita_originale} → {nuova_quantita}",
-                session['username']
+                giacenza.get('magazzino_id', 1),
+                'MODIFICA'
             ))
         
         conn.commit()
@@ -1779,4 +2293,8 @@ if __name__ == '__main__':
     print('--- URL MAP ---')
     print(app.url_map)
     print('---------------')
-    app.run(debug=True, host='0.0.0.0', port=80)
+    # Usa configurazione/env invece di hardcoded port 80
+    debug_flag = app.config.get('DEBUG', False)
+    port = int(os.getenv('PORT', '5000'))
+    host = os.getenv('HOST', '0.0.0.0')
+    app.run(debug=debug_flag, host=host, port=port)

@@ -4546,3 +4546,132 @@
 2025-10-01 15:47:21,416 - werkzeug - INFO - 10.77.0.66 - - [01/Oct/2025 15:47:21] "[32mPOST /movimento HTTP/1.1[0m" 302 -
 2025-10-01 15:47:21,467 - werkzeug - INFO - 10.77.0.66 - - [01/Oct/2025 15:47:21] "GET /movimento HTTP/1.1" 200 -
 2025-10-01 16:58:51,688 - werkzeug - INFO - 10.77.0.61 - - [01/Oct/2025 16:58:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-25 11:05:06,104 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE COMPLETA MAGAZZINI
+2025-11-25 11:05:06,118 - magazzino_reconciliation - INFO - File AS400 da processare: ['Magazzino_27_Grossisti', 'Magazzino_28_Deposito']
+2025-11-25 11:05:06,119 - magazzino_reconciliation - INFO - Processando Magazzino_27_Grossisti...
+2025-11-25 11:05:06,120 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2025-11-25 11:05:06,122 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 248
+2025-11-25 11:05:06,122 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2025-11-25 11:05:06,123 - magazzino_reconciliation - INFO -   Riga 1: 'PHARMAGEST - ESPORTAZIONE MAGAZZINO'
+2025-11-25 11:05:06,126 - magazzino_reconciliation - INFO -   Riga 2: 'Data esportazione: 29/10/2025 17:49'
+2025-11-25 11:05:06,127 - magazzino_reconciliation - INFO -   Riga 3: ''
+2025-11-25 11:05:06,127 - magazzino_reconciliation - INFO -   Riga 4: 'Codice        Prodotto                        Magazzino           Ubicazione        Stato         Quantità  Note'
+2025-11-25 11:05:06,128 - magazzino_reconciliation - INFO -   Riga 5: '------------------------------------------------------------------------------------------------------------------------------------------------------'
+2025-11-25 11:05:06,133 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_27_Grossisti line 91: '95413         ETICHETTE_ELETTRONICHE_ID.TAG_  farmacia            -                 baia_uscita         42  *Luparelli guaste da smaltire'
+2025-11-25 11:05:06,133 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_27_Grossisti line 92: '95413         ETICHETTE_ELETTRONICHE_ID.TAG_  farmacia            15A               in_magazzino      1203'
+2025-11-25 11:05:06,139 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2025-11-25 11:05:06,141 - magazzino_reconciliation - INFO -   Righe processate: 245
+2025-11-25 11:05:06,142 - magazzino_reconciliation - INFO -   Match pattern originale: 0
+2025-11-25 11:05:06,143 - magazzino_reconciliation - INFO -   Match pattern alternativo: 0
+2025-11-25 11:05:06,143 - magazzino_reconciliation - INFO -   Prodotti estratti: 0
+2025-11-25 11:05:06,144 - magazzino_reconciliation - WARNING - Magazzino_27_Grossisti: nessun prodotto estratto
+2025-11-25 11:05:06,145 - magazzino_reconciliation - INFO - Processando Magazzino_28_Deposito...
+2025-11-25 11:05:06,145 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2025-11-25 11:05:06,146 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 248
+2025-11-25 11:05:06,147 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2025-11-25 11:05:06,147 - magazzino_reconciliation - INFO -   Riga 1: 'PHARMAGEST - ESPORTAZIONE MAGAZZINO'
+2025-11-25 11:05:06,148 - magazzino_reconciliation - INFO -   Riga 2: 'Data esportazione: 31/10/2025 10:15'
+2025-11-25 11:05:06,148 - magazzino_reconciliation - INFO -   Riga 3: ''
+2025-11-25 11:05:06,149 - magazzino_reconciliation - INFO -   Riga 4: 'Codice        Prodotto                        Magazzino           Ubicazione        Stato         Quantità  Note'
+2025-11-25 11:05:06,149 - magazzino_reconciliation - INFO -   Riga 5: '------------------------------------------------------------------------------------------------------------------------------------------------------'
+2025-11-25 11:05:06,150 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 91: '95413         ETICHETTE_ELETTRONICHE_ID.TAG_  farmacia            -                 baia_uscita         42  *Luparelli guaste da smaltire'
+2025-11-25 11:05:06,151 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 92: '95413         ETICHETTE_ELETTRONICHE_ID.TAG_  farmacia            15A               in_magazzino      1203'
+2025-11-25 11:05:06,156 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2025-11-25 11:05:06,157 - magazzino_reconciliation - INFO -   Righe processate: 245
+2025-11-25 11:05:06,157 - magazzino_reconciliation - INFO -   Match pattern originale: 0
+2025-11-25 11:05:06,158 - magazzino_reconciliation - INFO -   Match pattern alternativo: 0
+2025-11-25 11:05:06,158 - magazzino_reconciliation - INFO -   Prodotti estratti: 0
+2025-11-25 11:05:06,159 - magazzino_reconciliation - WARNING - Magazzino_28_Deposito: nessun prodotto estratto
+2025-11-25 11:05:06,159 - magazzino_reconciliation - INFO - AS400 unificato: 0 prodotti totali
+2025-11-25 11:05:06,159 - magazzino_reconciliation - INFO - Parsing export WebApp
+2025-11-25 11:05:06,161 - magazzino_reconciliation - INFO - File WebApp - Righe totali: 248
+2025-11-25 11:05:06,161 - magazzino_reconciliation - INFO - File WebApp - Righe di dati (senza header): 242
+2025-11-25 11:05:06,162 - magazzino_reconciliation - INFO - Prime 3 righe di dati:
+2025-11-25 11:05:06,163 - magazzino_reconciliation - INFO -   Riga 1: '245           SCANNER_MANUALE_CANON_DR-M140   farmacia            10D               in_magazzino    ...' se lunga
+2025-11-25 11:05:06,163 - magazzino_reconciliation - INFO -   Riga 2: '564           SCHEDA_SERIALE_2_PORTE_PCI      farmacia            9B                in_magazzino    ...' se lunga
+2025-11-25 11:05:06,164 - magazzino_reconciliation - INFO -   Riga 3: '94308         CASSETTE_ULTRIUM_LTO            grossisti           9D                in_magazzino    ...' se lunga
+2025-11-25 11:05:06,165 - magazzino_reconciliation - INFO - DEBUG 94906: riga_completa='94906         MULTIMEDS_-_KIT_DI_PREPARAZIONE farmacia            6B                in_magazzino        33  VENDIBILI SOLO 25'
+2025-11-25 11:05:06,165 - magazzino_reconciliation - INFO - DEBUG 94906: words=['94906', 'MULTIMEDS_-_KIT_DI_PREPARAZIONE', 'farmacia', '6B', 'in_magazzino', '33', 'VENDIBILI', 'SOLO', '25']
+2025-11-25 11:05:06,166 - magazzino_reconciliation - INFO - DEBUG 94906: tutti_numeri=[(5, 33), (8, 25)], qty_finale=33
+2025-11-25 11:05:06,167 - magazzino_reconciliation - INFO - DEBUG 94964: riga_completa='94964         MINI_TASTIERA_ACK_RF420_WIRELES farmacia            9C                in_magazzino         1'
+2025-11-25 11:05:06,168 - magazzino_reconciliation - INFO - DEBUG 94964: words=['94964', 'MINI_TASTIERA_ACK_RF420_WIRELES', 'farmacia', '9C', 'in_magazzino', '1']
+2025-11-25 11:05:06,169 - magazzino_reconciliation - INFO - DEBUG 94964: tutti_numeri=[(5, 1)], qty_finale=1
+2025-11-25 11:05:06,173 - magazzino_reconciliation - INFO - DEBUG 95592: riga_completa='95592         DISCO_KINGSTONE_480GB_SSD       farmacia            9B                in_magazzino         3  1 pz ha l'imballo riciclato'
+2025-11-25 11:05:06,174 - magazzino_reconciliation - INFO - DEBUG 95592: words=['95592', 'DISCO_KINGSTONE_480GB_SSD', 'farmacia', '9B', 'in_magazzino', '3', '1', 'pz', 'ha', "l'imballo", 'riciclato']
+2025-11-25 11:05:06,175 - magazzino_reconciliation - INFO - DEBUG 95592: tutti_numeri=[(5, 3), (6, 1)], qty_finale=3
+2025-11-25 11:05:06,176 - magazzino_reconciliation - INFO - DEBUG 95774: riga_completa='95774         CARICABATTERIE_4_POS._PLUS_95_2 grossisti           1A                in_magazzino        18'
+2025-11-25 11:05:06,176 - magazzino_reconciliation - INFO - DEBUG 95774: words=['95774', 'CARICABATTERIE_4_POS._PLUS_95_2', 'grossisti', '1A', 'in_magazzino', '18']
+2025-11-25 11:05:06,177 - magazzino_reconciliation - INFO - DEBUG 95774: tutti_numeri=[(5, 18)], qty_finale=18
+2025-11-25 11:05:06,177 - magazzino_reconciliation - INFO - DEBUG 95774: riga_completa='95774         CARICABATTERIE_4_POS._PLUS_95_2 grossisti           1C                in_magazzino        11'
+2025-11-25 11:05:06,178 - magazzino_reconciliation - INFO - DEBUG 95774: words=['95774', 'CARICABATTERIE_4_POS._PLUS_95_2', 'grossisti', '1C', 'in_magazzino', '11']
+2025-11-25 11:05:06,179 - magazzino_reconciliation - INFO - DEBUG 95774: tutti_numeri=[(5, 11)], qty_finale=11
+2025-11-25 11:05:06,192 - magazzino_reconciliation - INFO - WebApp parsing completato:
+2025-11-25 11:05:06,193 - magazzino_reconciliation - INFO -   - Righe processate: 242
+2025-11-25 11:05:06,193 - magazzino_reconciliation - INFO -   - Righe valide: 242
+2025-11-25 11:05:06,193 - magazzino_reconciliation - INFO -   - Prodotti estratti: 242
+2025-11-25 11:05:06,194 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2025-11-25 11:05:06,250 - magazzino_reconciliation - INFO - Aggregati in 135 prodotti unici
+2025-11-25 11:05:06,250 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2025-11-25 11:05:06,251 - magazzino_reconciliation - INFO - Input AS400: 0 righe
+2025-11-25 11:05:06,251 - magazzino_reconciliation - INFO - Input WebApp: 135 righe
+2025-11-25 11:05:06,253 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2025-11-25 11:05:06,254 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2025-11-25 11:05:06,255 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2025-11-25 11:05:06,256 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2025-11-25 11:05:06,265 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2025-11-25 11:05:06,265 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2025-11-25 11:05:06,273 - magazzino_reconciliation - INFO - Dopo merge: 135 righe
+2025-11-25 11:05:06,280 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 0
+2025-11-25 11:05:06,293 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 0, WebApp total: 2661
+2025-11-25 11:05:06,294 - magazzino_reconciliation - INFO - Riconciliazione completata: 135 prodotti analizzati
+2025-11-25 11:05:06,296 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2025-11-25 11:05:06,297 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 0
+2025-11-25 11:05:06,297 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 135
+2025-11-25 11:05:06,297 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 0
+2025-11-25 11:05:06,302 - magazzino_reconciliation - INFO - Top 10 differenze: {1: 34, 2: 18, 3: 12, 4: 11, 6: 6, 10: 6, 12: 5, 5: 5, 19: 3, 33: 2}
+2025-11-25 11:05:06,304 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:0, WebApp:1245, Diff:1245)
+2025-11-25 11:05:06,319 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20251125_110506.csv
+2025-11-25 11:05:06,320 - magazzino_reconciliation - INFO - RICONCILIAZIONE COMPLETATA CON SUCCESSO
+2025-11-25 11:05:06,326 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:06] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2025-11-25 11:05:13,461 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:13] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:05:43,769 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:43] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:05:46,216 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:46] "GET /carico_merci HTTP/1.1" 200 -
+2025-11-25 11:05:46,502 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:46] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:05:46,907 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:46] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:05:49,922 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:49] "GET /logscarico HTTP/1.1" 200 -
+2025-11-25 11:05:50,147 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:50] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:05:51,095 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:51] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:05:51,658 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:51] "GET /logmovimenti HTTP/1.1" 200 -
+2025-11-25 11:05:51,794 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:51] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:05:52,496 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:52] "GET /movimento HTTP/1.1" 200 -
+2025-11-25 11:05:52,539 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:52] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:05:52,703 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:52] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:05:54,817 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:54] "GET / HTTP/1.1" 200 -
+2025-11-25 11:05:54,851 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:54] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:05:55,809 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:05:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:06:26,134 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:06:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:06:55,820 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:06:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:07:26,131 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:07:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:07:55,820 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:07:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:08:26,137 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:08:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:08:55,827 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:08:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:09:26,128 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:09:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:09:55,826 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:09:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:10:26,138 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:10:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:10:55,823 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:10:55] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:11:26,127 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:11:26] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:11:53,674 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:11:53] "GET /logscarico HTTP/1.1" 200 -
+2025-11-25 11:11:53,939 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:11:53] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:11:54,909 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:11:54] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:12:01,459 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:12:01] "GET /logmovimenti HTTP/1.1" 200 -
+2025-11-25 11:12:01,655 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:12:01] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2025-11-25 11:12:03,258 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:12:03] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:12:33,647 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:12:33] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:13:03,953 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:13:03] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:13:33,641 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:13:33] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:14:03,956 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:14:03] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:14:33,637 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:14:33] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:15:03,955 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:15:03] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:15:33,638 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:15:33] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:16:14,950 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:16:14] "GET /notifications HTTP/1.1" 200 -
+2025-11-25 11:16:39,380 - werkzeug - INFO -  * Detected change in 'C:\\magazzino_webapp\\app.py', reloading

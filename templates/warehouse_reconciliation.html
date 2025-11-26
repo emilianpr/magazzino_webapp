@@ -29,12 +29,16 @@
   border-radius: 1rem;
   background: var(--bg-primary);
   backdrop-filter: blur(20px);
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
-  margin-bottom: 1.5rem;
   transition: all 0.3s ease;
   cursor: pointer;
   box-shadow: var(--shadow-light);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-area:hover {
@@ -44,17 +48,29 @@
   box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
 }
 
+.upload-area.drag-over {
+  border-color: #00a8e8;
+  background: linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 86, 166, 0.15) 100%);
+  transform: scale(1.02);
+}
+
 .dark .upload-area:hover {
   box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
+}
+
+.dark .upload-area.drag-over {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(37, 99, 235, 0.2) 100%);
 }
 
 .file-info {
   background: var(--bg-secondary);
   backdrop-filter: blur(20px);
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   border: 1px solid var(--border-light);
+  font-size: 0.85rem;
+  word-break: break-word;
 }
 
 .stat-card {
@@ -62,7 +78,6 @@
   color: white;
   border-radius: 1rem;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
   box-shadow: var(--shadow-light);
   backdrop-filter: blur(20px);
 }
@@ -78,7 +93,6 @@
   border: 1px solid var(--border-light);
   border-radius: 1rem;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
   box-shadow: var(--shadow-light);
   transition: all 0.3s ease;
 }
@@ -125,26 +139,30 @@
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: var(--shadow-light);
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .table th {
   background: var(--bg-secondary);
   color: var(--text-primary);
   font-weight: 600;
-  padding: 1rem;
+  padding: 0.75rem;
   border: none;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .table td {
   color: var(--text-primary);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   border: none;
   border-bottom: 1px solid var(--border-light);
 }
 
 .table tbody tr:hover {
   background: var(--bg-secondary);
-  transform: scale(1.01);
   transition: all 0.2s ease;
 }
 
@@ -193,10 +211,10 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-black dark:to-gray-800 py-8 page-content">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header Section -->
-        <div class="text-center mb-12">
+        <div class="text-center mb-8">
             <div class="section-title justify-center">
                 <div class="section-icon">
                     <i class="fas fa-warehouse"></i>
@@ -208,294 +226,208 @@
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Main Upload Section -->
-            <div class="lg:col-span-2">
+        <!-- Upload Section - Horizontal Grid -->
+        <form id="reconciliation-form" enctype="multipart/form-data">
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
                 
-                <!-- Main Upload Form -->
+                <!-- Magazzino 27 Upload -->
                 <div class="reconciliation-card">
-                    <div class="section-title">
-                        <div class="section-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <div class="flex items-center justify-center gap-2">
+                            <i class="fas fa-file-alt text-blue-500"></i>
+                            Magazzino 27
+                            <span class="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
+                                Opzionale
+                            </span>
                         </div>
-                        <h3>Caricamento File</h3>
+                    </label>
+                    <div class="upload-area" data-input="magazzino_27">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                            Trascina qui o clicca
+                        </p>
+                        <input type="file" name="magazzino_27" id="magazzino_27" 
+                               class="hidden" accept=".txt,.csv">
+                        <small class="text-gray-500 dark:text-gray-400 text-xs">AS400 - Grossisti</small>
                     </div>
-                    
-                    <form id="reconciliation-form" enctype="multipart/form-data" class="space-y-6">
-                        
-                        <!-- Magazzino 27 Upload -->
-                        <div class="space-y-3">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <i class="fas fa-file-alt text-blue-500"></i>
-                                    Magazzino 27 (AS400 - Grossisti)
-                                    <span class="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
-                                        Opzionale
-                                    </span>
-                                </div>
-                            </label>
-                            <div class="upload-area" onclick="document.getElementById('magazzino_27').click()">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                <p class="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
-                                    Clicca per selezionare il file
-                                </p>
-                                <input type="file" name="magazzino_27" id="magazzino_27" 
-                                       class="hidden" accept=".txt,.csv">
-                                <small class="text-gray-500 dark:text-gray-400">File .txt dal sistema AS400</small>
-                            </div>
-                            <div id="info_magazzino_27" class="file-info hidden"></div>
-                        </div>
+                    <div id="info_magazzino_27" class="file-info hidden"></div>
+                </div>
 
-                        <!-- Magazzino 28 Upload -->
-                        <div class="space-y-3">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <i class="fas fa-file-alt text-blue-500"></i>
-                                    Magazzino 28 (AS400 - Deposito)
-                                    <span class="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
-                                        Opzionale
-                                    </span>
-                                </div>
-                            </label>
-                            <div class="upload-area" onclick="document.getElementById('magazzino_28').click()">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                <p class="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
-                                    Clicca per selezionare il file
-                                </p>
-                                <input type="file" name="magazzino_28" id="magazzino_28" 
-                                       class="hidden" accept=".txt,.csv">
-                                <small class="text-gray-500 dark:text-gray-400">File .txt dal sistema AS400</small>
-                            </div>
-                            <div id="info_magazzino_28" class="file-info hidden"></div>
+                <!-- Magazzino 28 Upload -->
+                <div class="reconciliation-card">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <div class="flex items-center justify-center gap-2">
+                            <i class="fas fa-file-alt text-blue-500"></i>
+                            Magazzino 28
+                            <span class="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
+                                Opzionale
+                            </span>
                         </div>
+                    </label>
+                    <div class="upload-area" data-input="magazzino_28">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                            Trascina qui o clicca
+                        </p>
+                        <input type="file" name="magazzino_28" id="magazzino_28" 
+                               class="hidden" accept=".txt,.csv">
+                        <small class="text-gray-500 dark:text-gray-400 text-xs">AS400 - Deposito</small>
+                    </div>
+                    <div id="info_magazzino_28" class="file-info hidden"></div>
+                </div>
 
-                        <!-- Export WebApp Upload -->
-                        <div class="space-y-3">
-                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <i class="fas fa-file-export text-green-500"></i>
-                                    Export WebApp
-                                    <span class="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-full">
-                                        Obbligatorio
-                                    </span>
-                                </div>
-                            </label>
-                            <div class="upload-area" onclick="document.getElementById('webapp_export').click()">
-                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                <p class="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
-                                    Clicca per selezionare il file
-                                </p>
-                                <input type="file" name="webapp_export" id="webapp_export" 
-                                       class="hidden" accept=".txt,.csv" required>
-                                <small class="text-gray-500 dark:text-gray-400">File export dalla WebApp magazzino</small>
-                            </div>
-                            <div id="info_webapp_export" class="file-info hidden"></div>
+                <!-- Export WebApp Upload -->
+                <div class="reconciliation-card">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        <div class="flex items-center justify-center gap-2">
+                            <i class="fas fa-file-export text-green-500"></i>
+                            Export WebApp
+                            <span class="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-full">
+                                Obbligatorio
+                            </span>
                         </div>
-
-                        <!-- Progress Bar -->
-                        <div class="progress">
-                            <div class="progress-bar" 
-                                 role="progressbar" style="width: 0%"></div>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="pt-4">
-                            <button type="submit" 
-                                    class="btn-primary w-full py-4 text-lg font-semibold inline-flex items-center justify-center gap-3" 
-                                    id="submit-btn">
-                                <i class="fas fa-play text-xl"></i>
-                                Avvia Confronto
-                            </button>
-                        </div>
-                    </form>
+                    </label>
+                    <div class="upload-area" data-input="webapp_export">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                            Trascina qui o clicca
+                        </p>
+                        <input type="file" name="webapp_export" id="webapp_export" 
+                               class="hidden" accept=".txt,.csv" required>
+                        <small class="text-gray-500 dark:text-gray-400 text-xs">File WebApp magazzino</small>
+                    </div>
+                    <div id="info_webapp_export" class="file-info hidden"></div>
                 </div>
             </div>
 
-            <!-- Sidebar with Info -->
-            <div class="lg:col-span-1">
-                <div class="reconciliation-card">
-                    <div class="section-title">
-                        <div class="section-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <h3>Informazioni</h3>
-                    </div>
-                    
-                    <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
-                        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                                <i class="fas fa-lightbulb mr-2"></i>Come funziona
-                            </h4>
-                            <ul class="space-y-2">
-                                <li>• Carica i file AS400 e WebApp</li>
-                                <li>• Il sistema confronta automaticamente le quantità</li>
-                                <li>• Vengono evidenziate le differenze</li>
-                                <li>• Scarica il report dettagliato</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                            <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">
-                                <i class="fas fa-check-circle mr-2"></i>Formati supportati
-                            </h4>
-                            <ul class="space-y-1">
-                                <li>• File .txt da AS400</li>
-                                <li>• Export .csv da WebApp</li>
-                                <li>• Encoding automatico</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                            <h4 class="font-semibold text-amber-800 dark:text-amber-300 mb-2">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>Note importanti
-                            </h4>
-                            <ul class="space-y-1">
-                                <li>• Almeno un file AS400 è richiesto</li>
-                                <li>• Il file WebApp è sempre obbligatorio</li>
-                                <li>• I risultati sono salvati automaticamente</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <!-- Progress Bar -->
+            <div class="progress">
+                <div class="progress-bar" 
+                     role="progressbar" style="width: 0%"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mb-8">
+                <button type="submit" 
+                        class="btn-primary py-3 px-8 text-lg font-semibold inline-flex items-center justify-center gap-3" 
+                        id="submit-btn">
+                    <i class="fas fa-play text-xl"></i>
+                    Avvia Confronto
+                </button>
+            </div>
+        </form>
+
+        <!-- Statistics Cards -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8 hidden" id="stats-section">
+            <div class="stat-card text-center">
+                <i class="fas fa-boxes text-3xl mb-4 opacity-80"></i>
+                <h3 class="text-3xl font-bold mb-2" id="total-products">0</h3>
+                <p class="text-lg opacity-90">Prodotti Totali</p>
+            </div>
+            <div class="stat-card text-center">
+                <i class="fas fa-check-circle text-3xl mb-4 opacity-80"></i>
+                <h3 class="text-3xl font-bold mb-2" id="aligned-products">0</h3>
+                <p class="text-lg opacity-90">Allineati</p>
+            </div>
+            <div class="stat-card text-center">
+                <i class="fas fa-percentage text-3xl mb-4 opacity-80"></i>
+                <h3 class="text-3xl font-bold mb-2" id="alignment-percentage">0%</h3>
+                <p class="text-lg opacity-90">Allineamento</p>
+            </div>
+            <div class="stat-card text-center">
+                <i class="fas fa-exclamation-triangle text-3xl mb-4 opacity-80"></i>
+                <h3 class="text-3xl font-bold mb-2" id="differences-count">0</h3>
+                <p class="text-lg opacity-90">Differenze</p>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div class="results-container hidden mt-12" id="results-container">
-            
-            <!-- Statistics Cards -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card text-center">
-                    <i class="fas fa-boxes text-3xl mb-4 opacity-80"></i>
-                    <h3 class="text-3xl font-bold mb-2" id="total-products">0</h3>
-                    <p class="text-lg opacity-90">Prodotti Totali</p>
-                </div>
-                <div class="stat-card text-center">
-                    <i class="fas fa-check-circle text-3xl mb-4 opacity-80"></i>
-                    <h3 class="text-3xl font-bold mb-2" id="aligned-products">0</h3>
-                    <p class="text-lg opacity-90">Allineati</p>
-                </div>
-                <div class="stat-card text-center">
-                    <i class="fas fa-percentage text-3xl mb-4 opacity-80"></i>
-                    <h3 class="text-3xl font-bold mb-2" id="alignment-percentage">0%</h3>
-                    <p class="text-lg opacity-90">Allineamento</p>
-                </div>
-                <div class="stat-card text-center">
-                    <i class="fas fa-exclamation-triangle text-3xl mb-4 opacity-80"></i>
-                    <h3 class="text-3xl font-bold mb-2" id="differences-count">0</h3>
-                    <p class="text-lg opacity-90">Differenze</p>
-                </div>
-            </div>
-
-            <!-- Results Tables -->
-            <div class="space-y-8">
+        <!-- Results Section - 3 Column Grid -->
+        <div class="results-container hidden" id="results-container">
+            <div class="grid lg:grid-cols-3 gap-6 mb-8">
                 
                 <!-- WebApp Higher Products -->
                 <div class="reconciliation-card">
-                    <div class="section-title text-yellow-600 dark:text-yellow-400">
-                        <div class="section-icon bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800 text-yellow-600 dark:text-yellow-400">
+                    <div class="text-center mb-4">
+                        <div class="section-icon mx-auto mb-3 bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800 text-yellow-600 dark:text-yellow-400">
                             <i class="fas fa-arrow-up"></i>
                         </div>
-                        <div>
-                            <h3>ECCEDENZA in WebApp</h3>
-                            <span class="px-3 py-1 text-xs bg-gray-800 text-white rounded-full ml-2">WebApp > AS400</span>
-                        </div>
+                        <h3 class="text-lg font-bold text-yellow-600 dark:text-yellow-400 mb-2">ECCEDENZA WebApp</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            Più unità in WebApp
+                        </p>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Questi prodotti hanno più unità nella WebApp. 
-                                        </p>
                     
                     <div class="table-container">
-                        <div class="overflow-x-auto">
-                            <table class="table w-full">
-                                <thead>
-                                    <tr class="bg-yellow-50 dark:bg-yellow-900/20">
-                                        <th class="text-left">Codice</th>
-                                        <th class="text-left">Descrizione</th>
-                                        <th class="text-center"><i class="fas fa-server mr-1"></i> AS400</th>
-                                        <th class="text-center"><i class="fas fa-globe mr-1"></i> WebApp</th>
-                                        <th class="text-center"><i class="fas fa-plus-circle text-yellow-600 mr-1"></i> Eccedenza</th>
-                                        <th class="text-left">Stato</th>
-                                        <th class="text-left">Note</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="webapp-higher-tbody"></tbody>
-                            </table>
-                        </div>
+                        <table class="table w-full text-sm">
+                            <thead>
+                                <tr class="bg-yellow-50 dark:bg-yellow-900/20">
+                                    <th class="text-left text-xs">Codice</th>
+                                    <th class="text-center text-xs">AS400</th>
+                                    <th class="text-center text-xs">WebApp</th>
+                                    <th class="text-center text-xs">Diff</th>
+                                </tr>
+                            </thead>
+                            <tbody id="webapp-higher-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- AS400 Higher Products -->
                 <div class="reconciliation-card">
-                    <div class="section-title text-red-600 dark:text-red-400">
-                        <div class="section-icon bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 text-red-600 dark:text-red-400">
+                    <div class="text-center mb-4">
+                        <div class="section-icon mx-auto mb-3 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 text-red-600 dark:text-red-400">
                             <i class="fas fa-arrow-down"></i>
                         </div>
-                        <div>
-                            <h3>ECCEDENZA in AS400</h3>
-                            <span class="px-3 py-1 text-xs bg-gray-800 text-white rounded-full ml-2">AS400 > WebApp</span>
-                        </div>
+                        <h3 class="text-lg font-bold text-red-600 dark:text-red-400 mb-2">ECCEDENZA AS400</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            Più unità in AS400
+                        </p>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Questi prodotti hanno più unità in AS400.
-                    </p>
                     
                     <div class="table-container">
-                        <div class="overflow-x-auto">
-                            <table class="table w-full">
-                                <thead>
-                                    <tr class="bg-red-50 dark:bg-red-900/20">
-                                        <th class="text-left">Codice</th>
-                                        <th class="text-left">Descrizione</th>
-                                        <th class="text-center"><i class="fas fa-server mr-1"></i> AS400</th>
-                                        <th class="text-center"><i class="fas fa-globe mr-1"></i> WebApp</th>
-                                        <th class="text-center"><i class="fas fa-minus-circle text-red-600 mr-1"></i> Differenza</th>
-                                        <th class="text-left">Stato</th>
-                                        <th class="text-left">Note</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="as400-higher-tbody"></tbody>
-                            </table>
-                        </div>
+                        <table class="table w-full text-sm">
+                            <thead>
+                                <tr class="bg-red-50 dark:bg-red-900/20">
+                                    <th class="text-left text-xs">Codice</th>
+                                    <th class="text-center text-xs">AS400</th>
+                                    <th class="text-center text-xs">WebApp</th>
+                                    <th class="text-center text-xs">Diff</th>
+                                </tr>
+                            </thead>
+                            <tbody id="as400-higher-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- Aligned Products -->
                 <div class="reconciliation-card">
-                    <div class="section-title text-green-600 dark:text-green-400">
-                        <div class="section-icon bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 text-green-600 dark:text-green-400">
+                    <div class="text-center mb-4">
+                        <div class="section-icon mx-auto mb-3 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 text-green-600 dark:text-green-400">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <div>
-                            <h3>Prodotti Allineati</h3>
-                            <span class="px-3 py-1 text-xs bg-green-600 text-white rounded-full ml-2">AS400 = WebApp</span>
-                        </div>
+                        <h3 class="text-lg font-bold text-green-600 dark:text-green-400 mb-2">Prodotti Allineati</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            Quantità identiche
+                        </p>
                     </div>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Questi prodotti hanno quantità identiche in entrambi i magazzini.
-                    </p>
                     
                     <div class="table-container">
-                        <div class="overflow-x-auto">
-                            <table class="table w-full">
-                                <thead>
-                                    <tr class="bg-green-50 dark:bg-green-900/20">
-                                        <th class="text-left">Codice</th>
-                                        <th class="text-left">Descrizione</th>
-                                        <th class="text-center"><i class="fas fa-equals text-green-600 mr-1"></i> Quantità</th>
-                                        <th class="text-left">Stato</th>
-                                        <th class="text-left">Note</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="aligned-tbody"></tbody>
-                            </table>
-                        </div>
+                        <table class="table w-full text-sm">
+                            <thead>
+                                <tr class="bg-green-50 dark:bg-green-900/20">
+                                    <th class="text-left text-xs">Codice</th>
+                                    <th class="text-center text-xs">Quantità</th>
+                                    <th class="text-left text-xs">Stato</th>
+                                </tr>
+                            </thead>
+                            <tbody id="aligned-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             <!-- Download Section -->
-            <div class="text-center mt-12">
+            <div class="text-center">
                 <button class="btn-primary inline-flex items-center gap-3 text-lg px-8 py-4" 
                         onclick="downloadResults()" id="download-btn" style="display: none;">
                     <i class="fas fa-download text-xl"></i>
@@ -508,6 +440,58 @@
 
 <script>
 let currentResults = null;
+
+// Drag and drop functionality
+function setupDragAndDrop() {
+    const uploadAreas = document.querySelectorAll('.upload-area');
+    
+    uploadAreas.forEach(area => {
+        const inputId = area.getAttribute('data-input');
+        const input = document.getElementById(inputId);
+        
+        // Click to upload
+        area.addEventListener('click', (e) => {
+            if (e.target !== input) {
+                input.click();
+            }
+        });
+        
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            area.addEventListener(eventName, () => {
+                area.classList.add('drag-over');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            area.addEventListener(eventName, () => {
+                area.classList.remove('drag-over');
+            }, false);
+        });
+        
+        area.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                input.files = files;
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        }, false);
+    });
+}
+
+setupDragAndDrop();
 
 document.getElementById('reconciliation-form').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -557,7 +541,7 @@ document.getElementById('reconciliation-form').addEventListener('submit', functi
     .finally(() => {
         document.querySelector('.progress').style.display = 'none';
         document.getElementById('submit-btn').disabled = false;
-        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-play mr-2"></i>Avvia Riconciliazione';
+        document.getElementById('submit-btn').innerHTML = '<i class="fas fa-play mr-2"></i>Avvia Confronto';
     });
 });
 
@@ -568,10 +552,13 @@ function displayResults(data) {
     document.getElementById('alignment-percentage').textContent = data.summary.alignment_percentage + '%';
     document.getElementById('differences-count').textContent = data.summary.products_with_differences;
     
-    // Display tables
-    populateTable('webapp-higher-tbody', data.details.webapp_higher, ['Codice', 'Descrizione', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza', 'Stato', 'Note']);
-    populateTable('as400-higher-tbody', data.details.as400_higher, ['Codice', 'Descrizione', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza', 'Stato', 'Note']);
-    populateTable('aligned-tbody', data.details.aligned_products, ['Codice', 'Descrizione', 'Quantita_AS400', 'Stato', 'Note']);
+    // Show statistics section
+    document.getElementById('stats-section').classList.remove('hidden');
+    
+    // Display tables with compact columns
+    populateTable('webapp-higher-tbody', data.details.webapp_higher, ['Codice', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
+    populateTable('as400-higher-tbody', data.details.as400_higher, ['Codice', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
+    populateTable('aligned-tbody', data.details.aligned_products, ['Codice', 'Quantita_AS400', 'Stato']);
     
     // Show download button
     document.getElementById('download-btn').style.display = 'inline-flex';
@@ -585,12 +572,15 @@ function populateTable(tableBodyId, products, columns) {
         const row = tbody.insertRow();
         const cell = row.insertCell();
         cell.colSpan = columns.length;
-        cell.className = 'text-center text-gray-500 dark:text-gray-400 py-8';
-        cell.textContent = 'Nessun prodotto in questa categoria';
+        cell.className = 'text-center text-gray-500 dark:text-gray-400 py-6 text-xs';
+        cell.textContent = 'Nessun prodotto';
         return;
     }
     
-    products.forEach(product => {
+    // Limit to first 50 products for better performance in compact view
+    const displayProducts = products.slice(0, 50);
+    
+    displayProducts.forEach(product => {
         const row = tbody.insertRow();
         row.className = 'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200';
         
@@ -600,21 +590,35 @@ function populateTable(tableBodyId, products, columns) {
             
             if (col === 'Differenza') {
                 const diff = parseInt(value);
+                cell.className = 'text-center';
                 if (diff > 0) {
-                    cell.innerHTML = `<span class="text-yellow-600 font-semibold">+${diff}</span>`;
+                    cell.innerHTML = `<span class="text-yellow-600 font-bold">+${diff}</span>`;
                 } else if (diff < 0) {
-                    cell.innerHTML = `<span class="text-red-600 font-semibold">${diff}</span>`;
+                    cell.innerHTML = `<span class="text-red-600 font-bold">${diff}</span>`;
                 } else {
-                    cell.innerHTML = `<span class="text-green-600 font-semibold">=</span>`;
+                    cell.innerHTML = `<span class="text-green-600 font-bold">=</span>`;
                 }
             } else if (['Quantita_AS400', 'Quantita_WebApp'].includes(col)) {
-                cell.className = 'text-center font-mono';
+                cell.className = 'text-center font-mono font-semibold';
+                cell.textContent = value;
+            } else if (col === 'Codice') {
+                cell.className = 'font-mono text-xs';
                 cell.textContent = value;
             } else {
+                cell.className = 'text-xs';
                 cell.textContent = value;
             }
         });
     });
+    
+    // Add "more results" indicator if truncated
+    if (products.length > 50) {
+        const row = tbody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = columns.length;
+        cell.className = 'text-center text-gray-500 dark:text-gray-400 py-3 text-xs italic';
+        cell.textContent = `... e altri ${products.length - 50} prodotti (vedi CSV completo)`;
+    }
 }
 
 function downloadResults() {

@@ -26,6 +26,20 @@
       }
     }
   </script>
+  <script>
+    // Apply dark mode immediately
+    (function() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        const style = document.createElement('style');
+        style.textContent = `
+          body { background: #0a0a0a !important; color: #ffffff !important; transition: none !important; }
+          .glass-card { background: rgba(20, 20, 20, 0.9) !important; border-color: rgba(255,255,255,0.1) !important; }
+        `;
+        document.head.appendChild(style);
+      }
+    })();
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     :root {

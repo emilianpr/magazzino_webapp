@@ -5,35 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Gestione Magazzino - Pharmagest{% endblock %}</title>
   
-  <!-- Script per applicare immediatamente la dark mode senza flash -->
+  <!-- Script per applicare immediatamente il tema senza flash -->
   <script>
     (function() {
-      // Applica il tema salvato SUBITO
       const savedTheme = localStorage.getItem('appTheme') || 'default';
       document.documentElement.setAttribute('data-theme', savedTheme);
-      console.log('Theme applicato immediatamente:', savedTheme);
-      
-      // Applica la dark mode SUBITO su HTML
-      const darkMode = localStorage.getItem('darkMode');
-      if (darkMode === 'true') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.backgroundColor = '#000000';
-        document.documentElement.style.minHeight = '100vh';
-        console.log('Dark mode applicata immediatamente su HTML');
-        
-        // Quando il DOM è pronto, applica anche su body
-        if (document.body) {
-          document.body.classList.add('dark');
-          document.body.style.backgroundColor = '#000000';
-          console.log('Dark mode applicata anche su BODY');
-        } else {
-          document.addEventListener('DOMContentLoaded', function() {
-            document.body.classList.add('dark');
-            document.body.style.backgroundColor = '#000000';
-            console.log('Dark mode applicata su BODY al DOMContentLoaded');
-          });
-        }
+
+      let storedDark = localStorage.getItem('darkMode');
+      if (savedTheme === 'minimal' && storedDark === null) {
+        storedDark = 'true';
+        localStorage.setItem('darkMode', 'true');
       }
+
+      const isDark = storedDark === 'true';
+      document.documentElement.classList.toggle('dark', isDark);
+
+      const bgColor = savedTheme === 'minimal'
+        ? (isDark ? '#15100C' : '#FAF8F5')
+        : (isDark ? '#000000' : '#f8fafc');
+
+      document.documentElement.style.setProperty('background-color', bgColor, 'important');
+
+      const criticalStyle = document.createElement('style');
+      criticalStyle.id = 'dark-mode-critical';
+      criticalStyle.textContent = `
+        html, body, html body, body.bg-gray-50 {
+          background-color: ${bgColor} !important;
+          transition: none !important;
+        }
+        html[data-theme="minimal"].dark {
+          --minimal-bg: #15100C;
+        }
+      `;
+      document.head.appendChild(criticalStyle);
     })();
   </script>
   
@@ -62,1902 +66,29 @@
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-    /* Reset base margins */
-    body, html {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-
-    
-    
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-    }
-    
-    .glass-card {
-      background: linear-gradient(120deg, #e3f2fd 0%, #f0f8ff 100%);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-      border-radius: 1.25rem;
-      padding: 2.5rem 2rem;
-      position: relative;
-      width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-      transition: background 0.3s ease, border-color 0.3s ease;
-    }
-    
-    .glass-card > * {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .glass-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 1.25rem;
-      background: transparent;
-      opacity: 0;
-      z-index: 0;
-    }
-
-    /* Dark mode styles */
-    :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f9fafb;
-      --bg-tertiary: #f3f4f6;
-      --text-primary: #111827;
-      --text-secondary: #6b7280;
-      --border-color: #e5e7eb;
-      --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-
-
-    .dark {
-      --bg-primary: #0a0a0a; /* Quasi nero per le card */
-      --bg-secondary: #000000; /* Nero puro AMOLED per lo sfondo */
-      --bg-tertiary: #1a1a1a; /* Grigio molto scuro per elementi hover */
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0a0;
-      --border-color: #2a2a2a;
-      --shadow: rgba(0, 0, 0, 0.8);
-    }
-
-    .dark body {
-      background-color: #000000 !important; /* Nero puro AMOLED */
-      color: var(--text-primary) !important;
-    }
-
-    .dark .glass-card {
-      background: linear-gradient(120deg, rgba(227, 242, 253, 0.15) 0%, rgba(240, 248, 255, 0.1) 100%) !important;
-      border: 1px solid rgba(227, 242, 253, 0.2) !important;
-      backdrop-filter: blur(10px);
-    }
-
-    .dark .bg-white {
-      background-color: #0a0a0a !important; /* Quasi nero per uniformità AMOLED */
-    }
-
-    .dark .bg-gray-50 {
-      background-color: #000000 !important; /* Nero puro */
-    }
-
-    .dark .bg-gray-100 {
-      background-color: #0a0a0a !important; /* Quasi nero */
-    }
-
-    .dark .text-gray-900 {
-      color: var(--text-primary) !important;
-    }
-
-    .dark .text-gray-700 {
-      color: var(--text-primary) !important;
-    }
-
-    .dark .text-gray-500 {
-      color: var(--text-secondary) !important;
-    }
-
-    .dark .border-gray-200 {
-      border-color: var(--border-color) !important;
-    }
-
-    .dark .border-gray-300 {
-      border-color: var(--border-color) !important;
-    }
-    .main-content-area {
-      margin-left: 256px;
-      margin-right: 0;
-      margin-top: 0 !important;
-      width: calc(100vw - 256px);
-      max-width: none;
-      min-width: 0;
-      transition: none;
-    }
-    @media (max-width: 1024px) {
-      .main-content-area {
-        margin-left: 0;
-        margin-top: 0 !important;
-        width: 100vw;
-        max-width: 100vw;
-      }
-    }
-    .main-content-area > [x-data] > div:first-child.px-2.md\:px-6 {
-      padding: 0 0.5rem 1rem 0.5rem !important; /* mobile */
-    }
-
-    @media (min-width: 768px) {
-      .main-content-area > [x-data] > div:first-child.px-2.md\:px-6 {
-        padding: 0 1.5rem 1.5rem 1.5rem !important; /* desktop */
-      }
-    }
-    
-    /* Reset completo per contenuto principale - ESCLUDE Neubrutalism */
-    html:not([data-theme="neubrutalism"]) .nav-pill {
-      transition: all 0.3s ease;
-    }
-    html:not([data-theme="neubrutalism"]) .nav-pill:hover {
-      background-color: rgba(0, 86, 166, 0.1);
-    }
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill:hover {
-      background-color: var(--bg-tertiary);
-    }
-    html:not([data-theme="neubrutalism"]) .nav-pill.active {
-      background-color: rgba(0, 86, 166, 0.2);
-      border-left: 3px solid #0056a6;
-    }
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill.active {
-      background-color: var(--bg-tertiary);
-    }
-    
-    /* Override per Neubrutalism - rimuove TUTTI gli sfondi */
-    html[data-theme="neubrutalism"] .nav-pill,
-    html[data-theme="neubrutalism"] .nav-pill:hover,
-    html[data-theme="neubrutalism"] .nav-pill.active {
-      background-color: transparent !important;
-      background: transparent !important;
-      border-left: none !important;
-    }
-    
-    /* Dark mode toggle button */
-    .dark-mode-toggle {
-      transition: all 0.3s ease;
-    }
-    .dark-mode-toggle {
-      transition: all 0.3s ease;
-    }
-    
-    /* Rimuovi margini dalla navigazione principale */
-    .main-content-area > .sticky {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-      border-top: none !important;
-    }
-    
-    /* Forza eliminazione completa di qualsiasi gap superiore */
-    body, html {
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    
-    body > * {
-      margin-top: 0 !important;
-    }
-    
-    /* Stili per input e form elements in dark mode */
-    .dark input[type="text"],
-    .dark input[type="number"],
-    .dark input[type="email"],
-    .dark input[type="password"],
-    .dark select,
-    .dark textarea {
-      background-color: #0a0a0a !important;
-      border-color: #2a2a2a !important;
-      color: var(--text-primary) !important;
-    }
-
-    .dark input[type="text"]:focus,
-    .dark input[type="number"]:focus,
-    .dark input[type="email"]:focus,
-    .dark input[type="password"]:focus,
-    .dark select:focus,
-    .dark textarea:focus {
-      background-color: #1a1a1a !important;
-      border-color: #3a3a3a !important;
-    }
-
-    /* Stili per button in dark mode */
-    .dark .bg-blue-600 {
-      background-color: #1e40af !important;
-    }
-
-    .dark .bg-blue-600:hover {
-      background-color: #1d4ed8 !important;
-    }
-
-    .dark .bg-red-600 {
-      background-color: #dc2626 !important;
-    }
-
-    .dark .bg-red-600:hover {
-      background-color: #b91c1c !important;
-    }
-
-    .dark .bg-green-600 {
-      background-color: #059669 !important;
-    }
-
-    .dark .bg-green-600:hover {
-      background-color: #047857 !important;
-    }
-
-    /* Stili per shadow in dark mode */
-    .dark .shadow-lg {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.4) !important;
-    }
-
-    .dark .shadow-xl {
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.4) !important;
-    }
-
-    /* Stili per table in dark mode */
-    .dark table {
-      background-color: #0a0a0a !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark th {
-      background-color: #1a1a1a !important;
-      color: var(--text-primary) !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark td {
-      background-color: #0a0a0a !important;
-      color: var(--text-primary) !important;
-      border-color: #2a2a2a !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark tr:hover td {
-      background-color: #1a1a1a !important;
-    }
-
-    /* Mobile responsive fixes */
-    @media (max-width: 768px) {
-      .glass-card {
-        padding: 1.5rem 1rem;
-        margin: 0.5rem;
-      }
-    }
-
-    /* Force sidebar header to be clean */
-    .sidebar-header,
-    .sidebar-header::before,
-    .sidebar-header::after {
-      background: #ffffff !important;
-      background-color: #ffffff !important;
-      background-image: none !important;
-      background-size: auto !important;
-      background-repeat: no-repeat !important;
-      background-position: 0 0 !important;
-      background-attachment: scroll !important;
-    }
-
-    .dark .sidebar-header,
-    .dark .sidebar-header::before,
-    .dark .sidebar-header::after {
-      background: #000000 !important;
-      background-color: #000000 !important;
-      background-image: none !important;
-      background-size: auto !important;
-      background-repeat: no-repeat !important;
-      background-position: 0 0 !important;
-      background-attachment: scroll !important;
-    }
-
-    /* Mantieni il logo con i suoi colori originali in dark mode */
-    .dark .sidebar-header img {
-      background: transparent !important;
-      /* Rimosso mix-blend-mode per mantenere i colori originali */
-    }
-
-    /* Assicura che non ci siano sfondi su tutto il contenitore del logo */
-    .dark .sidebar-header {
-      background: transparent !important;
-    }
-
-    /* Navigation styles for dark mode - ESCLUDI Neubrutalism */
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill {
-      color: #d1d5db !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill .text-gray-500 {
-      color: #9ca3af !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill:hover {
-      background-color: rgba(55, 65, 81, 0.5) !important;
-    }
-
-    html:not([data-theme="neubrutalism"]) .dark .nav-pill.active {
-      background-color: rgba(55, 65, 81, 0.7) !important;
-    }
-
-    /* Dark mode text colors - rendere i testi blu più chiari */
-    .dark .text-phg-primary {
-      color: #ffffff !important; /* Azzurro più chiaro */
-    }
-
-    /* Assicurarsi che lo sfondo del body sia nero */
-    .dark {
-      background-color: #000000 !important;
-    }
-
-    /* Mobile sidebar styles */
-    .mobile-sidebar {
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-in-out;
-    }
-    
-    .mobile-sidebar.open {
-      transform: translateX(0);
-    }
-    
-    .mobile-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 19;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-    
-    .mobile-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    /* Hamburger menu styles */
-    .hamburger-menu {
-      display: flex;
-      flex-direction: column;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-
-    /* Global icon-circle centralizzata */
-    .icon-circle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 3.5rem;
-      height: 3.5rem;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
-      color: #0056a6;
-      font-size: 2rem;
-      margin: 0 auto 1.2rem auto;
-      box-shadow: 0 2px 8px rgba(0,86,166,0.08);
-      transition: all 0.2s ease;
-    }
-    .dark .icon-circle {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2563eb 100%);
-      color: #60a5fa;
-      box-shadow: 0 2px 8px rgba(96, 165, 250, 0.2);
-    }
-    .icon-circle.small-icon { width: 2.75rem; height: 2.75rem; font-size: 1.35rem; margin: 0; }
-
-    /* Gradient button riutilizzabile */
-    .gradient-btn {
-      background: linear-gradient(135deg, #0056a6 0%, #00a8e8 100%);
-      color: #ffffff;
-      transition: all .3s ease;
-      box-shadow: 0 10px 15px -3px rgba(0,86,166,.3), 0 4px 6px -2px rgba(0,86,166,.1);
-    }
-    .gradient-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0,86,166,.3),0 10px 10px -5px rgba(0,86,166,.1); }
-    .dark .gradient-btn { background: linear-gradient(135deg,#1e40af 0%,#2563eb 100%); box-shadow: 0 4px 16px 0 rgba(37,99,235,.3); }
-    .dark .gradient-btn:hover { box-shadow: 0 4px 12px rgba(29,78,216,.4); }
-
-    /* Bug button */
-    .bug-btn {
-      background: transparent;
-      color: #374151; /* gray-700 */
-      transition: background .25s ease, color .25s ease;
-    }
-    .bug-btn:hover {
-      background: rgba(239,68,68,0.12); /* soft red tint */
-      color: #991b1b; /* red-800 for text change subtle */
-    }
-    .dark .bug-btn { color: #d1d5db; /* gray-300 */ }
-    .dark .bug-btn:hover { background: rgba(239,68,68,0.18); color: #fca5a5; }
-    
-    .hamburger-line {
-      width: 100%;
-      height: 2px;
-      background-color: #0056a6;
-      margin: 2px 0;
-      transition: 0.3s;
-    }
-    
-    .dark .hamburger-line {
-      background-color: #60a5fa !important;
-    }
-    
-    .hamburger-menu.active .hamburger-line:nth-child(1) {
-      transform: rotate(-45deg) translate(-4px, 4px);
-    }
-    
-    .hamburger-menu.active .hamburger-line:nth-child(2) {
-      opacity: 0;
-    }
-
-    /* Elimina gap tra sticky nav e contenuto - DISABLED per permettere spacing corretto */
-    /*
-    .main-content-area > .sticky + * {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-    */
-
-    /* Override padding-top generato con pt-16 in index.html */
-    .main-content-area .pt-16 {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
-
-    /* Standard top spacing for all pages - solves topbar overlap issue */
-    .page-content {
-      padding-top: 5rem !important; /* 80px spacing after sticky topbar */
-    }
-    
-    /* Special case for index page which already handles its own spacing */
-    .page-content.index-page {
-      padding-top: 0 !important;
-    }
-
-    
-    
-
-    /* DISABLED - troppo aggressivo per spacing pagine */
-    /*
-    .main-content-area > .sticky + * > div {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-    */
-    
-    .hamburger-menu.active .hamburger-line:nth-child(3) {
-      transform: rotate(45deg) translate(-4px, -4px);
-    } 
-    
-    /* Break margin collapse on sticky to avoid top gap */
-    
-      .sticky {
-    overflow: auto !important;
-    border-top: 1px solid transparent !important;
-  }
-  .sticky h1 {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-    
-    /* Scrollbar pulita cross-browser */
-    :root {
-      --scrollbar-bg: #f1f5f9; /* slate-100 */
-      --scrollbar-thumb: #cbd5e1; /* slate-300 */
-      --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
-      --scrollbar-thumb-active: #64748b; /* slate-500 */
-    }
-    .dark :root, .dark {
-      --scrollbar-bg: #0f0f0f;
-      --scrollbar-thumb: #2d2d2d;
-      --scrollbar-thumb-hover: #3a3a3a;
-      --scrollbar-thumb-active: #4b4b4b;
-    }
-    /* Firefox */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
-    }
-    /* WebKit */
-    *::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-    *::-webkit-scrollbar-track {
-      background: var(--scrollbar-bg);
-    }
-    *::-webkit-scrollbar-thumb {
-      background: var(--scrollbar-thumb);
-      border-radius: 999px;
-      border: 2px solid var(--scrollbar-bg);
-      transition: background .2s ease, border-color .2s ease;
-    }
-    *::-webkit-scrollbar-thumb:hover {
-      background: var(--scrollbar-thumb-hover);
-    }
-    *::-webkit-scrollbar-thumb:active {
-      background: var(--scrollbar-thumb-active);
-    }
-    /* Evita che su elementi rotondi la scrollbar rompa il design */
-    .glass-card::-webkit-scrollbar {
-      width: 8px;
-    }
-    .glass-card {
-      scrollbar-width: thin;
-    }
-    /* Nascondi scrollbar orizzontali indesiderate */
-    body, .main-content-area {
-      overflow-x: hidden;
-    }
-    
-    /* Settings panel slide-in animation with bounce */
-    @keyframes slideInBounce {
-      0% {
-        opacity: 0;
-        transform: translateX(100%);
-      }
-      60% {
-        opacity: 1;
-        transform: translateX(-10px);
-      }
-      80% {
-        transform: translateX(5px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes slideOutRight {
-      0% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(100%);
-      }
-    }
-    
-    .settings-panel-enter {
-      animation: slideInBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    
-    .settings-panel-leave {
-      animation: slideOutRight 0.2s ease-in forwards;
-    }
-    
-    /* Theme selector animations */
-    @keyframes slideUpBounce {
-      0% {
-        opacity: 0;
-        transform: translateY(100%);
-      }
-      60% {
-        opacity: 1;
-        transform: translateY(-10px);
-      }
-      80% {
-        transform: translateY(5px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideDownOut {
-      0% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(100%);
-      }
-    }
-    
-    .theme-selector-enter {
-      animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    
-    .theme-selector-leave {
-      animation: slideDownOut 0.4s ease-in forwards;
-    }
-    
-    /* Theme glow effect */
-    .theme-glow-blue {
-      box-shadow: 0 0 60px 30px rgba(0, 86, 166, 0.3),
-                  0 0 100px 50px rgba(0, 168, 232, 0.2);
-    }
-    
-    .theme-glow-neubrutalism {
-      box-shadow: 0 0 60px 30px rgba(255, 214, 10, 0.4),
-                  0 0 100px 50px rgba(124, 58, 237, 0.3);
-    }
-    
-    /* Floating buttons with modern style - applies to all themes */
-    .floating-btn {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      border: 1px solid rgba(0, 0, 0, 0.08) !important;
-      border-radius: 0.5rem !important;
-    }
-    
-    .floating-btn:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-      transform: translateY(-2px) !important;
-    }
-    
-    .floating-btn:active {
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
-      transform: translateY(0) !important;
-    }
-    
-    /* Neubrutalism Theme Styles */
-    [data-theme="neubrutalism"] {
-      /* Colors */
-      --nb-yellow: #FFD60A;
-      --nb-purple: #7C3AED;
-      --nb-blue: #3B82F6;
-      --nb-red: #EF4444;
-      --nb-green: #10B981;
-      --nb-black: #000000;
-      --nb-white: #FFFFFF;
-      --nb-gray: #F3F4F6;
-      --nb-border: 3px;
-    }
-    
-    /* PRIORITÀ MASSIMA: Rimuovi TUTTI gli sfondi dai nav-pill in Neubrutalism */
-    html[data-theme="neubrutalism"] .nav-pill,
-    html[data-theme="neubrutalism"] a.nav-pill,
-    html[data-theme="neubrutalism"] button.nav-pill,
-    html[data-theme="neubrutalism"] .nav-pill:hover,
-    html[data-theme="neubrutalism"] .nav-pill:focus,
-    html[data-theme="neubrutalism"] .nav-pill:active,
-    html[data-theme="neubrutalism"] .nav-pill.active,
-    html[data-theme="neubrutalism"] a.nav-pill:hover,
-    html[data-theme="neubrutalism"] a.nav-pill.active,
-    html[data-theme="neubrutalism"] button.nav-pill:hover,
-    html[data-theme="neubrutalism"] button.nav-pill.active {
-      background: none !important;
-      background-color: transparent !important;
-      background-image: none !important;
-      border-left: none !important;
-      box-shadow: none !important;
-    }
-    
-    /* Neubrutalism: Font - Space Grotesk style (bold, geometric) */
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
-    
-    [data-theme="neubrutalism"] * {
-      font-family: 'Space Grotesk', 'Inter', sans-serif !important;
-    }
-    
-    /* Neubrutalism: Reset background to pure white */
-    [data-theme="neubrutalism"] body,
-    [data-theme="neubrutalism"] html {
-      background-color: var(--nb-white) !important;
-    }
-    
-    [data-theme="neubrutalism"] .dark body,
-    [data-theme="neubrutalism"] .dark html {
-      background-color: var(--nb-white) !important;
-    }
-    
-    [data-theme="neubrutalism"] .bg-gray-50,
-    [data-theme="neubrutalism"] .bg-gray-100,
-    [data-theme="neubrutalism"] .bg-white {
-      background-color: var(--nb-white) !important;
-    }
-    
-    [data-theme="neubrutalism"] .dark .bg-gray-50,
-    [data-theme="neubrutalism"] .dark .bg-gray-100,
-    [data-theme="neubrutalism"] .dark .bg-white,
-    [data-theme="neubrutalism"] .dark .bg-black {
-      background-color: var(--nb-white) !important;
-    }
-    
-    /* Neubrutalism: All containers and divs */
-    [data-theme="neubrutalism"] .main-content-area,
-    [data-theme="neubrutalism"] div {
-      background-color: transparent;
-    }
-    
-    /* Neubrutalism: Cards with bold black borders */
-    [data-theme="neubrutalism"] .glass-card {
-      background: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-      transition: all 0.2s ease !important;
-    }
-    
-    [data-theme="neubrutalism"] .glass-card:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 8px 8px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: All buttons base style */
-    [data-theme="neubrutalism"] button:not(.nav-pill),
-    [data-theme="neubrutalism"] .gradient-btn,
-    [data-theme="neubrutalism"] .floating-btn,
-    [data-theme="neubrutalism"] [type="button"]:not(.nav-pill),
-    [data-theme="neubrutalism"] [type="submit"]:not(.nav-pill) {
-      background: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      font-weight: 700 !important;
-      transition: all 0.2s ease !important;
-      text-shadow: none !important;
-    }
-    
-    [data-theme="neubrutalism"] button:hover,
-    [data-theme="neubrutalism"] .gradient-btn:hover,
-    [data-theme="neubrutalism"] .floating-btn:hover {
-      transform: translate(-2px, -2px) !important;
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"] button:active,
-    [data-theme="neubrutalism"] .gradient-btn:active,
-    [data-theme="neubrutalism"] .floating-btn:active {
-      transform: translate(2px, 2px) !important;
-      box-shadow: 2px 2px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Primary/blue buttons purple */
-    [data-theme="neubrutalism"] .bg-blue-600,
-    [data-theme="neubrutalism"] .bg-blue-500,
-    [data-theme="neubrutalism"] .bg-phg-primary,
-    [data-theme="neubrutalism"] button.bg-blue-600,
-    [data-theme="neubrutalism"] .hover\:bg-blue-700:hover {
-      background: var(--nb-purple) !important;
-      color: var(--nb-white) !important;
-      border-color: var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Success buttons green */
-    [data-theme="neubrutalism"] .bg-green-600,
-    [data-theme="neubrutalism"] .bg-green-500,
-    [data-theme="neubrutalism"] button.bg-green-600 {
-      background: var(--nb-green) !important;
-      color: var(--nb-white) !important;
-      border-color: var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Danger buttons red */
-    [data-theme="neubrutalism"] .bg-red-600,
-    [data-theme="neubrutalism"] .bg-red-500,
-    [data-theme="neubrutalism"] button.bg-red-600,
-    [data-theme="neubrutalism"] .text-red-600 {
-      background: var(--nb-red) !important;
-      color: var(--nb-white) !important;
-      border-color: var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Sidebar with bold borders */
-    [data-theme="neubrutalism"] .sidebar-header,
-    [data-theme="neubrutalism"] nav,
-    [data-theme="neubrutalism"] .fixed.inset-y-0 {
-      background: var(--nb-white) !important;
-      border-right: var(--nb-border) solid var(--nb-black) !important;
-    }
-    
-    html[data-theme="neubrutalism"] .nav-pill {
-      background: transparent !important;
-      border: none !important;
-      border-radius: 0.5rem !important;
-      font-weight: 600 !important;
-      color: var(--nb-black) !important;
-      transition: all 0.2s ease !important;
-      box-shadow: none !important;
-    }
-    
-    html[data-theme="neubrutalism"] .nav-pill:hover {
-      background: transparent !important;
-      background-color: transparent !important;
-      border: none !important;
-      border-left: none !important;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-    
-    html[data-theme="neubrutalism"] .nav-pill.active {
-      background: transparent !important;
-      background-color: transparent !important;
-      border: none !important;
-      border-left: none !important;
-      box-shadow: none !important;
-    }
-    
-    /* Force override di tutte le classi Tailwind sui nav-pill */
-    html[data-theme="neubrutalism"] a.nav-pill,
-    html[data-theme="neubrutalism"] a.nav-pill:hover,
-    html[data-theme="neubrutalism"] a.nav-pill.active,
-    html[data-theme="neubrutalism"] button.nav-pill,
-    html[data-theme="neubrutalism"] button.nav-pill:hover,
-    html[data-theme="neubrutalism"] button.nav-pill.active {
-      background: transparent !important;
-      background-color: transparent !important;
-      border: none !important;
-      border-left: none !important;
-      box-shadow: none !important;
-      transform: none !important;
-    }
-    
-    /* SUPER OVERRIDE - usa path completo della sidebar */
-    html[data-theme="neubrutalism"] nav.fixed a.nav-pill,
-    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:hover,
-    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:focus,
-    html[data-theme="neubrutalism"] nav.fixed a.nav-pill.active,
-    html[data-theme="neubrutalism"] nav.fixed a.nav-pill:active {
-      background: transparent !important;
-      background-color: transparent !important;
-      background-image: none !important;
-      border: none !important;
-      border-left: none !important;
-      border-right: none !important;
-      box-shadow: none !important;
-      transform: none !important;
-    }
-    
-    /* Neubrutalism: Input fields */
-    [data-theme="neubrutalism"] input,
-    [data-theme="neubrutalism"] select,
-    [data-theme="neubrutalism"] textarea,
-    [data-theme="neubrutalism"] input[type="text"],
-    [data-theme="neubrutalism"] input[type="number"],
-    [data-theme="neubrutalism"] input[type="email"],
-    [data-theme="neubrutalism"] input[type="password"],
-    [data-theme="neubrutalism"] input[type="search"] {
-      background: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      color: var(--nb-black) !important;
-      font-weight: 600 !important;
-      box-shadow: none !important;
-    }
-    
-    [data-theme="neubrutalism"] input:focus,
-    [data-theme="neubrutalism"] select:focus,
-    [data-theme="neubrutalism"] textarea:focus {
-      outline: none !important;
-      box-shadow: 4px 4px 0 var(--nb-purple) !important;
-      transform: translate(-1px, -1px);
-      border-color: var(--nb-black) !important;
-    }
-     
-    /* Neubrutalism: Filter container & groups (logmovimenti) */
-    [data-theme="neubrutalism"] .filter-container {
-      background: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-radius: 0.75rem !important;
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-      backdrop-filter: none !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-container::before {
-      display: none !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-group {
-      background: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-group.has-active {
-      background: var(--nb-yellow) !important;
-      border-color: var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-purple) !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-input-compact,
-    [data-theme="neubrutalism"] .notes-input-wrapper {
-      background: var(--nb-white) !important;
-      border: 2px solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      font-weight: 600 !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-input-compact.active {
-      background: var(--nb-yellow) !important;
-      border-color: var(--nb-black) !important;
-      box-shadow: 3px 3px 0 var(--nb-purple) !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-input-compact:focus,
-    [data-theme="neubrutalism"] .notes-input-compact:focus {
-      outline: none !important;
-      box-shadow: 4px 4px 0 var(--nb-purple) !important;
-      transform: translate(-1px, -1px);
-    }
-
-    [data-theme="neubrutalism"] .filter-title,
-    [data-theme="neubrutalism"] .filter-group-title {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-
-    /* Neubrutalism: Filter buttons */
-    [data-theme="neubrutalism"] .filter-btn-primary-compact {
-      background: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-btn-primary-compact:hover {
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-      transform: translate(-2px, -2px) !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-btn-secondary-compact {
-      background: var(--nb-white) !important;
-      color: var(--nb-black) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-
-    [data-theme="neubrutalism"] .filter-btn-secondary-compact:hover {
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-      transform: translate(-2px, -2px) !important;
-    }
-
-    /* Neubrutalism: Tables */
-    [data-theme="neubrutalism"] table {
-      border: var(--nb-border) solid var(--nb-black) !important;
-      border-collapse: separate !important;
-      border-spacing: 0 !important;
-      background: var(--nb-white) !important;
-      box-shadow: 5px 5px 0 var(--nb-black) !important;
-    }
-    
-    /* Stato normale: sfondo giallo */
-    [data-theme="neubrutalism"] th,
-    [data-theme="neubrutalism"] table th,
-    [data-theme="neubrutalism"] thead th {
-      background: var(--nb-yellow) !important;
-      background-color: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border-bottom: var(--nb-border) solid var(--nb-black) !important;
-      font-weight: 700 !important;
-      text-transform: uppercase !important;
-      font-size: 0.875rem !important;
-      letter-spacing: 0.05em !important;
-    }
-    
-    /* Hover: sfondo bianco */
-    [data-theme="neubrutalism"] th:hover,
-    [data-theme="neubrutalism"] table th:hover,
-    [data-theme="neubrutalism"] thead th:hover {
-      background: var(--nb-white) !important;
-      background-color: var(--nb-white) !important;
-      color: var(--nb-black) !important;
-    }
-    
-    /* Override Tailwind classes on th */
-    [data-theme="neubrutalism"] th a,
-    [data-theme="neubrutalism"] th a:hover,
-    [data-theme="neubrutalism"] th a i {
-      color: var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"] td {
-      border-bottom: 2px solid var(--nb-gray) !important;
-      color: var(--nb-black) !important;
-      font-weight: 500 !important;
-      background: var(--nb-white) !important;
-    }
-    
-    [data-theme="neubrutalism"] tr:hover td {
-      background: var(--nb-gray) !important;
-    }
-    
-    /* Neubrutalism: Topbar */
-    [data-theme="neubrutalism"] .sticky {
-      background: var(--nb-white) !important;
-      border-bottom: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 0 4px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Text colors bold and clear */
-    [data-theme="neubrutalism"] .text-gray-900,
-    [data-theme="neubrutalism"] .text-gray-800,
-    [data-theme="neubrutalism"] .text-gray-700,
-    [data-theme="neubrutalism"] .text-gray-600,
-    [data-theme="neubrutalism"] .text-gray-500,
-    [data-theme="neubrutalism"] .text-gray-400,
-    [data-theme="neubrutalism"] .text-gray-300,
-    [data-theme="neubrutalism"] h1, 
-    [data-theme="neubrutalism"] h2, 
-    [data-theme="neubrutalism"] h3, 
-    [data-theme="neubrutalism"] h4,
-    [data-theme="neubrutalism"] p,
-    [data-theme="neubrutalism"] span {
-      color: var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"] .text-phg-primary {
-      color: var(--nb-purple) !important;
-      font-weight: 700 !important;
-    }
-    
-    /* Neubrutalism: Icons with bold style */
-    [data-theme="neubrutalism"] .icon-circle {
-      background: var(--nb-yellow) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      color: var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: All FontAwesome icons - make them bold and visible */
-    [data-theme="neubrutalism"] .fa,
-    [data-theme="neubrutalism"] .fas,
-    [data-theme="neubrutalism"] i.fas,
-    [data-theme="neubrutalism"] i.fa {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-      font-size: inherit !important;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      font-family: "Font Awesome 6 Free" !important;
-      display: inline-block !important;
-      font-style: normal !important;
-      font-variant: normal !important;
-      text-rendering: auto !important;
-      line-height: 1 !important;
-    }
-    
-    /* Neubrutalism: Icon containers with colored backgrounds */
-    [data-theme="neubrutalism"] .nav-pill i {
-      display: inline-flex !important;
-      align-items: center;
-      justify-content: center;
-      width: 2rem;
-      height: 2rem;
-      background: var(--nb-yellow) !important;
-      border: 2px solid var(--nb-black) !important;
-      border-radius: 0.375rem !important;
-      color: var(--nb-black) !important;
-      margin-right: 0.5rem;
-      box-shadow: 2px 2px 0 var(--nb-black) !important;
-      font-size: 1rem !important;
-    }
-    
-    /* Neubrutalism: Active nav icons in purple */
-    [data-theme="neubrutalism"] .nav-pill.active i {
-      background: var(--nb-purple) !important;
-      color: var(--nb-white) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Hover effect on nav icons */
-    [data-theme="neubrutalism"] .nav-pill:hover i {
-      background: var(--nb-blue) !important;
-      color: var(--nb-white) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Topbar buttons and links - remove all borders and backgrounds */
-    [data-theme="neubrutalism"] .sticky button,
-    [data-theme="neubrutalism"] .sticky a,
-    [data-theme="neubrutalism"] #dark-mode-toggle,
-    [data-theme="neubrutalism"] button[title="Impostazioni"],
-    [data-theme="neubrutalism"] a[title="Changelog"] {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      padding: 0 !important;
-    }
-    
-    /* Neubrutalism: Topbar icons - clean without borders, all identical */
-    [data-theme="neubrutalism"] .sticky button i,
-    [data-theme="neubrutalism"] .sticky a i,
-    [data-theme="neubrutalism"] #dark-mode-toggle i,
-    [data-theme="neubrutalism"] .fa-sun,
-    [data-theme="neubrutalism"] .fa-moon,
-    [data-theme="neubrutalism"] .fa-code-branch,
-    [data-theme="neubrutalism"] button[title="Impostazioni"] i,
-    [data-theme="neubrutalism"] .fa-cog {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      width: auto !important;
-      height: auto !important;
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-    
-    /* Neubrutalism Dark: Topbar icons white */
-    html[data-theme="neubrutalism"] body.dark .sticky button i,
-    html[data-theme="neubrutalism"] body.dark .sticky a i,
-    html[data-theme="neubrutalism"] body.dark #dark-mode-toggle i,
-    html[data-theme="neubrutalism"] body.dark .fa-sun,
-    html[data-theme="neubrutalism"] body.dark .fa-moon,
-    html[data-theme="neubrutalism"] body.dark .fa-code-branch,
-    html[data-theme="neubrutalism"] body.dark button[title="Impostazioni"] i,
-    html[data-theme="neubrutalism"] body.dark .fa-cog {
-      color: #FFFFFF !important;
-    }
-    
-    /* Neubrutalism: Button icons inside buttons */
-    [data-theme="neubrutalism"] button i,
-    [data-theme="neubrutalism"] .gradient-btn i {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      width: auto !important;
-      height: auto !important;
-      margin-right: 0.25rem;
-    }
-    
-    /* Neubrutalism: Table action icons */
-    [data-theme="neubrutalism"] table button i {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
-    
-    /* Neubrutalism: Specific icon colors for actions */
-    [data-theme="neubrutalism"] .fa-check,
-    [data-theme="neubrutalism"] .fa-check-circle {
-      color: var(--nb-green) !important;
-    }
-    
-    [data-theme="neubrutalism"] .fa-times,
-    [data-theme="neubrutalism"] .fa-times-circle,
-    [data-theme="neubrutalism"] .fa-trash {
-      color: var(--nb-red) !important;
-    }
-    
-    [data-theme="neubrutalism"] .fa-edit,
-    [data-theme="neubrutalism"] .fa-pen {
-      color: var(--nb-blue) !important;
-    }
-    
-    [data-theme="neubrutalism"] .fa-info-circle,
-    [data-theme="neubrutalism"] .fa-exclamation-circle {
-      color: var(--nb-purple) !important;
-    }
-    
-    /* Neubrutalism: Chevron and arrow icons */
-    [data-theme="neubrutalism"] .fa-chevron-right,
-    [data-theme="neubrutalism"] .fa-chevron-left,
-    [data-theme="neubrutalism"] .fa-chevron-down,
-    [data-theme="neubrutalism"] .fa-arrow-right,
-    [data-theme="neubrutalism"] .fa-arrow-left,
-    [data-theme="neubrutalism"] .fa-arrow-up,
-    [data-theme="neubrutalism"] .fa-arrow-down {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    /* Neubrutalism: Mobile bottom menu icons */
-    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 i {
-      display: inline-flex !important;
-      align-items: center;
-      justify-content: center;
-      width: 2.5rem;
-      height: 2.5rem;
-      background: var(--nb-yellow) !important;
-      border: 2px solid var(--nb-black) !important;
-      border-radius: 0.5rem !important;
-      color: var(--nb-black) !important;
-      box-shadow: 2px 2px 0 var(--nb-black) !important;
-      margin-bottom: 0.25rem;
-      font-size: 1.25rem !important;
-    }
-    
-    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 .text-phg-primary i {
-      background: var(--nb-purple) !important;
-      color: var(--nb-white) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: User profile icon */
-    [data-theme="neubrutalism"] img.rounded-full {
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Bug report icon - red */
-    [data-theme="neubrutalism"] .fa-bug {
-      color: var(--nb-red) !important;
-    }
-    
-    /* Neubrutalism: Shield icon for admin */
-    [data-theme="neubrutalism"] .fa-shield-alt {
-      color: var(--nb-purple) !important;
-    }
-    
-    /* Neubrutalism: User icon */
-    [data-theme="neubrutalism"] .fa-user,
-    [data-theme="neubrutalism"] .fa-user-plus {
-      color: var(--nb-blue) !important;
-    }
-    
-    /* Neubrutalism Light: Contenitore icona utente sidebar - RIMOSSO BORDO */
-    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0.rounded-full,
-    [data-theme="neubrutalism"]:not(.dark) nav .bg-white.rounded-full,
-    [data-theme="neubrutalism"]:not(.dark) nav .border.rounded-full {
-      border: none !important;
-      background: transparent !important;
-    }
-    
-    /* Neubrutalism Light: Icona utente sidebar visibile con bordo giallo */
-    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0.rounded-full {
-      border: 3px solid var(--nb-yellow) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-      background: var(--nb-white) !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) nav .flex-shrink-0 .fa-user {
-      color: var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism Light: Rimuovi TUTTI i bordi dal container segnala bug */
-    [data-theme="neubrutalism"]:not(.dark) .bug-btn,
-    [data-theme="neubrutalism"]:not(.dark) a.bug-btn,
-    [data-theme="neubrutalism"]:not(.dark) .border-b.pb-4 {
-      border: none !important;
-      background: transparent !important;
-      border-bottom: none !important;
-      padding-bottom: 1rem !important;
-    }
-    
-    /* Neubrutalism: Shadows always black, no blur */
-    [data-theme="neubrutalism"] .shadow,
-    [data-theme="neubrutalism"] .shadow-sm,
-    [data-theme="neubrutalism"] .shadow-md,
-    [data-theme="neubrutalism"] .shadow-lg,
-    [data-theme="neubrutalism"] .shadow-xl,
-    [data-theme="neubrutalism"] .shadow-2xl {
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Links */
-    [data-theme="neubrutalism"] a {
-      color: var(--nb-purple) !important;
-      font-weight: 600 !important;
-      text-decoration: none !important;
-    }
-    
-    [data-theme="neubrutalism"] a:hover {
-      text-decoration: underline !important;
-    }
-    
-    /* Neubrutalism: Modals and overlays */
-    [data-theme="neubrutalism"] .fixed.inset-0 {
-      background: rgba(0, 0, 0, 0.3) !important;
-    }
-    
-    /* Neubrutalism: Settings panel */
-    [data-theme="neubrutalism"] .bg-white.dark\:bg-gray-800,
-    [data-theme="neubrutalism"] [class*="bg-gray"] {
-      background: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism Light Mode: Settings Panel dettagliato */
-    [data-theme="neubrutalism"]:not(.dark) div[x-show="settingsOpen"].fixed.bg-white {
-      background: var(--nb-white) !important;
-      border: 3px solid var(--nb-black) !important;
-      box-shadow: none !important;
-    }
-    
-    /* Settings panel header giallo */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child.border-b {
-      background: var(--nb-yellow) !important;
-      border-bottom: 3px solid var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child h3,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] > div:first-child i {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    /* Area utente senza bordo */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .bg-gray-100,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .rounded-full.border,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .border-gray-200,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] .flex-shrink-0.border {
-      background: transparent !important;
-      border: none !important;
-    }
-    
-    /* Icona utente visibile */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] img.rounded-full {
-      border: 3px solid var(--nb-yellow) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-      background: var(--nb-white) !important;
-    }
-    
-    /* Pulsanti gialli con testo nero */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative):not([class*="text-red"]) {
-      background: var(--nb-yellow) !important;
-      border: 3px solid var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative) span,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:not(.relative) i {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button:hover:not(.relative) {
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      transform: translate(-2px, -2px) !important;
-    }
-    
-    /* Toggle switch */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] button.relative.inline-flex {
-      border: 3px solid var(--nb-black) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Logout button rosso */
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"] {
-      background: #DC2626 !important;
-      color: var(--nb-black) !important;
-      border: 3px solid var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600:hover,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"]:hover {
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      transform: translate(-2px, -2px) !important;
-    }
-    
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a.text-red-600 i,
-    [data-theme="neubrutalism"]:not(.dark) [x-show="settingsOpen"] a[href*="logout"] i {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    /* Neubrutalism: Borders everywhere */
-    [data-theme="neubrutalism"] .border,
-    [data-theme="neubrutalism"] .border-gray-200,
-    [data-theme="neubrutalism"] .border-gray-300 {
-      border-color: var(--nb-black) !important;
-      border-width: 2px !important;
-    }
-    
-    /* Neubrutalism: Rounded elements stay slightly rounded */
-    [data-theme="neubrutalism"] .rounded-full {
-      border-radius: 0.75rem !important;
-    }
-    
-    
-    /* ========== DARK MODE: SOLO COLORI CAMBIATI ========== */
-    /* Background principale ultra-nero */
-    html[data-theme="neubrutalism"] body.dark {
-      background-color: #000000 !important;
-    }
-    
-    /* Testo bianco di default per TUTTO */
-    html[data-theme="neubrutalism"] body.dark,
-    html[data-theme="neubrutalism"] body.dark * {
-      color: #FFFFFF !important;
-    }
-    
-    /* Cards: sfondo scuro, bordo giallo, ombra bianca */
-    html[data-theme="neubrutalism"] body.dark .glass-card {
-      background: #141414 !important;
-      border: 3px solid var(--nb-white) !important;
-      box-shadow: 6px 6px 0 #FFFFFF !important;
-    }
-    
-    /* Sidebar e nav: sfondo nero, bordo giallo */
-    html[data-theme="neubrutalism"] body.dark .fixed.inset-y-0,
-    html[data-theme="neubrutalism"] body.dark nav {
-      background: #0a0a0a !important;
-      border-right: 3px solid var(--nb-white) !important;
-    }
-
-    /* Neubrutalism: uniform sidebar background across sections */
-    html[data-theme="neubrutalism"] .sidebar-container {
-      background: var(--nb-white) !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .sidebar-container {
-      background: #0a0a0a !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .sidebar-container nav,
-    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-footer {
-      background: transparent !important;
-    }
-
-    /* Neubrutalism: logo area inherits container background (light & dark) */
-    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header,
-    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header::before,
-    html[data-theme="neubrutalism"] .sidebar-container .sidebar-header::after,
-    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header,
-    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header::before,
-    html[data-theme="neubrutalism"] body.dark .sidebar-container .sidebar-header::after {
-      background: transparent !important;
-      background-color: transparent !important;
-    }
-    
-    /* Table: sfondo scuro, bordi gialli, ombra bianca */
-    html[data-theme="neubrutalism"] body.dark table {
-      background: #141414 !important;
-      border: 3px solid var(--nb-white) !important;
-      box-shadow: 6px 6px 0 #FFFFFF !important;
-    }
-    
-    /* TD: sfondo scuro */
-    html[data-theme="neubrutalism"] body.dark td {
-      background: #141414 !important;
-      border-bottom: 2px solid #0a0a0a !important;
-    }
-    
-    /* TR hover: sfondo più scuro */
-    html[data-theme="neubrutalism"] body.dark tr:hover td {
-      background: #0a0a0a !important;
-    }
-    
-    /* Elementi con background bianco forzato - RIMOSSA la regola [class*="bg-white"] che causava problemi */
-  html[data-theme="neubrutalism"] body.dark .bg-white:not(.dark\:bg-gray-800):not(.sidebar-dropdown),
-    html[data-theme="neubrutalism"] body.dark .bg-gray-50,
-    html[data-theme="neubrutalism"] body.dark .bg-gray-100 {
-      background: #141414 !important;
-      background-color: #141414 !important;
-    }
-
-    /* Neubrutalism Dark: Filter containers and groups */
-    html[data-theme="neubrutalism"] body.dark .filter-container {
-      background: #141414 !important;
-      border: 3px solid var(--nb-white) !important;
-      box-shadow: 6px 6px 0 #FFFFFF !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-group {
-      background: #0a0a0a !important;
-      border: 3px solid var(--nb-white) !important;
-      box-shadow: 3px 3px 0 #FFFFFF !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-group.has-active {
-      background: var(--nb-yellow) !important;
-      border-color: var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-purple) !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-group.has-active * {
-      color: var(--nb-black) !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-input-compact,
-    html[data-theme="neubrutalism"] body.dark .notes-input-wrapper {
-      background: #0a0a0a !important;
-      border: 2px solid var(--nb-white) !important;
-      color: #FFFFFF !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-input-compact.active {
-      background: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border-color: var(--nb-black) !important;
-      box-shadow: 3px 3px 0 var(--nb-purple) !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-input-compact:focus,
-    html[data-theme="neubrutalism"] body.dark .notes-input-compact:focus {
-      box-shadow: 4px 4px 0 var(--nb-purple) !important;
-      transform: translate(-1px, -1px);
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-btn-primary-compact {
-      background: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border: 3px solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 #FFFFFF !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-btn-primary-compact:hover {
-      box-shadow: 6px 6px 0 #FFFFFF !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-btn-secondary-compact {
-      background: var(--nb-white) !important;
-      color: var(--nb-black) !important;
-      border: 3px solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark .filter-btn-secondary-compact:hover {
-      box-shadow: 6px 6px 0 var(--nb-black) !important;
-    }
-
-    /* Sidebar dropdown: chiaro e scuro coerenti */
-    [data-theme="neubrutalism"] nav .sidebar-dropdown,
-    [data-theme="neubrutalism"] nav .sidebar-dropdown a {
-      background: #ffffff !important;
-      border-color: var(--nb-black) !important;
-      color: var(--nb-black) !important;
-    }
-
-    [data-theme="neubrutalism"] nav .sidebar-dropdown a:hover {
-      background: #f3f4f6 !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown,
-    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown a {
-      background: #0a0a0a !important;
-      border-color: var(--nb-white) !important;
-      color: #f9fafb !important;
-    }
-
-    html[data-theme="neubrutalism"] body.dark nav .sidebar-dropdown a:hover {
-      background: #141414 !important;
-    }
-    
-    /* Badge pills - mantengono sfondo giallo con testo nero */
-    html[data-theme="neubrutalism"] body.dark .badge,
-    html[data-theme="neubrutalism"] body.dark span[class*="bg-green"],
-    html[data-theme="neubrutalism"] body.dark span[class*="bg-blue"],
-    html[data-theme="neubrutalism"] body.dark span[class*="bg-yellow"],
-    html[data-theme="neubrutalism"] body.dark span[class*="bg-red"] {
-      background-color: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border: 2px solid var(--nb-black) !important;
-    }
-    
-    /* Inputs: sfondo scuro, bordo giallo */
-    html[data-theme="neubrutalism"] body.dark input,
-    html[data-theme="neubrutalism"] body.dark select,
-    html[data-theme="neubrutalism"] body.dark textarea {
-      background: #0a0a0a !important;
-      border-color: var(--nb-white) !important;
-      color: #FFFFFF !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark input::placeholder,
-    html[data-theme="neubrutalism"] body.dark select::placeholder,
-    html[data-theme="neubrutalism"] body.dark textarea::placeholder {
-      color: #888888 !important;
-    }
-    
-    /* Select options */
-    html[data-theme="neubrutalism"] body.dark select option {
-      background: #0a0a0a !important;
-      color: #FFFFFF !important;
-    }
-    
-    /* Icon circles nelle stats card - icone gialle con ombra bianca */
-    html[data-theme="neubrutalism"] body.dark .icon-circle {
-      background: var(--nb-yellow) !important;
-      border: 3px solid var(--nb-black) !important;
-      box-shadow: 5px 5px 0 #FFFFFF !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark .icon-circle i,
-    html[data-theme="neubrutalism"] body.dark .icon-circle svg,
-    html[data-theme="neubrutalism"] body.dark .icon-circle *,
-    html[data-theme="neubrutalism"] body.dark .glass-card .icon-circle i,
-    html[data-theme="neubrutalism"] body.dark .glass-card .icon-circle svg {
-      color: var(--nb-black) !important;
-      fill: var(--nb-black) !important;
-      background: var(--nb-yellow) !important;
-    }
-    
-    /* Stats card icons - forza colori */
-    html[data-theme="neubrutalism"] body.dark .glass-card i[class*="fa-"],
-    html[data-theme="neubrutalism"] body.dark .glass-card svg[class*="fa-"] {
-      color: var(--nb-black) !important;
-    }
-    
-    /* BORDI BIANCHI - Glass cards e filtri */
-    html[data-theme="neubrutalism"] body.dark .glass-card {
-      border-color: #FFFFFF !important;
-    }
-    
-    /* Header tabella "Stock Campospinoso" - bordo inferiore BIANCO */
-    html[data-theme="neubrutalism"] body.dark .glass-card > div.border-b.px-6.py-4,
-    html[data-theme="neubrutalism"] body.dark .desktop-table > div.border-b.px-6.py-4,
-    html[data-theme="neubrutalism"] body.dark .glass-card div.border-b[class*="px-6"],
-    html[data-theme="neubrutalism"] body.dark .desktop-table div.border-b[class*="px-6"] {
-      border-bottom-color: #FFFFFF !important;
-      border-bottom-width: 3px !important;
-      border-bottom-style: solid !important;
-      background: #0a0a0a !important;
-    }
-    
-    /* Filtri e pannello ricerca - TUTTI i bordi */
-    html[data-theme="neubrutalism"] body.dark .border,
-    html[data-theme="neubrutalism"] body.dark [class*="border-"] {
-      border-color: var(--nb-white) !important;
-    }
-    
-    /* Settings Panel - bordo bianco semplice */
-    html[data-theme="neubrutalism"] body.dark div[x-show="settingsOpen"].fixed.bg-white,
-    html[data-theme="neubrutalism"] body.dark div[x-show="settingsOpen"].dark\:bg-gray-800,
-    html[data-theme="neubrutalism"] body.dark .fixed.right-4.bg-white.dark\:bg-gray-800 {
-      background: #000000 !important;
-      background-color: #000000 !important;
-      border: 3px solid #FFFFFF !important;
-      box-shadow: none !important;
-    }
-    
-    /* Settings panel - header con sfondo giallo */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child.border-b {
-      background: var(--nb-yellow) !important;
-      border-bottom: 3px solid var(--nb-black) !important;
-      border-color: var(--nb-black) !important;
-    }
-    
-    /* Settings panel - titolo header nero su giallo (grassetto) */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child h3,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] > div:first-child i {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    /* Settings panel - divisori bianchi */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-b:not(:first-child),
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-gray-200 {
-      border-color: #FFFFFF !important;
-    }
-    
-    /* Settings panel - area utente SENZA BORDO */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .bg-gray-100,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .dark\:bg-gray-700,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .border-gray-200,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .rounded-full.border {
-      background: transparent !important;
-      border: none !important;
-    }
-    
-    /* Settings panel - icona utente visibile */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] img.rounded-full {
-      border: 3px solid var(--nb-yellow) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-      background: #FFFFFF !important;
-      filter: none !important;
-      opacity: 1 !important;
-    }
-    
-    /* Dark mode: Contenitore icona utente sidebar - RIMOSSO BORDO (identico a light mode) */
-    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0.rounded-full,
-    html[data-theme="neubrutalism"] body.dark nav .bg-white.rounded-full,
-    html[data-theme="neubrutalism"] body.dark nav .border.rounded-full,
-    html[data-theme="neubrutalism"] body.dark nav .dark\:bg-gray-700 {
-      border: none !important;
-      background: transparent !important;
-    }
-    
-    /* Dark mode: Icona utente sidebar visibile */
-    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0.rounded-full {
-      border: 3px solid var(--nb-yellow) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-      background: var(--nb-white) !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark nav .flex-shrink-0 .fa-user {
-      color: var(--nb-black) !important;
-    }
-    
-    /* Dark mode: Rimuovi TUTTI i bordi dal container segnala bug (identico a light mode) */
-    html[data-theme="neubrutalism"] body.dark .bug-btn,
-    html[data-theme="neubrutalism"] body.dark a.bug-btn,
-    html[data-theme="neubrutalism"] body.dark .border-b.pb-4 {
-      border: none !important;
-      background: transparent !important;
-      border-bottom: none !important;
-      padding-bottom: 1rem !important;
-    }
-    
-    /* Settings panel - tutto il testo bianco */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] p,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] span,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-900,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-700,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] .text-gray-500 {
-      color: #FFFFFF !important;
-    }
-    
-    /* Settings panel - pulsanti gialli con testo NERO GRASSETTO */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative):not([class*="text-red"]) {
-      background: var(--nb-yellow) !important;
-      border: 3px solid var(--nb-black) !important;
-      transition: all 0.2s !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative) span,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:not(.relative) i {
-      color: var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button:hover:not(.relative) {
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-      transform: translate(-2px, -2px) !important;
-    }
-    
-    /* Toggle switch dark mode */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] button.relative.inline-flex {
-      border: 3px solid var(--nb-yellow) !important;
-      box-shadow: 3px 3px 0 var(--nb-black) !important;
-    }
-    
-    /* Logout button rosso con icona NERA */
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"] {
-      background: #DC2626 !important;
-      color: var(--nb-black) !important;
-      border: 3px solid var(--nb-black) !important;
-      font-weight: 900 !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600:hover,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"]:hover {
-      transform: translate(-2px, -2px) !important;
-    }
-    
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a.text-red-600 i,
-    html[data-theme="neubrutalism"] body.dark [x-show="settingsOpen"] a[href*="logout"] i {
-      font-weight: 900 !important;
-    }
-    
-    /* Contenitori e wrapper - TUTTI SCURI */
-    html[data-theme="neubrutalism"] body.dark .container,
-    html[data-theme="neubrutalism"] body.dark .wrapper,
-    html[data-theme="neubrutalism"] body.dark [class*="container"],
-    html[data-theme="neubrutalism"] body.dark .overflow-x-auto,
-    html[data-theme="neubrutalism"] body.dark .relative {
-      background: transparent !important;
-    }
-    
-    /* Barra sopra la tabella e header */
-    html[data-theme="neubrutalism"] body.dark thead,
-    html[data-theme="neubrutalism"] body.dark thead tr {
-      background: transparent !important;
-    }
-    
-    /* Qualsiasi div con sfondo chiaro */
-    html[data-theme="neubrutalism"] body.dark div[class*="bg-"],
-    html[data-theme="neubrutalism"] body.dark section[class*="bg-"] {
-      background-color: transparent !important;
-    }
-    
-    /* SVG e icone */
-    html[data-theme="neubrutalism"] body.dark svg,
-    html[data-theme="neubrutalism"] body.dark svg path {
-      fill: currentColor !important;
-      color: #FFFFFF !important;
-    }
-    
-    /* ECCEZIONI: Testo e icone NERI dove c'è sfondo giallo */
-    
-    /* Bottoni gialli */
-    html[data-theme="neubrutalism"] body.dark button,
-    html[data-theme="neubrutalism"] body.dark button *,
-    html[data-theme="neubrutalism"] body.dark button i,
-    html[data-theme="neubrutalism"] body.dark .gradient-btn,
-    html[data-theme="neubrutalism"] body.dark .gradient-btn *,
-    html[data-theme="neubrutalism"] body.dark .gradient-btn i,
-    html[data-theme="neubrutalism"] body.dark .floating-btn,
-    html[data-theme="neubrutalism"] body.dark .floating-btn *,
-    html[data-theme="neubrutalism"] body.dark .floating-btn i,
-    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill),
-    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill) *,
-    html[data-theme="neubrutalism"] body.dark [type="button"]:not(.nav-pill) i,
-    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill),
-    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill) *,
-    html[data-theme="neubrutalism"] body.dark [type="submit"]:not(.nav-pill) i {
-      color: var(--nb-black) !important;
-    }
-    
-    /* Header tabella giallo */
-    html[data-theme="neubrutalism"] body.dark th,
-    html[data-theme="neubrutalism"] body.dark th *,
-    html[data-theme="neubrutalism"] body.dark th a,
-    html[data-theme="neubrutalism"] body.dark th i,
-    html[data-theme="neubrutalism"] body.dark thead th,
-    html[data-theme="neubrutalism"] body.dark thead th *,
-    html[data-theme="neubrutalism"] body.dark thead th a,
-    html[data-theme="neubrutalism"] body.dark thead th i {
-      color: var(--nb-black) !important;
-    }
-    
-    /* Nav-pill icons (sfondo giallo) */
-    html[data-theme="neubrutalism"] body.dark .nav-pill i,
-    html[data-theme="neubrutalism"] body.dark .nav-pill svg {
-      color: var(--nb-black) !important;
-      fill: var(--nb-black) !important;
-    }
-    
-    /* Badge gialli */
-    html[data-theme="neubrutalism"] body.dark .badge,
-    html[data-theme="neubrutalism"] body.dark .badge *,
-    html[data-theme="neubrutalism"] body.dark .badge i {
-      color: var(--nb-black) !important;
-    }
-    
-    
-    /* ===== OVERRIDE FINALE PER NAV-PILL - MASSIMA PRIORITA' ===== */
-    /* Rimuove tutti gli sfondi dalla sidebar in LIGHT mode */
-    html[data-theme="neubrutalism"] .nav-pill,
-    html[data-theme="neubrutalism"] a.nav-pill,
-    html[data-theme="neubrutalism"] button.nav-pill {
-      background-color: transparent !important;
-      background: transparent !important;
-      border-left: none !important;
-    }
-    
-    html[data-theme="neubrutalism"] .nav-pill:hover,
-    html[data-theme="neubrutalism"] a.nav-pill:hover,
-    html[data-theme="neubrutalism"] button.nav-pill:hover {
-      background-color: transparent !important;
-      background: transparent !important;
-      border-left: none !important;
-    }
-    
-    html[data-theme="neubrutalism"] .nav-pill.active,
-    html[data-theme="neubrutalism"] a.nav-pill.active,
-    html[data-theme="neubrutalism"] button.nav-pill.active {
-      background-color: transparent !important;
-      background: transparent !important;
-      border-left: none !important;
-    }
-    
-    /* Neubrutalism: Flash messages */
-    [data-theme="neubrutalism"] .bg-green-100 {
-      background: var(--nb-green) !important;
-      color: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-    }
-    
-    [data-theme="neubrutalism"] .bg-red-100 {
-      background: var(--nb-red) !important;
-      color: var(--nb-white) !important;
-      border: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 4px 4px 0 var(--nb-black) !important;
-    }
-    
-    /* Neubrutalism: Badges and tags */
-    [data-theme="neubrutalism"] .badge,
-    [data-theme="neubrutalism"] span.text-xs {
-      background: var(--nb-yellow) !important;
-      color: var(--nb-black) !important;
-      border: 2px solid var(--nb-black) !important;
-      padding: 0.25rem 0.5rem !important;
-      font-weight: 700 !important;
-    }
-    
-    /* Neubrutalism: Mobile bottom menu */
-    [data-theme="neubrutalism"] .md\:hidden.fixed.bottom-0 {
-      background: var(--nb-white) !important;
-      border-top: var(--nb-border) solid var(--nb-black) !important;
-      box-shadow: 0 -4px 0 var(--nb-black) !important;
-    }
-
-</style>
+    /* Critical inline CSS only. Full theme & component styles moved to static/optimized.css for caching & performance. */
+    body, html { margin:0 !important; padding:0 !important; }
+    body { font-family:'Inter', sans-serif; background-color:#f8fafc; }
+    :root { --bg-primary:#ffffff; --bg-secondary:#f9fafb; --bg-tertiary:#f3f4f6; --text-primary:#111827; --text-secondary:#6b7280; --border-color:#e5e7eb; --shadow:rgba(0,0,0,0.1); }
+    .dark { --bg-primary:#0a0a0a; --bg-secondary:#000000; --bg-tertiary:#1a1a1a; --text-primary:#ffffff; --text-secondary:#a0a0a0; --border-color:#2a2a2a; --shadow:rgba(0,0,0,0.8); }
+    .dark body { background-color:#000000 !important; color:var(--text-primary) !important; }
+    .glass-card { background:linear-gradient(120deg,#e3f2fd 0%,#f0f8ff 100%); border:1px solid rgba(0,86,166,0.15); box-shadow:0 2px 8px rgba(0,86,166,0.08); border-radius:1.25rem; padding:2.5rem 2rem; position:relative; width:100%; min-width:0; box-sizing:border-box; transition:border-color 0.2s ease,box-shadow 0.2s ease; } .glass-card:hover { border-color:rgba(0,86,166,0.3); box-shadow:0 4px 12px rgba(0,86,166,0.12); }
+    .dark .glass-card { background:linear-gradient(120deg,rgba(227,242,253,0.15) 0%, rgba(240,248,255,0.1) 100%) !important; border:1px solid rgba(227,242,253,0.2) !important; box-shadow:0 2px 8px rgba(0,0,0,0.4) !important; transition:border-color 0.2s ease,box-shadow 0.2s ease; } .dark .glass-card:hover { border-color:rgba(96,165,250,0.4) !important; box-shadow:0 4px 12px rgba(96,165,250,0.15) !important; }
+    .main-content-area { margin-left:256px; margin-right:0; margin-top:0 !important; width:calc(100vw - 256px); max-width:none; min-width:0; transition:none; }
+    @media (max-width:1024px){ .main-content-area { margin-left:0; margin-top:0 !important; width:100vw; max-width:100vw; } }
+    .main-content-area > [x-data] > div:first-child.px-2.md\:px-6 { padding:0 .5rem 1rem .5rem !important; }
+    @media (min-width:768px){ .main-content-area > [x-data] > div:first-child.px-2.md\:px-6 { padding:0 1.5rem 1.5rem 1.5rem !important; } }
+    /* End critical inline */
+  </style>
+  <!-- Preconnect & Preload Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">
+  <!-- External optimized stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='optimized.css') }}">
 {% block extra_css %}{% endblock %}
     <script>
     // Apply theme on page load
@@ -1985,34 +116,48 @@
     });
     </script>
 </head>
-<body x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" 
+<body x-data="{ 
+        darkMode: localStorage.getItem('darkMode') === 'true', 
+        sidebarOpen: false,
+        currentTheme: localStorage.getItem('appTheme') || 'default'
+      }" 
       x-init="
-        console.log('Inizializzazione - darkMode dal localStorage:', localStorage.getItem('darkMode'), 'parsed:', darkMode);
-        $watch('darkMode', value => { 
-          console.log('Watch triggered - nuovo valore darkMode:', value);
-          localStorage.setItem('darkMode', value.toString()); 
-          if (value) {
-            document.body.classList.add('dark');
-            document.documentElement.classList.add('dark');
-            document.body.style.backgroundColor = '#000000';
-            document.documentElement.style.backgroundColor = '#000000';
-          } else {
-            document.body.classList.remove('dark');
-            document.documentElement.classList.remove('dark'); 
-            document.body.style.backgroundColor = '';
-            document.documentElement.style.backgroundColor = '';
+        const getBgColor = (theme, isDark) => {
+          const activeTheme = theme || 'default';
+          if (activeTheme === 'minimal') {
+            return isDark ? '#15100C' : '#FAF8F5';
           }
-        }); 
-        // Lo stato iniziale è già applicato dallo script inline nel head
-        if (darkMode) {
-          console.log('Conferma stato iniziale: dark mode già applicato');
-          document.body.classList.add('dark');
-          document.body.style.backgroundColor = '#000000';
+          return isDark ? '#000000' : '#f8fafc';
+        };
+
+        const applyThemeState = (theme, isDark) => {
+          const bg = getBgColor(theme, isDark);
+          document.documentElement.classList.toggle('dark', isDark);
+          document.body.classList.toggle('dark', isDark);
+          document.documentElement.style.setProperty('background-color', bg, 'important');
+          document.body.style.setProperty('background-color', bg, 'important');
+        };
+
+        applyThemeState(currentTheme, darkMode);
+
+        $watch('darkMode', value => { 
+          localStorage.setItem('darkMode', value.toString()); 
+          applyThemeState(currentTheme, value);
+        });
+
+        $watch('currentTheme', value => {
+          applyThemeState(value, darkMode);
+        });
+
+        const criticalStyle = document.getElementById('dark-mode-critical');
+        if (criticalStyle) {
+          setTimeout(() => criticalStyle.remove(), 150);
         }
       "
+      @storage.window="if ($event.key === 'appTheme') currentTheme = $event.newValue || 'default'"
+      @theme-changed="currentTheme = $event.detail"
       :class="{ 'dark': darkMode }"
-      class="bg-gray-50 dark:bg-black min-h-screen overflow-x-hidden"
-      :style="darkMode ? 'background-color: #000000 !important;' : ''">
+      class="bg-gray-50 dark:bg-black min-h-screen overflow-x-hidden">
   
   <!-- Theme Selector Modal -->
   <div x-data="{
@@ -2021,7 +166,8 @@
          previewTheme: 'default',
          themes: [
            { id: 'default', name: 'Pharmagest', primary: '#0056a6', secondary: '#00a8e8', glow: 'theme-glow-blue' },
-           { id: 'neubrutalism', name: 'Neubrutalism', primary: '#FFD60A', secondary: '#7C3AED', glow: 'theme-glow-neubrutalism' }
+           { id: 'neubrutalism', name: 'Neubrutalism', primary: '#FFD60A', secondary: '#7C3AED', glow: 'theme-glow-neubrutalism' },
+           { id: 'minimal', name: 'Minimal', primary: '#C47B5A', secondary: '#E5B299', glow: 'theme-glow-minimal' }
          ],
          get currentTheme() {
            return this.themes[this.currentThemeIndex];
@@ -2042,6 +188,7 @@
          },
          confirmTheme() {
            localStorage.setItem('appTheme', this.currentTheme.id);
+           $dispatch('theme-changed', this.currentTheme.id);
            this.themeSelectorOpen = false;
          },
          openSettings() {
@@ -2129,6 +276,261 @@
       </div>
     </div>
   </div>
+
+  <!-- Notifications Manager Modal -->
+  <div x-data="{
+         notifManagerOpen: false,
+         showAddModal: false,
+         editMode: false,
+         thresholdId: null,
+         selectedProduct: '',
+         productName: '',
+         threshold: 10,
+         active: true,
+         soglie: [],
+         prodotti: [],
+         loadData() {
+           fetch('/api/soglie_data')
+             .then(r => r.json())
+             .then(data => {
+               this.soglie = data.soglie;
+               this.prodotti = data.prodotti;
+             });
+         },
+         openAddModal() {
+           this.editMode = false;
+           this.thresholdId = null;
+           this.selectedProduct = '';
+           this.productName = '';
+           this.threshold = 10;
+           this.active = true;
+           this.showAddModal = true;
+         },
+         editThreshold(soglia) {
+           this.editMode = true;
+           this.thresholdId = soglia.id;
+           this.selectedProduct = soglia.codice_prodotto;
+           this.productName = soglia.nome_prodotto;
+           this.threshold = soglia.soglia_minima;
+           this.active = soglia.notifica_attiva;
+           this.showAddModal = true;
+         },
+         submitForm(event) {
+           const form = event.target;
+           const formData = new FormData(form);
+           fetch(form.action, {
+             method: 'POST',
+             body: formData
+           }).then(response => {
+             if(response.redirected) {
+               this.showAddModal = false;
+               this.loadData();
+               window.refreshNotifications();
+             }
+             return response.text();
+           });
+         },
+         toggleThreshold(id) {
+           const formData = new FormData();
+           formData.append('threshold_id', id);
+           fetch('/toggle_threshold', {
+             method: 'POST',
+             body: formData
+           }).then(() => {
+             this.loadData();
+             window.refreshNotifications();
+           });
+         },
+         deleteThreshold(id) {
+           if(confirm('Sei sicuro di voler eliminare questa soglia?')) {
+             const formData = new FormData();
+             formData.append('threshold_id', id);
+             fetch('/delete_threshold', {
+               method: 'POST',
+               body: formData
+             }).then(() => {
+               this.loadData();
+               window.refreshNotifications();
+             });
+           }
+         }
+       }"
+       @open-notifications-manager.window="notifManagerOpen = true; loadData();"
+       x-show="notifManagerOpen"
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       class="fixed inset-0 bg-black bg-opacity-50 z-[9998] flex items-center justify-center p-4"
+       style="display: none;">
+    
+    <div @click.away="notifManagerOpen = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95"
+         class="glass-card rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+          <i class="fas fa-bell mr-2" style="color: #2256a7;"></i>
+          Gestione Soglie Notifiche
+        </h2>
+        <button @click="notifManagerOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+      
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        Imposta le soglie minime per ricevere notifiche quando un prodotto scende sotto una certa quantità
+      </p>
+      
+      <!-- Pulsante Aggiungi -->
+      <button @click="openAddModal()" 
+              class="gradient-btn px-6 py-3 rounded-lg font-medium flex items-center text-white mb-6">
+        <i class="fas fa-plus mr-2"></i>
+        Aggiungi Nuova Soglia
+      </button>
+      
+      <!-- Lista Soglie -->
+      <div class="space-y-4">
+        <template x-if="soglie.length === 0">
+          <div class="text-center py-12">
+            <i class="fas fa-bell-slash text-5xl text-gray-300 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Nessuna Soglia Configurata</h3>
+            <p class="text-gray-500 dark:text-gray-400">Aggiungi la tua prima soglia per iniziare a ricevere notifiche</p>
+          </div>
+        </template>
+        
+        <template x-for="soglia in soglie" :key="soglia.id">
+          <div class="glass-card rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white" x-text="soglia.nome_prodotto"></h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400" x-text="soglia.codice_prodotto"></p>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                        :class="soglia.notifica_attiva ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'"
+                        x-text="soglia.notifica_attiva ? 'Attiva' : 'Disattivata'"></span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-3">
+                  <div class="flex items-center text-sm">
+                    <i class="fas fa-chart-line mr-2 text-gray-400"></i>
+                    <span class="text-gray-600 dark:text-gray-400">Soglia:</span>
+                    <span class="ml-2 font-bold" style="color: #2256a7;" x-text="soglia.soglia_minima"></span>
+                  </div>
+                  <div class="flex items-center text-sm">
+                    <i class="fas fa-box mr-2 text-gray-400"></i>
+                    <span class="text-gray-600 dark:text-gray-400">Attuale:</span>
+                    <span class="ml-2 font-bold"
+                          :class="soglia.quantita_attuale <= soglia.soglia_minima ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'"
+                          x-text="soglia.quantita_attuale"></span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex space-x-2 ml-4">
+                <button @click="editThreshold(soglia)"
+                        class="px-3 py-2 text-xs font-medium rounded-lg text-white"
+                        style="background: linear-gradient(135deg, #2256a7, #1e4d96);">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button @click="toggleThreshold(soglia.id)"
+                        class="px-3 py-2 text-xs font-medium rounded-lg text-white bg-gray-500 hover:bg-gray-600">
+                  <i :class="soglia.notifica_attiva ? 'fas fa-pause' : 'fas fa-play'"></i>
+                </button>
+                <button @click="deleteThreshold(soglia.id)"
+                        class="px-3 py-2 text-xs font-medium rounded-lg text-white bg-red-500 hover:bg-red-600">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      
+      <!-- Modal Aggiungi/Modifica interno -->
+      <div x-show="showAddModal"
+           x-transition
+           class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4"
+           style="display: none;">
+        <div @click.away="showAddModal = false"
+             class="glass-card rounded-xl p-6 max-w-md w-full bg-white dark:bg-gray-800">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold dark:text-white" style="color: #2256a7;">
+              <i class="fas fa-bell mr-2"></i>
+              <span x-text="editMode ? 'Modifica Soglia' : 'Aggiungi Nuova Soglia'"></span>
+            </h3>
+            <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          
+          <form :action="editMode ? '/update_threshold' : '/add_threshold'" method="POST" @submit.prevent="submitForm($event)">
+            <input type="hidden" name="threshold_id" x-model="thresholdId">
+            
+            <div class="mb-4" x-show="!editMode">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <i class="fas fa-box mr-1"></i>Prodotto
+              </label>
+              <select name="codice_prodotto" x-model="selectedProduct" required
+                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+                <option value="">-- Seleziona un prodotto --</option>
+                <template x-for="prod in prodotti" :key="prod.codice_prodotto">
+                  <option :value="prod.codice_prodotto" x-text="`${prod.codice_prodotto} - ${prod.nome_prodotto}`"></option>
+                </template>
+              </select>
+            </div>
+            
+            <div x-show="editMode" class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Prodotto</label>
+              <input type="text" x-model="productName" readonly
+                     class="w-full px-3 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white">
+              <input type="hidden" name="codice_prodotto" x-model="selectedProduct">
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <i class="fas fa-chart-line mr-1"></i>Soglia Minima
+              </label>
+              <input type="number" name="soglia_minima" x-model="threshold" min="0" required
+                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white">
+            </div>
+            
+            <div class="mb-6">
+              <label class="flex items-center cursor-pointer">
+                <input type="checkbox" name="notifica_attiva" x-model="active" value="true"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded">
+                <span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <i class="fas fa-bell mr-1"></i>Notifica attiva
+                </span>
+              </label>
+            </div>
+            
+            <div class="flex space-x-3">
+              <button type="button" @click="showAddModal = false"
+                      class="flex-1 px-4 py-2 border rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                Annulla
+              </button>
+              <button type="submit"
+                      class="flex-1 px-4 py-2 text-white rounded-lg font-medium"
+                      style="background: linear-gradient(135deg, #2256a7, #1e4d96);">
+                <span x-text="editMode ? 'Aggiorna' : 'Aggiungi'"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -2169,10 +571,6 @@
         <i class="fas fa-file-invoice mr-3 {% if request.endpoint == 'logmovimenti' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
         Log Movimenti
       </a>
-      <a href="{{ url_for('logscarico') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint == 'logscarico' %}active{% endif %}">
-        <i class="fas fa-file-arrow-down mr-3 {% if request.endpoint == 'logscarico' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
-        Log Scarichi
-      </a>
       <div x-data="{ open: false }" class="relative">
         <a href="#" @click.prevent="open = !open"
            class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}active{% endif %}">
@@ -2209,8 +607,8 @@
       {% if session.get('is_admin') %}
 
       <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
-        <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
-        Nuovo Utente
+        <i class="fas fa-users-cog mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500 dark:text-gray-400{% endif %}"></i>
+        Gestione Utenti
       </a>
       {% endif %}
     </nav>
@@ -2266,10 +664,6 @@
         <i class="fas fa-file-invoice mr-3 {% if request.endpoint == 'logmovimenti' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
         Log Movimenti
       </a>
-      <a href="{{ url_for('logscarico') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'logscarico' %}active{% endif %}">
-        <i class="fas fa-file-arrow-down mr-3 {% if request.endpoint == 'logscarico' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
-        Log Scarichi
-      </a>
       <div x-data="{ open: false }" class="relative">
         <a href="#" @click.prevent="open = !open"
            class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint in ['scaricomerce', 'scarico_merce_non_in_magazzino'] %}active{% endif %}">
@@ -2310,8 +704,8 @@
       {% if session.get('is_admin') %}
 
       <a href="{{ url_for('register') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-md nav-pill {% if request.endpoint == 'register' %}active{% endif %}">
-        <i class="fas fa-user-plus mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
-        Nuovo Utente
+        <i class="fas fa-users-cog mr-3 {% if request.endpoint == 'register' %}text-phg-primary{% else %}text-gray-500{% endif %}"></i>
+        Gestione Utenti
       </a>
       {% endif %}
     </nav>
@@ -2341,22 +735,167 @@
           <!-- Dark Mode Toggle -->
           <button id="dark-mode-toggle" 
                   @click="console.log('Toggle clicked, current darkMode:', darkMode); darkMode = !darkMode; console.log('New darkMode:', darkMode);"
-                  class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
-                  title="Toggle Dark Mode">
+                  class="topbar-icon" 
+                  title="Toggle Dark Mode"
+                  aria-label="Attiva/Disattiva modalità scura">
             <i class="fas text-lg" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
           </button>
           <!-- Icona Changelog -->
           <a href="{{ url_for('changelogs') }}" 
-             class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
-             title="Changelog">
+             class="topbar-icon" 
+             title="Changelog"
+             aria-label="Visualizza changelog">
             <i class="fas fa-code-branch text-lg"></i>
           </a>
+          
+          <!-- Notifications Bell -->
+          <div class="relative" x-data="{
+                 notificationsOpen: false,
+                 notificationCount: 0,
+                 notifications: [],
+                 fetchNotifications() {
+                   fetch('/notifications')
+                     .then(response => response.json())
+                     .then(data => {
+                       this.notificationCount = data.count;
+                       this.notifications = data.notifications;
+                     })
+                     .catch(error => console.error('Errore nel caricamento notifiche:', error));
+                 },
+                 markAsRead(notificationId) {
+                   fetch(`/mark_notification_read/${notificationId}`, {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' }
+                   })
+                   .then(response => response.json())
+                   .then(data => {
+                     if (data.success) {
+                       this.notifications = this.notifications.filter(n => n.id !== notificationId);
+                       this.notificationCount = this.notifications.length;
+                     }
+                   })
+                   .catch(error => console.error('Errore:', error));
+                 },
+                 markAllRead() {
+                   fetch('/mark_all_notifications_read', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' }
+                   })
+                   .then(response => response.json())
+                   .then(data => {
+                     if (data.success) {
+                       this.notifications = [];
+                       this.notificationCount = 0;
+                     }
+                   })
+                   .catch(error => console.error('Errore:', error));
+                 },
+                 formatDate(dateString) {
+                   const date = new Date(dateString);
+                   const now = new Date();
+                   const diff = now - date;
+                   const minutes = Math.floor(diff / 60000);
+                   const hours = Math.floor(diff / 3600000);
+                   const days = Math.floor(diff / 86400000);
+                   
+                   if (minutes < 1) return 'Adesso';
+                   if (minutes < 60) return minutes + ' min fa';
+                   if (hours < 24) return hours + ' ore fa';
+                   if (days < 7) return days + ' giorni fa';
+                   
+                   return date.toLocaleDateString('it-IT', { 
+                     day: '2-digit', 
+                     month: '2-digit', 
+                     year: 'numeric',
+                     hour: '2-digit',
+                     minute: '2-digit'
+                   });
+                 }
+               }"
+               x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)">
+            <button @click="notificationsOpen = !notificationsOpen"
+                    class="topbar-icon relative" 
+                    title="Notifiche"
+                    aria-label="Visualizza notifiche">
+              <i class="fas fa-bell text-lg"></i>
+              <span x-show="notificationCount > 0" 
+                    class="absolute top-0 right-0 bg-red-500 rounded-full h-2 w-2"></span>
+            </button>
+            
+            <!-- Notifications Dropdown -->
+            <div x-show="notificationsOpen" 
+                 @click.away="notificationsOpen = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform scale-95"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 transform scale-100"
+                 x-transition:leave-end="opacity-0 transform scale-95"
+                 class="fixed right-4 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto"
+                 style="display: none; z-index: 9999; top: 4rem;">
+              <!-- Header -->
+              <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <i class="fas fa-bell mr-2 text-phg-primary"></i>
+                  Notifiche <span x-show="notificationCount > 0" class="text-sm text-gray-500" x-text="'(' + notificationCount + ')'"></span>
+                </h3>
+                <button @click="markAllRead()" 
+                        x-show="notificationCount > 0"
+                        class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                  Segna tutte come lette
+                </button>
+              </div>
+              
+              <!-- Notifications List -->
+              <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <template x-if="notifications.length === 0">
+                  <div class="p-6 text-center">
+                    <i class="fas fa-bell-slash text-4xl text-gray-300 dark:text-gray-600 mb-2"></i>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Nessuna notifica</p>
+                  </div>
+                </template>
+                
+                <template x-for="notif in notifications" :key="notif.id">
+                  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white" x-text="notif.nome_prodotto"></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <span x-text="notif.codice_prodotto"></span>
+                        </p>
+                        <div class="mt-2 space-y-1">
+                          <p class="text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Quantità attuale: <strong x-text="notif.quantita_attuale"></strong>
+                          </p>
+                          <p class="text-xs text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            Soglia minima: <strong x-text="notif.soglia_minima"></strong>
+                          </p>
+                          <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="far fa-clock mr-1"></i>
+                            <span x-text="formatDate(notif.data_notifica)"></span>
+                          </p>
+                        </div>
+                      </div>
+                      <button @click="markAsRead(notif.id)" 
+                              class="ml-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                              title="Segna come letta">
+                        <i class="fas fa-check"></i>
+                      </button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
           
           <!-- Settings Tab Toggle -->
           <div class="relative">
             <button @click="settingsOpen = !settingsOpen"
-                    class="text-gray-500 hover:text-phg-primary dark:text-gray-400 dark:hover:text-phg-primary transition-colors duration-200" 
-                    title="Impostazioni">
+                    class="topbar-icon" 
+                    title="Impostazioni"
+                    aria-label="Apri impostazioni">
               <i class="fas fa-cog text-lg"></i>
             </button>
             
@@ -2417,6 +956,14 @@
                           class="flex items-center w-full p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <i class="fas fa-palette text-gray-500 dark:text-gray-400 mr-3"></i>
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tema Applicazione</span>
+                    <i class="fas fa-chevron-right ml-auto text-gray-400 text-xs"></i>
+                  </button>
+                  
+                  <!-- Gestisci Notifiche -->
+                  <button @click="settingsOpen = false; $dispatch('open-notifications-manager')"
+                          class="flex items-center w-full p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-bell text-gray-500 dark:text-gray-400 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gestisci notifiche</span>
                     <i class="fas fa-chevron-right ml-auto text-gray-400 text-xs"></i>
                   </button>
                   
@@ -2496,8 +1043,10 @@
               console.log('Correzione: attivando dark mode');
               document.body.classList.add('dark');
               document.documentElement.classList.add('dark');
-              document.body.style.backgroundColor = '#000000';
-              document.documentElement.style.backgroundColor = '#000000';
+              const theme = localStorage.getItem('appTheme') || 'default';
+              const bg = theme === 'minimal' ? '#15100C' : '#000000';
+              document.body.style.setProperty('background-color', bg, 'important');
+              document.documentElement.style.setProperty('background-color', bg, 'important');
             } else if (currentMode === 'false' && (hasBodyDark || hasHtmlDark)) {
               console.log('Correzione: disattivando dark mode');
               document.body.classList.remove('dark');
@@ -2510,6 +1059,20 @@
       }
     });
   </script>
+  
+  <script>
+    // Funzione globale per aggiornare le notifiche da altri componenti
+    window.refreshNotifications = function() {
+      const notifElement = document.querySelector('[x-data*="notificationsOpen"]');
+      if (notifElement && notifElement.__x) {
+        const component = Alpine.$data(notifElement);
+        if (component && typeof component.fetchNotifications === 'function') {
+          component.fetchNotifications();
+        }
+      }
+    };
+  </script>
+
   
   {% block extra_js %}{% endblock %}
 </body>
