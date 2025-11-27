@@ -39,6 +39,11 @@ except ImportError:
     print("WARNING: Using default or environment SECRET_KEY. Create config_local.py for better security.")
 
 # ========================================
+# APP VERSION
+# ========================================
+VERSION = "Beta v1.4.1"
+
+# ========================================
 # MAINTENANCE MODE CONFIGURATION
 # ========================================
 MAINTENANCE_MODE = False
@@ -58,6 +63,9 @@ def check_maintenance():
 # Route per la pagina di manutenzione
 @app.route('/maintenance')
 def maintenance():
+    # Se la maintenance mode non è attiva, reindirizza a index
+    if not MAINTENANCE_MODE:
+        return redirect(url_for('index'))
     return render_template('maintenance.html', maintenance_message=MAINTENANCE_MESSAGE)
 
 # API: ubicazioni disponibili per prodotto (per scaricomerce)
@@ -129,26 +137,10 @@ def format_db_string(value):
 
 app.jinja_env.filters['format_db_string'] = format_db_string
 
-# Context processor: versione applicazione (ultima voce changelogs)
+# Context processor: versione applicazione (usa la variabile VERSION)
 @app.context_processor
 def inject_app_version():
-    version = 'Beta v1.3'  # fallback
-    try:
-        conn = connect_to_database()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT versione FROM changelogs ORDER BY data_rilascio DESC, id DESC LIMIT 1")
-        row = cursor.fetchone()
-        if row and row.get('versione'):
-            version = row['versione']
-    except Exception:
-        pass
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
-    return dict(app_version=version)
+    return dict(app_version=VERSION)
 
 # API endpoint to get ubicazioni with quantities for a given prodotto_id
 @app.route("/api/ubicazioni_prodotto/<int:prodotto_id>")
