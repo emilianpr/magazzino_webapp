@@ -265,122 +265,373 @@ form textarea:focus {
 {% endblock %}
 
 {% block content %}
-<div x-data="{ showForm: false, editingId: null }">
-  <div class="flex items-center justify-between mb-6">
+<style>
+.timeline-container {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 1024px) {
+  .timeline-container {
+    grid-template-columns: 1fr;
+  }
+  #sidePanel {
+    position: fixed !important;
+    top: 0;
+    right: -100%;
+    width: 90% !important;
+    max-width: 400px;
+    height: 100vh;
+    z-index: 1000;
+    transition: right 0.3s ease;
+  }
+  #sidePanel.show {
+    right: 0 !important;
+  }
+}
+.timeline-line {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent-color), transparent);
+}
+.timeline-item {
+  position: relative;
+  padding-left: 60px;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+.timeline-dot {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-color), #0084ff);
+  box-shadow: 0 0 0 4px var(--bg-primary), 0 0 16px rgba(0, 132, 255, 0.5);
+  transition: all 0.3s ease;
+}
+.timeline-item:hover .timeline-dot {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px var(--bg-primary), 0 0 24px rgba(0, 132, 255, 0.8);
+}
+.timeline-item.patch .timeline-dot {
+  width: 12px;
+  height: 12px;
+  left: 15px;
+  background: rgba(0, 132, 255, 0.5);
+  border: 2px solid var(--accent-color);
+}
+.timeline-card {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border-left: 3px solid var(--accent-color);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.timeline-item:hover .timeline-card {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0, 132, 255, 0.2);
+}
+.timeline-item.active .timeline-card {
+  background: rgba(0, 132, 255, 0.15);
+  border-left-color: #0084ff;
+}
+.timeline-item.patch .timeline-card {
+  background: rgba(0, 132, 255, 0.05);
+  border-left: 2px solid rgba(0, 132, 255, 0.4);
+  margin-left: 20px;
+}
+.version-text {
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.timeline-item.patch .version-text {
+  font-size: 14px;
+  color: var(--accent-color);
+}
+.date-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+.side-panel {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+</style>
+
+<div class="container mx-auto px-4">
+  
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold" style="color: var(--text-primary);">
+      <i class="fas fa-code-branch mr-2" style="color: var(--accent-color);"></i>Changelog
+    </h1>
     {% if session.get('is_admin') %}
-    <button @click="showForm = !showForm; editingId = null" 
-            class="btn-primary">
-      <i class="fas fa-plus mr-2"></i>
-      <span class="hidden md:inline">Nuovo Changelog</span>
-      <span class="md:hidden">Nuovo</span>
+    <button type="button" onclick="showModal()" class="btn-primary px-4 py-2 text-sm">
+      <i class="fas fa-plus mr-2"></i>Nuova Versione
     </button>
     {% endif %}
   </div>
 
-  <!-- Form per nuovo/modifica changelog -->
+  <!-- Modale Form -->
   {% if session.get('is_admin') %}
-  <div x-show="showForm" class="glass-card mb-6" x-transition>
-    <h3 class="section-title">
-      <span x-show="!editingId">Nuovo Changelog</span>
-      <span x-show="editingId">Modifica Changelog</span>
-    </h3>
-    <form method="POST" action="{{ url_for('changelogs') }}">
-      <input type="hidden" name="changelog_id" x-bind:value="editingId">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="versione">Versione</label>
-          <input type="text" id="versione" name="versione" required 
-                 placeholder="es. v1.2.3">
+  <div id="modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; backdrop-filter: blur(5px);">
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px;">
+      <div class="glass-card" style="max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold" style="color: var(--text-primary);" id="modalTitle">Nuovo Changelog</h3>
+          <button type="button" onclick="closeModal()" style="color: var(--text-primary); font-size: 20px;">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-        <div>
-          <label for="data_rilascio">Data Rilascio</label>
-          <input type="date" id="data_rilascio" name="data_rilascio" required>
-        </div>
+        
+        <form method="POST" action="{{ url_for('changelogs') }}">
+          <input type="hidden" name="changelog_id" id="changelog_id">
+          <input type="hidden" name="base_version" id="base_version">
+          
+          <div class="mb-4">
+            <label for="versione" class="block mb-1 text-sm font-medium" style="color: var(--text-primary);">
+              Versione
+            </label>
+            <input type="text" id="versione" name="versione" required 
+                   class="w-full px-3 py-2 rounded-lg text-sm"
+                   style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid rgba(0, 132, 255, 0.3);"
+                   placeholder="es. v1.4 o v1.4.1">
+          </div>
+          
+          <div class="mb-4">
+            <label for="data_rilascio" class="block mb-1 text-sm font-medium" style="color: var(--text-primary);">
+              Data Rilascio
+            </label>
+            <input type="date" id="data_rilascio" name="data_rilascio" required 
+                   class="w-full px-3 py-2 rounded-lg text-sm"
+                   style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid rgba(0, 132, 255, 0.3);">
+          </div>
+          
+          <div class="mb-4">
+            <label for="descrizione" class="block mb-1 text-sm font-medium" style="color: var(--text-primary);">
+              Modifiche
+            </label>
+            <textarea id="descrizione" name="descrizione" rows="8" required 
+                      class="w-full px-3 py-2 rounded-lg text-sm"
+                      style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid rgba(0, 132, 255, 0.3); resize: vertical;"
+                      placeholder="- Nuova funzionalità...&#10;- Correzione bug..."></textarea>
+          </div>
+          
+          <div class="flex gap-2 justify-end">
+            <button type="button" onclick="closeModal()" class="btn-secondary px-4 py-2 text-sm">
+              Annulla
+            </button>
+            <button type="submit" class="btn-primary px-4 py-2 text-sm">
+              <span id="submitText">Salva</span>
+            </button>
+          </div>
+        </form>
       </div>
-      <div class="mb-4">
-        <label for="descrizione">Descrizione delle modifiche</label>
-        <textarea id="descrizione" name="descrizione" rows="6" required 
-                  placeholder="Descrivi le nuove funzionalità, correzioni di bug, miglioramenti..."></textarea>
-      </div>
-      <div class="flex gap-2">
-        <button type="submit" class="btn-primary">
-          <i class="fas fa-save mr-2"></i>
-          <span x-show="!editingId">Salva Changelog</span>
-          <span x-show="editingId">Aggiorna Changelog</span>
-        </button>
-        <button type="button" @click="showForm = false; editingId = null" 
-                class="btn-secondary">
-          <i class="fas fa-times mr-2"></i>Annulla
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
   {% endif %}
 
-  <!-- Lista Changelog -->
-  <div class="glass-card">
-    <h2 class="section-title">
-      <i class="fas fa-history mr-2"></i>Note di Rilascio
-    </h2>
-    
-    {% if changelogs %}
+  <!-- Layout Timeline + Pannello Laterale -->
+  {% if changelogs %}
+  <div class="timeline-container">
+    <!-- Timeline Verticale -->
+    <div style="position: relative;">
+      <div class="timeline-line"></div>
+      
       {% for changelog in changelogs %}
-      <div class="changelog-entry">
-        <div class="flex justify-between items-start mb-2">
-          <div>
-            <div class="changelog-version">{{ changelog.versione }}</div>
-            <div class="changelog-date">{{ changelog.data_rilascio.strftime('%d/%m/%Y') }}</div>
+        {% set version_parts = changelog.versione.replace('Beta ', '').replace('v', '').split('.') %}
+        {% set is_patch = version_parts|length > 2 %}
+        
+        <div class="timeline-item {% if is_patch %}patch{% endif %}" 
+             data-id="{{ changelog.id }}"
+             data-version="{{ changelog.versione }}"
+             data-date="{{ changelog.data_rilascio.strftime('%Y-%m-%d') }}"
+             data-dateformat="{{ changelog.data_rilascio.strftime('%d %B %Y') }}"
+             data-desc="{{ changelog.descrizione }}"
+             onclick="selectVersion(this)">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="version-text">{{ changelog.versione }}</div>
+            <div class="date-text">
+              <i class="far fa-calendar-alt mr-1"></i>
+              {{ changelog.data_rilascio.strftime('%d/%m/%Y') }}
+            </div>
           </div>
-          {% if session.get('is_admin') %}
-          <div class="flex gap-2">
-            <button @click="editChangelog({{ changelog.id }}, '{{ changelog.versione }}', '{{ changelog.data_rilascio.strftime('%Y-%m-%d') }}', {{ changelog.descrizione|tojson }})" 
-                    class="btn-action">
-              <i class="fas fa-edit"></i>
-            </button>
-            <form method="POST" action="{{ url_for('delete_changelog', changelog_id=changelog.id) }}" 
-                  class="inline" onsubmit="return confirm('Sei sicuro di voler eliminare questo changelog?')">
-              <button type="submit" class="btn-action delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </form>
-          </div>
-          {% endif %}
         </div>
-        <div class="changelog-description">
-          {{ changelog.descrizione|replace('\n', '<br>')|safe }}
-        </div>
-      </div>
       {% endfor %}
-    {% else %}
-      <div class="empty-state">
-        <i class="fas fa-code-branch"></i>
-        <h3>Nessun changelog</h3>
-        <p>Non ci sono ancora changelog nel sistema.</p>
-        {% if session.get('is_admin') %}
-        <button @click="showForm = true" 
-                class="btn-primary">
-          <i class="fas fa-plus mr-2"></i>Aggiungi il primo changelog
-        </button>
-        {% endif %}
+    </div>
+
+    <!-- Pannello Laterale Dettagli -->
+    <div id="sidePanel" class="side-panel glass-card" style="display: none;">
+      <div class="mb-4 pb-4" style="border-bottom: 1px solid rgba(0, 132, 255, 0.2);">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xl font-bold" style="color: var(--accent-color);" id="panelVersion"></h2>
+          <button type="button" onclick="closePanel()" class="text-xl opacity-70 hover:opacity-100 lg:hidden" style="color: var(--text-primary);">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <p class="text-sm opacity-70" style="color: var(--text-secondary);" id="panelDate"></p>
       </div>
+
+      <div class="mb-6" style="color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap;" id="panelDesc"></div>
+
+      {% if session.get('is_admin') %}
+      <div class="flex flex-col gap-2" style="border-top: 1px solid rgba(0, 132, 255, 0.2); padding-top: 16px;">
+        <button type="button" onclick="addPatchToSelected()" class="btn-primary px-4 py-2 text-sm w-full">
+          <i class="fas fa-plus mr-2"></i>Aggiungi Patch
+        </button>
+        <button type="button" onclick="editSelected()" class="px-4 py-2 text-sm w-full rounded-lg" 
+                style="background: rgba(76, 175, 80, 0.2); color: #4CAF50; border: 1px solid #4CAF50;">
+          <i class="fas fa-edit mr-2"></i>Modifica
+        </button>
+        <button type="button" onclick="deleteSelected()" class="px-4 py-2 text-sm w-full rounded-lg" 
+                style="background: rgba(244, 67, 54, 0.2); color: #f44336; border: 1px solid #f44336;">
+          <i class="fas fa-trash-alt mr-2"></i>Elimina
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="glass-card text-center py-12">
+    <i class="fas fa-inbox text-6xl mb-4" style="color: var(--accent-color); opacity: 0.3;"></i>
+    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Nessun Changelog</h3>
+    <p class="text-sm opacity-70 mb-4" style="color: var(--text-secondary);">Inizia aggiungendo la prima versione.</p>
+    {% if session.get('is_admin') %}
+    <button type="button" onclick="showModal()" class="btn-primary px-6 py-2">
+      <i class="fas fa-plus mr-2"></i>Aggiungi Versione
+    </button>
     {% endif %}
   </div>
+  {% endif %}
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-{% if session.get('is_admin') %}
-function editChangelog(id, versione, data, descrizione) {
-  // Imposta i valori del form per la modifica
-  document.getElementById('versione').value = versione;
-  document.getElementById('data_rilascio').value = data;
-  document.getElementById('descrizione').value = descrizione;
-  
-  // Usa Alpine.js per aggiornare lo stato
-  document.querySelector('[x-data]').__x.$data.editingId = id;
-  document.querySelector('[x-data]').__x.$data.showForm = true;
+let selectedVersion = null;
+
+function showModal(isPatch = false, baseVersion = '') {
+  document.getElementById('changelog_id').value = '';
+  document.getElementById('base_version').value = baseVersion;
+  document.getElementById('versione').value = isPatch ? baseVersion + '.' : '';
+  document.getElementById('data_rilascio').value = '';
+  document.getElementById('descrizione').value = '';
+  document.getElementById('modalTitle').textContent = isPatch ? 'Aggiungi Patch' : 'Nuovo Changelog';
+  document.getElementById('submitText').textContent = 'Salva';
+  document.getElementById('modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('versione').focus(), 100);
 }
-{% endif %}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function selectVersion(element) {
+  // Rimuovi classe active da tutti
+  document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active'));
+  
+  // Aggiungi classe active
+  element.classList.add('active');
+  selectedVersion = element;
+  
+  // Popola pannello laterale
+  document.getElementById('panelVersion').textContent = element.getAttribute('data-version');
+  document.getElementById('panelDate').textContent = element.getAttribute('data-dateformat');
+  document.getElementById('panelDesc').textContent = element.getAttribute('data-desc');
+  
+  // Mostra pannello
+  const panel = document.getElementById('sidePanel');
+  panel.style.display = 'block';
+  
+  // Su mobile aggiungi classe show
+  if (window.innerWidth <= 1024) {
+    panel.classList.add('show');
+  }
+}
+
+function closePanel() {
+  const panel = document.getElementById('sidePanel');
+  panel.classList.remove('show');
+  setTimeout(() => {
+    if (window.innerWidth <= 1024) {
+      panel.style.display = 'none';
+    }
+  }, 300);
+}
+
+function addPatchToSelected() {
+  if (!selectedVersion) return;
+  
+  const version = selectedVersion.getAttribute('data-version');
+  // Estrai versione base (es. v1.4 da v1.4 o v1.4.1)
+  const baseVersion = version.replace('Beta ', '').replace('v', '').split('.').slice(0, 2).join('.');
+  
+  closeModal();
+  showModal(true, 'v' + baseVersion);
+}
+
+function editSelected() {
+  if (!selectedVersion) return;
+  
+  const id = selectedVersion.getAttribute('data-id');
+  const version = selectedVersion.getAttribute('data-version');
+  const date = selectedVersion.getAttribute('data-date');
+  const desc = selectedVersion.getAttribute('data-desc');
+  
+  document.getElementById('changelog_id').value = id;
+  document.getElementById('versione').value = version;
+  document.getElementById('data_rilascio').value = date;
+  document.getElementById('descrizione').value = desc;
+  document.getElementById('modalTitle').textContent = 'Modifica Changelog';
+  document.getElementById('submitText').textContent = 'Aggiorna';
+  document.getElementById('modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function deleteSelected() {
+  if (!selectedVersion) return;
+  
+  const id = selectedVersion.getAttribute('data-id');
+  const version = selectedVersion.getAttribute('data-version');
+  
+  if (confirm('Eliminare ' + version + '?')) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("changelogs") }}'.replace('changelogs', 'delete_changelog/' + id);
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+// ESC per chiudere
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('modal').style.display === 'block') {
+      closeModal();
+    } else {
+      closePanel();
+    }
+  }
+});
+
+// Chiudi modale cliccando fuori
+document.getElementById('modal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 </script>
 {% endblock %}
