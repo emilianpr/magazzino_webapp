@@ -712,7 +712,7 @@ def api_soglie_data():
         """)
         prodotti = cursor.fetchall()
         
-        # Recupera tutte le soglie configurate con quantità attuale
+        # Recupera tutte le soglie configurate con quantità attuale (solo per l'utente corrente)
         cursor.execute("""
             SELECT 
                 pt.id,
@@ -724,9 +724,10 @@ def api_soglie_data():
             FROM product_thresholds pt
             LEFT JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
             LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            WHERE pt.user_id = %s
             GROUP BY pt.id, pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, pt.notifica_attiva
             ORDER BY pt.nome_prodotto
-        """)
+        """, (session['user_id'],))
         soglie = cursor.fetchall()
         
         cursor.close()
@@ -755,7 +756,7 @@ def gestione_soglie():
         """)
         prodotti = cursor.fetchall()
         
-        # Recupera tutte le soglie configurate con quantità attuale
+        # Recupera tutte le soglie configurate con quantità attuale (solo per l'utente corrente)
         cursor.execute("""
             SELECT 
                 pt.id,
@@ -767,9 +768,10 @@ def gestione_soglie():
             FROM product_thresholds pt
             LEFT JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
             LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            WHERE pt.user_id = %s
             GROUP BY pt.id, pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, pt.notifica_attiva
             ORDER BY pt.nome_prodotto
-        """)
+        """, (session['user_id'],))
         soglie = cursor.fetchall()
         
         cursor.close()
@@ -807,11 +809,11 @@ def add_threshold():
             flash('Prodotto non trovato.', 'error')
             return redirect(request.referrer or url_for('index'))
         
-        # Inserisci la soglia
+        # Inserisci la soglia con user_id
         cursor.execute("""
-            INSERT INTO product_thresholds (codice_prodotto, nome_prodotto, soglia_minima, notifica_attiva)
-            VALUES (%s, %s, %s, %s)
-        """, (codice_prodotto, prodotto['nome_prodotto'], soglia_minima, notifica_attiva))
+            INSERT INTO product_thresholds (user_id, codice_prodotto, nome_prodotto, soglia_minima, notifica_attiva)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (session['user_id'], codice_prodotto, prodotto['nome_prodotto'], soglia_minima, notifica_attiva))
         
         conn.commit()
         cursor.close()
@@ -851,8 +853,8 @@ def update_threshold():
         cursor.execute("""
             UPDATE product_thresholds 
             SET soglia_minima = %s, notifica_attiva = %s
-            WHERE id = %s
-        """, (soglia_minima, notifica_attiva, threshold_id))
+            WHERE id = %s AND user_id = %s
+        """, (soglia_minima, notifica_attiva, threshold_id, session['user_id']))
         
         conn.commit()
         cursor.close()
@@ -884,8 +886,8 @@ def toggle_threshold():
         cursor.execute("""
             UPDATE product_thresholds 
             SET notifica_attiva = NOT notifica_attiva
-            WHERE id = %s
-        """, (threshold_id,))
+            WHERE id = %s AND user_id = %s
+        """, (threshold_id, session['user_id']))
         
         conn.commit()
         cursor.close()
@@ -910,7 +912,7 @@ def delete_threshold():
         conn = connect_to_database()
         cursor = conn.cursor()
         
-        cursor.execute("DELETE FROM product_thresholds WHERE id = %s", (threshold_id,))
+        cursor.execute("DELETE FROM product_thresholds WHERE id = %s AND user_id = %s", (threshold_id, session['user_id']))
         
         conn.commit()
         cursor.close()
@@ -926,15 +928,16 @@ def delete_threshold():
 def check_and_create_notifications():
     """
     Funzione che controlla tutte le soglie attive e crea notifiche
-    per i prodotti che sono sotto la soglia minima
+    per i prodotti che sono sotto la soglia minima (per ogni utente)
     """
     try:
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
         
-        # Trova tutti i prodotti sotto soglia
+        # Trova tutti i prodotti sotto soglia per ogni utente
         cursor.execute("""
             SELECT 
+                pt.user_id,
                 pt.codice_prodotto,
                 pt.nome_prodotto,
                 pt.soglia_minima,
@@ -945,29 +948,30 @@ def check_and_create_notifications():
             LEFT JOIN giacenze g ON p.id = g.prodotto_id
             LEFT JOIN magazzini m ON g.magazzino_id = m.id
             WHERE pt.notifica_attiva = TRUE
-            GROUP BY pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, m.nome
+            GROUP BY pt.user_id, pt.codice_prodotto, pt.nome_prodotto, pt.soglia_minima, m.nome
             HAVING quantita_attuale <= pt.soglia_minima
         """)
         
         prodotti_sotto_soglia = cursor.fetchall()
         
         for prodotto in prodotti_sotto_soglia:
-            # Controlla se esiste già una notifica non visualizzata per questo prodotto
+            # Controlla se esiste già una notifica non visualizzata per questo prodotto e utente
             cursor.execute("""
                 SELECT id FROM notifications 
-                WHERE codice_prodotto = %s AND visualizzata = FALSE
+                WHERE codice_prodotto = %s AND user_id = %s AND visualizzata = FALSE
                 LIMIT 1
-            """, (prodotto['codice_prodotto'],))
+            """, (prodotto['codice_prodotto'], prodotto['user_id']))
             
             existing = cursor.fetchone()
             
             if not existing:
-                # Crea nuova notifica
+                # Crea nuova notifica per questo utente specifico
                 cursor.execute("""
                     INSERT INTO notifications 
-                    (codice_prodotto, nome_prodotto, quantita_attuale, soglia_minima, magazzino)
-                    VALUES (%s, %s, %s, %s, %s)
+                    (user_id, codice_prodotto, nome_prodotto, quantita_attuale, soglia_minima, magazzino)
+                    VALUES (%s, %s, %s, %s, %s, %s)
                 """, (
+                    prodotto['user_id'],
                     prodotto['codice_prodotto'],
                     prodotto['nome_prodotto'],
                     prodotto['quantita_attuale'],
@@ -992,7 +996,7 @@ def notifications():
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
         
-        # Recupera notifiche non visualizzate
+        # Recupera notifiche non visualizzate per l'utente corrente
         cursor.execute("""
             SELECT 
                 id,
@@ -1003,9 +1007,9 @@ def notifications():
                 magazzino,
                 data_notifica
             FROM notifications
-            WHERE visualizzata = FALSE
+            WHERE visualizzata = FALSE AND user_id = %s
             ORDER BY data_notifica DESC
-        """)
+        """, (session['user_id'],))
         
         notifiche = cursor.fetchall()
         
@@ -1038,8 +1042,8 @@ def mark_notification_read(notification_id):
         cursor.execute("""
             UPDATE notifications 
             SET visualizzata = TRUE, data_visualizzazione = NOW()
-            WHERE id = %s
-        """, (notification_id,))
+            WHERE id = %s AND user_id = %s
+        """, (notification_id, session['user_id']))
         
         conn.commit()
         cursor.close()
@@ -1062,8 +1066,8 @@ def mark_all_notifications_read():
         cursor.execute("""
             UPDATE notifications 
             SET visualizzata = TRUE, data_visualizzazione = NOW()
-            WHERE visualizzata = FALSE
-        """)
+            WHERE visualizzata = FALSE AND user_id = %s
+        """, (session['user_id'],))
         
         conn.commit()
         cursor.close()
