@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pannello Admin - Pharmagest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+.admin-header {
+  background: var(--card-bg, var(--bg-secondary));
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+.admin-stat-card {
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--card-bg, var(--bg-secondary));
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover, 0 4px 16px rgba(0, 0, 0, 0.15));
+}
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-bottom: 8px;
+}
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.broadcast-form {
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--card-bg, var(--bg-secondary));
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+}
+.notification-type-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.notification-type-btn.active {
+  border-color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+.broadcast-item {
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border-left: 3px solid var(--accent-color);
+  margin-bottom: 12px;
+}
+.badge-info { background: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+.badge-warning { background: #FF9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+.badge-success { background: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+.badge-error { background: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+.nav-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  background: var(--card-bg, var(--bg-secondary));
+  color: var(--text-primary);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+}
+.nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover, 0 4px 16px rgba(0, 0, 0, 0.15));
+}
+.nav-btn.primary {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+</style>
+</head>
+<body>
+
+<!-- Header Admin -->
+<div class="admin-header">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">
+          <i class="fas fa-user-shield mr-2" style="color: var(--accent-color);"></i>
+          Pannello Amministratore
+        </h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('admin_users') }}" class="nav-btn primary">
+          <i class="fas fa-users-cog"></i>
+          Gestione Utenti
+        </a>
+        <a href="{{ url_for('index') }}" class="nav-btn">
+          <i class="fas fa-arrow-left"></i>
+          Torna alla WebApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenuto -->
+<div class="container mx-auto px-4 max-w-7xl py-8">
+
+  <!-- Statistiche -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="admin-stat-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="stat-value">{{ total_users }}</div>
+          <div class="stat-label">Utenti Totali</div>
+        </div>
+        <i class="fas fa-users text-4xl" style="color: var(--accent-color); opacity: 0.3;"></i>
+      </div>
+    </div>
+    
+    <div class="admin-stat-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="stat-value">{{ total_admins }}</div>
+          <div class="stat-label">Amministratori</div>
+        </div>
+        <i class="fas fa-user-shield text-4xl" style="color: var(--accent-color); opacity: 0.3;"></i>
+      </div>
+    </div>
+    
+    <div class="admin-stat-card">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="stat-value">{{ notifications_today }}</div>
+          <div class="stat-label">Notifiche Oggi</div>
+        </div>
+        <i class="fas fa-bell text-4xl" style="color: var(--accent-color); opacity: 0.3;"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout a due colonne -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+    <!-- Form Broadcast -->
+    <div>
+      <h2 class="text-xl font-bold mb-4" style="color: var(--text-primary);">
+        <i class="fas fa-broadcast-tower mr-2" style="color: var(--accent-color);"></i>
+        Invia Notifica Broadcast
+      </h2>
+      
+      <div class="broadcast-form">
+        <form id="broadcastForm">
+          <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium" style="color: var(--text-primary);">
+              Tipo Notifica
+            </label>
+            <div class="grid grid-cols-4 gap-2">
+              <button type="button" class="notification-type-btn active" data-type="info">
+                <i class="fas fa-info-circle"></i> Info
+              </button>
+              <button type="button" class="notification-type-btn" data-type="success">
+                <i class="fas fa-check-circle"></i> Success
+              </button>
+              <button type="button" class="notification-type-btn" data-type="warning">
+                <i class="fas fa-exclamation-triangle"></i> Warning
+              </button>
+              <button type="button" class="notification-type-btn" data-type="error">
+                <i class="fas fa-times-circle"></i> Error
+              </button>
+            </div>
+            <input type="hidden" id="notificationType" name="tipo" value="info">
+          </div>
+          
+          <div class="mb-4">
+            <label for="titolo" class="block mb-2 text-sm font-medium" style="color: var(--text-primary);">
+              Titolo *
+            </label>
+            <input type="text" id="titolo" name="titolo" required 
+                   class="w-full px-4 py-2 rounded-lg"
+                   style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);"
+                   placeholder="es. Manutenzione programmata">
+          </div>
+          
+          <div class="mb-6">
+            <label for="messaggio" class="block mb-2 text-sm font-medium" style="color: var(--text-primary);">
+              Messaggio *
+            </label>
+            <textarea id="messaggio" name="messaggio" rows="6" required 
+                      class="w-full px-4 py-2 rounded-lg"
+                      style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); resize: vertical;"
+                      placeholder="Scrivi il messaggio da inviare a tutti gli utenti..."></textarea>
+          </div>
+          
+          <div class="flex gap-3">
+            <button type="submit" class="btn-primary flex-1 py-3">
+              <i class="fas fa-paper-plane mr-2"></i>Invia a Tutti gli Utenti
+            </button>
+            <button type="button" onclick="resetForm()" class="btn-secondary px-6 py-3">
+              <i class="fas fa-redo mr-2"></i>Reset
+            </button>
+          </div>
+        </form>
+        
+        <div id="broadcastResult" class="mt-4 hidden"></div>
+      </div>
+    </div>
+
+    <!-- Broadcast Recenti -->
+    <div>
+      <h2 class="text-xl font-bold mb-4" style="color: var(--text-primary);">
+        <i class="fas fa-history mr-2" style="color: var(--accent-color);"></i>
+        Broadcast Recenti
+      </h2>
+      
+      <div class="space-y-3">
+        {% if recent_broadcasts %}
+          {% for broadcast in recent_broadcasts %}
+            <div class="broadcast-item">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <h3 class="font-bold mb-1" style="color: var(--text-primary);">{{ broadcast.riferimento or 'Notifica' }}</h3>
+                  <p class="text-sm mb-2" style="color: var(--text-secondary);">{{ broadcast.messaggio }}</p>
+                </div>
+                <span class="badge-{{ broadcast.tipo }}">{{ broadcast.tipo }}</span>
+              </div>
+              <div class="flex items-center justify-end text-xs" style="color: var(--text-secondary); opacity: 0.7;">
+                <span>
+                  <i class="far fa-clock mr-1"></i>{{ broadcast.data_notifica.strftime('%d/%m/%Y %H:%M') }}
+                </span>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-12" style="color: var(--text-secondary); opacity: 0.5;">
+            <i class="fas fa-inbox text-5xl mb-3"></i>
+            <p>Nessun broadcast inviato</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sezioni Future -->
+  <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="admin-stat-card text-center py-8 opacity-50 cursor-not-allowed">
+      <i class="fas fa-users-cog text-5xl mb-3" style="color: var(--accent-color);"></i>
+      <h3 class="font-bold mb-2" style="color: var(--text-primary);">Gestione Utenti</h3>
+      <p class="text-sm" style="color: var(--text-secondary);">Prossimamente</p>
+    </div>
+    
+    <div class="admin-stat-card text-center py-8 opacity-50 cursor-not-allowed">
+      <i class="fas fa-chart-line text-5xl mb-3" style="color: var(--accent-color);"></i>
+      <h3 class="font-bold mb-2" style="color: var(--text-primary);">Report Avanzati</h3>
+      <p class="text-sm" style="color: var(--text-secondary);">Prossimamente</p>
+    </div>
+    
+    <div class="admin-stat-card text-center py-8 opacity-50 cursor-not-allowed">
+      <i class="fas fa-cog text-5xl mb-3" style="color: var(--accent-color);"></i>
+      <h3 class="font-bold mb-2" style="color: var(--text-primary);">Impostazioni Sistema</h3>
+      <p class="text-sm" style="color: var(--text-secondary);">Prossimamente</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Gestione tipo notifica
+document.querySelectorAll('.notification-type-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.notification-type-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('notificationType').value = this.getAttribute('data-type');
+  });
+});
+
+// Submit form broadcast
+document.getElementById('broadcastForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const resultDiv = document.getElementById('broadcastResult');
+  const submitBtn = this.querySelector('button[type="submit"]');
+  
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Invio in corso...';
+  
+  try {
+    const response = await fetch('{{ url_for("admin_broadcast") }}', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    resultDiv.className = 'mt-4 px-4 py-3 rounded-lg';
+    if (data.success) {
+      resultDiv.className += ' bg-green-100 text-green-800';
+      resultDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>' + data.message;
+      resetForm();
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      resultDiv.className += ' bg-red-100 text-red-800';
+      resultDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>' + data.message;
+    }
+    resultDiv.classList.remove('hidden');
+    
+  } catch (error) {
+    resultDiv.className = 'mt-4 px-4 py-3 rounded-lg bg-red-100 text-red-800';
+    resultDiv.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Errore di connessione';
+    resultDiv.classList.remove('hidden');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Invia a Tutti gli Utenti';
+  }
+});
+
+function resetForm() {
+  document.getElementById('broadcastForm').reset();
+  document.querySelectorAll('.notification-type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.notification-type-btn[data-type="info"]').classList.add('active');
+  document.getElementById('notificationType').value = 'info';
+  document.getElementById('broadcastResult').classList.add('hidden');
+}
+</script>
+
+</body>
+</html>

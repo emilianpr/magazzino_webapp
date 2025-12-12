@@ -41,7 +41,24 @@ except ImportError:
 # ========================================
 # APP VERSION
 # ========================================
-VERSION = "Beta v1.4.1"
+VERSION = "Beta v1.4.2"
+
+# ========================================
+# STATI DISPONIBILI (lista statica)
+# ========================================
+# Lista di tutti gli stati possibili per le giacenze
+# Questa lista è statica per evitare che gli stati spariscano
+# quando non ci sono più prodotti con quello stato
+STATI_DISPONIBILI = [
+    'IN_MAGAZZINO',
+    'SPEDITO',
+    'BAIA_USCITA',
+    'IN_PREPARAZIONE',
+    'IN_UTILIZZO',
+    'LABORATORIO',
+    'DANNEGGIATO',
+    'ALTRO'
+]
 
 # ========================================
 # MAINTENANCE MODE CONFIGURATION
@@ -263,8 +280,8 @@ def index():
         cursor.execute("SELECT DISTINCT nome FROM magazzini ORDER BY nome ASC")
         magazzini_opzioni = [row['nome'] for row in cursor.fetchall()]
 
-        cursor.execute("SELECT DISTINCT stato FROM giacenze WHERE stato IS NOT NULL ORDER BY stato ASC")
-        stati_opzioni = [row['stato'] for row in cursor.fetchall()]
+        # Usa la lista statica degli stati invece di SELECT DISTINCT
+        stati_opzioni = STATI_DISPONIBILI.copy()
 
         cursor.execute("SELECT DISTINCT ubicazione FROM giacenze ORDER BY ubicazione ASC")
         ubicazioni_opzioni = [row['ubicazione'] for row in cursor.fetchall()]
@@ -459,14 +476,14 @@ def movimento():
     try:
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True, buffered=True)
-        cursor.execute("SELECT DISTINCT stato FROM giacenze")
-        stati = [row['stato'] for row in cursor.fetchall()]
+        # Usa la lista statica degli stati
+        stati = STATI_DISPONIBILI.copy()
         cursor.execute("SELECT id, nome FROM magazzini")
         magazzini = []  # Ora caricati dinamicamente via AJAX
         cursor.execute("SELECT id, nome_prodotto, codice_prodotto FROM prodotti")
         prodotti = cursor.fetchall()
     except Error as e:
-        stati = []
+        stati = STATI_DISPONIBILI.copy()
         magazzini = []
         prodotti = []
         flash(f"Errore nel recupero dati per il form: {e}", "error")
@@ -1434,8 +1451,8 @@ def scarico_merce_non_in_magazzino():
     try:
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT DISTINCT stato FROM giacenze WHERE stato != 'IN_MAGAZZINO'")
-        stati_non_magazzino = [row['stato'] for row in cursor.fetchall()]
+        # Usa la lista statica degli stati (escluso IN_MAGAZZINO)
+        stati_non_magazzino = [s for s in STATI_DISPONIBILI if s != 'IN_MAGAZZINO']
         query = """
             SELECT g.id, p.codice_prodotto, p.nome_prodotto, g.stato, g.quantita, g.note
             FROM giacenze g
@@ -1959,6 +1976,153 @@ def delete_changelog(changelog_id):
     return redirect(url_for('changelogs'))
 
 # ---------------------------------------------------
+# Route: Admin Panel
+# ---------------------------------------------------
+@app.route('/admin')
+def admin_panel():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    if not session.get('is_admin', False):
+        flash('Accesso negato: solo amministratori.', 'error')
+        return redirect(url_for('index'))
+    
+    # Statistiche per il pannello admin
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Conta utenti totali
+        cursor.execute("SELECT COUNT(*) as total FROM utenti")
+        total_users = cursor.fetchone()['total']
+        
+        # Conta admin
+        cursor.execute("SELECT COUNT(*) as total FROM utenti WHERE is_admin = TRUE")
+        total_admins = cursor.fetchone()['total']
+        
+        # Conta notifiche inviate oggi (broadcast iniziano con [])
+        cursor.execute("""
+            SELECT COUNT(DISTINCT id) as total FROM notifications 
+            WHERE DATE(data_notifica) = CURDATE() AND codice_prodotto LIKE '[%'
+        """)
+        notifications_today = cursor.fetchone()['total']
+        
+        # Ultimi broadcast (notifiche con [TIPO] nel codice_prodotto)
+        cursor.execute("""
+            SELECT codice_prodotto as riferimento, 
+                   nome_prodotto as messaggio,
+                   data_notifica,
+                   CASE 
+                     WHEN magazzino = 'info' THEN 'info'
+                     WHEN magazzino = 'success' THEN 'success'
+                     WHEN magazzino = 'warning' THEN 'warning'
+                     WHEN magazzino = 'error' THEN 'error'
+                     ELSE 'info'
+                   END as tipo
+            FROM notifications
+            WHERE codice_prodotto LIKE '[%'
+            ORDER BY data_notifica DESC
+            LIMIT 5
+        """)
+        recent_broadcasts = cursor.fetchall()
+        
+    except Exception as e:
+        flash(f'Errore nel caricamento statistiche: {e}', 'error')
+        total_users = total_admins = notifications_today = 0
+        recent_broadcasts = []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+    
+    return render_template('admin_panel.html',
+                         total_users=total_users,
+                         total_admins=total_admins,
+                         notifications_today=notifications_today,
+                         recent_broadcasts=recent_broadcasts,
+                         username=session.get('username'))
+
+@app.route('/admin/users')
+def admin_users():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    if not session.get('is_admin', False):
+        flash('Accesso negato: solo amministratori.', 'error')
+        return redirect(url_for('index'))
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Ottieni tutti gli utenti
+        cursor.execute("""
+            SELECT id, username, email, is_admin, data_creazione 
+            FROM utenti 
+            ORDER BY data_creazione DESC
+        """)
+        users = cursor.fetchall()
+        
+    except Exception as e:
+        flash(f'Errore nel caricamento utenti: {e}', 'error')
+        users = []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+    
+    return render_template('admin_users.html', users=users, username=session.get('username'))
+
+@app.route('/admin/broadcast', methods=['POST'])
+def admin_broadcast():
+    if 'user_id' not in session or not session.get('is_admin', False):
+        return jsonify({'success': False, 'message': 'Accesso negato'}), 403
+    
+    titolo = request.form.get('titolo', '').strip()
+    messaggio = request.form.get('messaggio', '').strip()
+    tipo = request.form.get('tipo', 'info')  # info, warning, success, error
+    
+    if not titolo or not messaggio:
+        return jsonify({'success': False, 'message': 'Titolo e messaggio sono obbligatori'}), 400
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        # Ottieni tutti gli utenti
+        cursor.execute("SELECT id FROM utenti")
+        users = cursor.fetchall()
+        
+        if not users:
+            return jsonify({'success': False, 'message': 'Nessun utente trovato'}), 400
+        
+        # Crea notifica per ogni utente usando i campi esistenti
+        # Uso nome_prodotto per il messaggio e codice_prodotto per il titolo
+        for user in users:
+            cursor.execute("""
+                INSERT INTO notifications 
+                (user_id, codice_prodotto, nome_prodotto, quantita_attuale, soglia_minima, magazzino, visualizzata)
+                VALUES (%s, %s, %s, 0, 0, %s, FALSE)
+            """, (user[0], f'[{tipo.upper()}] {titolo}', messaggio, tipo))
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Notifica inviata a {len(users)} utenti'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Errore: {str(e)}'}), 500
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# ---------------------------------------------------
 # Route: Rientro Merce
 # ---------------------------------------------------
 @app.route('/rientro_merce', methods=['GET', 'POST'])
@@ -2282,6 +2446,333 @@ def aggiorna_giacenza_rapida(giacenza_id):
 #   {% endif %}
 # {% endwith %}
 # ---------------------------------------------------
+
+
+# ========================================
+# MOVIMENTO MULTIPLO (BATCH) - BETA
+# ========================================
+
+@app.route('/movimento-multiplo')
+def movimento_multiplo():
+    """Pagina Movimento Multiplo (Beta)"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Usa la lista statica degli stati
+        stati = STATI_DISPONIBILI.copy()
+        
+        # Carica prodotti per autocomplete
+        cursor.execute("SELECT id, nome_prodotto, codice_prodotto FROM prodotti ORDER BY nome_prodotto")
+        prodotti = cursor.fetchall()
+        
+    except Error as e:
+        flash(f"Errore nel caricamento dati: {e}", "error")
+        stati = STATI_DISPONIBILI.copy()
+        prodotti = []
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
+    
+    return render_template('movimento_multiplo.html', stati=stati, prodotti=prodotti)
+
+
+@app.route('/api/movimento-multiplo/execute', methods=['POST'])
+def movimento_multiplo_execute():
+    """Esegue i movimenti batch in una singola transazione"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Non autenticato'}), 401
+    
+    data = request.get_json()
+    if not data or 'movimenti' not in data or len(data['movimenti']) == 0:
+        return jsonify({'success': False, 'error': 'Nessun movimento da elaborare'})
+    
+    stato_origine = data.get('stato_origine_globale')
+    movimenti = data['movimenti']
+    user_id = session.get('user_id')
+    
+    conn = None
+    cursor = None
+    
+    try:
+        conn = connect_to_database()
+        conn.autocommit = False  # Disabilita autocommit esplicitamente
+        cursor = conn.cursor(dictionary=True, buffered=True)
+        
+        # Fase 1: Validazione di tutti i movimenti
+        errori_validazione = []
+        for i, mov in enumerate(movimenti):
+            prodotto_id = mov.get('prodotto_id')
+            da_ubicazione = mov.get('da_ubicazione')
+            quantita = mov.get('quantita', 0)
+            
+            if not prodotto_id:
+                errori_validazione.append(f'Movimento {i+1}: prodotto mancante')
+                continue
+            
+            if quantita <= 0:
+                errori_validazione.append(f'Movimento {i+1}: quantità non valida')
+                continue
+            
+            # Verifica giacenza disponibile
+            cursor.execute("""
+                SELECT quantita FROM giacenze 
+                WHERE prodotto_id = %s AND stato = %s AND ubicazione = %s
+            """, (prodotto_id, stato_origine, da_ubicazione))
+            giacenza = cursor.fetchone()
+            
+            if not giacenza:
+                errori_validazione.append(f'Movimento {i+1}: giacenza non trovata per ubicazione {da_ubicazione}')
+                continue
+            
+            if giacenza['quantita'] < quantita:
+                errori_validazione.append(f'Movimento {i+1}: giacenza insufficiente (disponibili: {giacenza["quantita"]}, richiesti: {quantita})')
+        
+        # Se ci sono errori di validazione, esci
+        if errori_validazione:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': errori_validazione[0]})
+        
+        # Fase 2: Esecuzione movimenti
+        for mov in movimenti:
+            prodotto_id = mov.get('prodotto_id')
+            da_ubicazione = mov.get('da_ubicazione')
+            a_ubicazione = mov.get('a_ubicazione')
+            quantita = mov.get('quantita')
+            nota = mov.get('nota', '')
+            stato_dest = mov.get('stato_destinazione')
+            
+            # Determina magazzino_id (default)
+            cursor.execute("SELECT magazzino_id FROM giacenze WHERE prodotto_id = %s LIMIT 1", (prodotto_id,))
+            mag_result = cursor.fetchone()
+            magazzino_id = mag_result['magazzino_id'] if mag_result else None
+            
+            # Determina tipo movimento
+            if stato_origine == 'IN_MAGAZZINO' and stato_dest != 'IN_MAGAZZINO':
+                tipo_mov = 'SCARICO'
+            elif stato_origine == 'IN_MAGAZZINO' and stato_dest == 'IN_MAGAZZINO':
+                tipo_mov = 'TRASFERIMENTO'
+            else:
+                tipo_mov = 'TRASFERIMENTO'
+            
+            # 1. Inserisci record movimento
+            cursor.execute("""
+                INSERT INTO movimenti (
+                    prodotto_id, da_magazzino_id, a_magazzino_id, 
+                    da_ubicazione, a_ubicazione, quantita, note, 
+                    user_id, stato, tipo_movimento
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (prodotto_id, magazzino_id, magazzino_id, da_ubicazione, a_ubicazione, quantita, nota, user_id, stato_dest, tipo_mov))
+            
+            # 2. Decrementa giacenza origine
+            cursor.execute("""
+                SELECT id, quantita FROM giacenze 
+                WHERE prodotto_id = %s AND stato = %s AND ubicazione = %s
+            """, (prodotto_id, stato_origine, da_ubicazione))
+            giacenza_origine = cursor.fetchone()
+            
+            nuova_qty_origine = giacenza_origine['quantita'] - quantita
+            if nuova_qty_origine <= 0:
+                cursor.execute("DELETE FROM giacenze WHERE id = %s", (giacenza_origine['id'],))
+            else:
+                cursor.execute("UPDATE giacenze SET quantita = %s WHERE id = %s", (nuova_qty_origine, giacenza_origine['id']))
+            
+            # 3. Incrementa/crea giacenza destinazione
+            # Cerca giacenza esistente con stesso prodotto, stato, ubicazione E nota
+            cursor.execute("""
+                SELECT id, quantita FROM giacenze 
+                WHERE prodotto_id = %s AND stato = %s 
+                AND (ubicazione = %s OR (ubicazione IS NULL AND %s IS NULL))
+                AND (note = %s OR (note IS NULL AND %s IS NULL) OR (note = '' AND %s = ''))
+            """, (prodotto_id, stato_dest, a_ubicazione, a_ubicazione, nota, nota, nota))
+            giacenza_dest = cursor.fetchone()
+            
+            if giacenza_dest:
+                cursor.execute("UPDATE giacenze SET quantita = quantita + %s WHERE id = %s", (quantita, giacenza_dest['id']))
+            else:
+                cursor.execute("""
+                    INSERT INTO giacenze (prodotto_id, magazzino_id, ubicazione, stato, quantita, note)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (prodotto_id, magazzino_id, a_ubicazione, stato_dest, quantita, nota))
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'{len(movimenti)} movimenti eseguiti con successo!'
+        })
+        
+    except Exception as e:
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        if cursor:
+            try:
+                cursor.close()
+            except:
+                pass
+        if conn:
+            try:
+                conn.close()
+            except:
+                pass
+
+
+@app.route('/api/movimento-multiplo/bozza', methods=['POST'])
+def movimento_multiplo_salva_bozza():
+    """Salva una bozza di movimento multiplo"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Non autenticato'}), 401
+    
+    data = request.get_json()
+    user_id = session.get('user_id')
+    
+    nome_bozza = data.get('nome_bozza', '').strip()
+    if not nome_bozza:
+        return jsonify({'success': False, 'error': 'Nome bozza obbligatorio'})
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Conta bozze esistenti per l'utente
+        cursor.execute("SELECT COUNT(*) as count FROM movimenti_batch_draft WHERE user_id = %s", (user_id,))
+        count = cursor.fetchone()['count']
+        
+        # Se già 10 bozze, elimina la più vecchia
+        if count >= 10:
+            cursor.execute("""
+                DELETE FROM movimenti_batch_draft 
+                WHERE user_id = %s 
+                ORDER BY created_at ASC 
+                LIMIT 1
+            """, (user_id,))
+        
+        # Salva nuova bozza
+        json_items = json.dumps(data.get('movimenti', []))
+        cursor.execute("""
+            INSERT INTO movimenti_batch_draft (user_id, nome_bozza, json_items, nota_globale, stato_origine, stato_destinazione)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (user_id, nome_bozza, json_items, data.get('nota_globale', ''), data.get('stato_origine', ''), data.get('stato_destinazione', '')))
+        
+        conn.commit()
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
+
+
+@app.route('/api/movimento-multiplo/bozze')
+def movimento_multiplo_lista_bozze():
+    """Lista bozze dell'utente"""
+    if 'user_id' not in session:
+        return jsonify([])
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT id, nome_bozza, created_at 
+            FROM movimenti_batch_draft 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (session.get('user_id'),))
+        
+        bozze = cursor.fetchall()
+        
+        # Converti datetime in string
+        for b in bozze:
+            if b['created_at']:
+                b['created_at'] = b['created_at'].isoformat()
+        
+        return jsonify(bozze)
+        
+    except Exception as e:
+        return jsonify([])
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
+
+
+@app.route('/api/movimento-multiplo/bozza/<int:bozza_id>')
+def movimento_multiplo_carica_bozza(bozza_id):
+    """Carica una bozza specifica"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT * FROM movimenti_batch_draft 
+            WHERE id = %s AND user_id = %s
+        """, (bozza_id, session.get('user_id')))
+        
+        bozza = cursor.fetchone()
+        
+        if not bozza:
+            return jsonify({'error': 'Bozza non trovata'}), 404
+        
+        return jsonify({
+            'stato_origine': bozza['stato_origine'],
+            'stato_destinazione': bozza['stato_destinazione'],
+            'nota_globale': bozza['nota_globale'],
+            'movimenti': json.loads(bozza['json_items']) if bozza['json_items'] else []
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
+
+
+@app.route('/api/movimento-multiplo/bozza/<int:bozza_id>', methods=['DELETE'])
+def movimento_multiplo_elimina_bozza(bozza_id):
+    """Elimina una bozza"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Non autenticato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            DELETE FROM movimenti_batch_draft 
+            WHERE id = %s AND user_id = %s
+        """, (bozza_id, session.get('user_id')))
+        
+        conn.commit()
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
 
 if __name__ == '__main__':

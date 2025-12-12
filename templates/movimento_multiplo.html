@@ -1,0 +1,751 @@
+{% extends "base.html" %}
+
+{% block title %}Movimento Multiplo (Beta) - Pharmagest{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Solo stili custom non disponibili in Tailwind */
+.batch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 0.75rem;
+  height: calc(100vh - 100px);
+}
+
+@media (max-width: 1024px) {
+  .batch-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+  }
+}
+
+.section-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.beta-tag {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  font-size: 0.6rem;
+  padding: 0.15rem 0.4rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-3 h-full">
+  <!-- Header compatto -->
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <h1 class="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+      <i class="fas fa-layer-group text-blue-500"></i>
+      Movimento Multiplo
+      <span class="beta-tag text-white rounded font-bold uppercase">BETA</span>
+    </h1>
+    <span class="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+      <i class="fas fa-exclamation-triangle"></i>
+      Funzionalità in fase di test - utilizzare con cautela - IN CASO DI BUG SI E' PREGATI DI SEGNALARLO
+    </span>
+  </div>
+
+  <!-- Layout a 4 sezioni -->
+  <div class="batch-grid">
+    
+    <!-- 1. CONFIGURAZIONE GLOBALE (top-left) -->
+    <div class="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-sm font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+          <i class="fas fa-cog"></i> Configurazione Globale
+        </h2>
+      </div>
+      <div class="section-body p-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Stato partenza</label>
+            <select id="stato_origine_globale" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">-- Seleziona --</option>
+              {% for stato in stati %}
+              <option value="{{ stato }}">{{ stato|format_db_string }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Stato destinazione</label>
+            <select id="stato_destinazione_globale" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="">-- Seleziona --</option>
+              {% for stato in stati %}
+              <option value="{{ stato }}">{{ stato|format_db_string }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div id="warning_stati" class="mt-3 px-3 py-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-lg text-amber-800 dark:text-amber-300 text-xs hidden">
+          <i class="fas fa-exclamation-triangle mr-1"></i> Stato origine e destinazione sono uguali
+        </div>
+        
+        <div class="mt-3">
+          <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Nota globale</label>
+          <textarea id="nota_globale" rows="2" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Nota per tutti i movimenti..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. AGGIUNGI PRODOTTO (top-right) -->
+    <div class="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-sm font-semibold text-green-600 dark:text-green-400 flex items-center gap-2">
+          <i class="fas fa-plus-circle"></i> Aggiungi Prodotto
+        </h2>
+      </div>
+      <div class="section-body p-4">
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Prodotto -->
+          <div class="col-span-2 relative">
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Prodotto</label>
+            <input type="text" id="prodotto_input" autocomplete="off" placeholder="Cerca prodotto..." class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+            <input type="hidden" id="prodotto_id">
+            <input type="hidden" id="prodotto_nome">
+            <div id="suggestions" class="suggestions-dropdown hidden bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"></div>
+          </div>
+          
+          <!-- Da ubicazione -->
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Da ubicazione</label>
+            <select id="da_ubicazione" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+              <option value="">-- Seleziona --</option>
+            </select>
+            <p id="giacenza_info" class="text-xs text-gray-500 mt-1"></p>
+          </div>
+          
+          <!-- A ubicazione -->
+          <div id="a_ubicazione_container">
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">A ubicazione</label>
+            <input type="text" id="a_ubicazione" placeholder="Destinazione" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+          </div>
+          
+          <!-- Quantità -->
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Quantità</label>
+            <input type="number" id="quantita" min="1" value="1" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+            <p id="quantita_error" class="text-xs text-red-500 mt-1 hidden"></p>
+          </div>
+          
+          <!-- Pulsante -->
+          <div class="flex items-end">
+            <button id="btn_aggiungi" disabled class="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center gap-2">
+              <i class="fas fa-plus"></i> Aggiungi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. LISTA MOVIMENTI (bottom, full width) -->
+    <div class="flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden lg:col-span-2">
+      <div class="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-2">
+          <i class="fas fa-list"></i> Lista Movimenti
+          <span id="count_badge" class="px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full">0</span>
+        </h2>
+        <div class="flex gap-2">
+          <button id="btn_carica_bozza" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-1">
+            <i class="fas fa-folder-open"></i> <span class="hidden sm:inline">Bozze</span>
+          </button>
+          <button id="btn_salva_bozza" disabled class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1">
+            <i class="fas fa-save"></i> <span class="hidden sm:inline">Salva</span>
+          </button>
+          <button id="btn_svuota" disabled class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg flex items-center gap-1">
+            <i class="fas fa-trash"></i> <span class="hidden sm:inline">Svuota</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="section-body p-4">
+        <!-- Empty state -->
+        <div id="lista_vuota" class="flex flex-col items-center justify-center h-full text-gray-400 py-8">
+          <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
+          <p class="text-sm">Nessun movimento nella lista</p>
+          <p class="text-xs">Aggiungi prodotti dal pannello sopra</p>
+        </div>
+        
+        <!-- Lista -->
+        <div id="lista_container" class="hidden space-y-2">
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="px-4 py-3 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          <span id="total_items">0</span> prodotti • <span id="total_qty">0</span> unità totali
+        </div>
+        <button id="btn_anteprima" disabled class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg flex items-center gap-2 transition-colors">
+          <i class="fas fa-check-circle"></i> Conferma Movimenti
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- Modal Anteprima -->
+<div id="modal_anteprima" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+        <i class="fas fa-clipboard-check text-blue-500"></i> Conferma Movimenti
+      </h3>
+      <button id="btn_chiudi_modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    
+    <div class="p-5 overflow-y-auto flex-1">
+      <div id="modal_riepilogo" class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-sm"></div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-100 dark:bg-gray-800">
+            <tr>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Prodotto</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Ubicazione</th>
+              <th class="px-3 py-2 text-center font-semibold text-gray-700 dark:text-gray-300">Qtà</th>
+              <th class="px-3 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Nota</th>
+            </tr>
+          </thead>
+          <tbody id="modal_tbody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+        </table>
+      </div>
+      
+      <div id="modal_error" class="mt-4 px-4 py-3 bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300 text-sm hidden">
+        <i class="fas fa-exclamation-circle mr-2"></i><span id="modal_error_text"></span>
+      </div>
+    </div>
+    
+    <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+      <button id="btn_annulla_modal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50">Annulla</button>
+      <button id="btn_conferma_tutti" class="px-5 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg flex items-center gap-2">
+        <i class="fas fa-check"></i> Esegui Tutti
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Salva Bozza -->
+<div id="modal_salva_bozza" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-xl w-full max-w-sm shadow-2xl">
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="fas fa-save text-blue-500 mr-2"></i>Salva Bozza</h3>
+    </div>
+    <div class="p-5">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome bozza</label>
+      <input type="text" id="nome_bozza" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Es: Prestito cliente X">
+    </div>
+    <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+      <button id="btn_annulla_salva" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Annulla</button>
+      <button id="btn_conferma_salva" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fas fa-save mr-1"></i>Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Carica Bozza -->
+<div id="modal_carica_bozza" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl">
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="fas fa-folder-open text-blue-500 mr-2"></i>Carica Bozza</h3>
+    </div>
+    <div id="bozze_lista" class="p-5 max-h-80 overflow-y-auto">
+      <p class="text-gray-500 text-center py-4">Caricamento...</p>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+      <button id="btn_chiudi_bozze" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Modifica -->
+<div id="modal_modifica" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-xl w-full max-w-md shadow-2xl">
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white"><i class="fas fa-edit text-blue-500 mr-2"></i>Modifica Movimento</h3>
+    </div>
+    <div class="p-5 space-y-4">
+      <input type="hidden" id="modifica_index">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prodotto</label>
+        <input type="text" id="modifica_prodotto" disabled class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità</label>
+        <input type="number" id="modifica_quantita" min="1" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nota personalizzata</label>
+        <textarea id="modifica_nota" rows="2" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"></textarea>
+        <label class="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <input type="checkbox" id="modifica_nota_custom" class="rounded">
+          Usa nota personalizzata
+        </label>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stato personalizzato</label>
+        <select id="modifica_stato" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+          <option value="">-- Usa stato globale --</option>
+          {% for stato in stati %}
+          <option value="{{ stato }}">{{ stato|format_db_string }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+      <button id="btn_annulla_modifica" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg">Annulla</button>
+      <button id="btn_conferma_modifica" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fas fa-check mr-1"></i>Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Svuota -->
+<div id="modal_svuota" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+  <div class="bg-white dark:bg-gray-900 rounded-xl w-full max-w-sm shadow-2xl">
+    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-lg font-semibold text-red-600"><i class="fas fa-exclamation-triangle mr-2"></i>Conferma</h3>
+    </div>
+    <div class="p-5">
+      <p class="text-gray-600 dark:text-gray-400">Svuotare la lista? Questa azione non può essere annullata.</p>
+    </div>
+    <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+      <button id="btn_annulla_svuota" class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg">Annulla</button>
+      <button id="btn_conferma_svuota" class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg"><i class="fas fa-trash mr-1"></i>Svuota</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dati prodotti -->
+<script id="prodotti_data" type="application/json">{{ prodotti|tojson|safe }}</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const prodottiData = JSON.parse(document.getElementById('prodotti_data').textContent);
+  let listaMovimenti = [];
+  let giacenzaDisponibile = 0;
+
+  // DOM Elements
+  const $ = id => document.getElementById(id);
+  const statoOrigine = $('stato_origine_globale');
+  const statoDestinazione = $('stato_destinazione_globale');
+  const notaGlobale = $('nota_globale');
+  const warningStati = $('warning_stati');
+  const prodottoInput = $('prodotto_input');
+  const prodottoId = $('prodotto_id');
+  const suggestions = $('suggestions');
+  const daUbicazione = $('da_ubicazione');
+  const aUbicazione = $('a_ubicazione');
+  const aUbicazioneContainer = $('a_ubicazione_container');
+  const quantitaInput = $('quantita');
+  const quantitaError = $('quantita_error');
+  const giacenzaInfo = $('giacenza_info');
+  const btnAggiungi = $('btn_aggiungi');
+  const listaVuota = $('lista_vuota');
+  const listaContainer = $('lista_container');
+  const countBadge = $('count_badge');
+  const totalItems = $('total_items');
+  const totalQty = $('total_qty');
+
+  // Utils
+  function formatStato(s) {
+    return s ? s.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase()) : '';
+  }
+
+  // Check stati
+  function checkStati() {
+    const show = statoOrigine.value && statoDestinazione.value && statoOrigine.value === statoDestinazione.value;
+    warningStati.classList.toggle('hidden', !show);
+    
+    if (statoDestinazione.value === 'IN_MAGAZZINO') {
+      aUbicazioneContainer.classList.remove('hidden');
+    } else {
+      aUbicazioneContainer.classList.add('hidden');
+      aUbicazione.value = '';
+    }
+    checkAggiungi();
+  }
+
+  statoOrigine.addEventListener('change', checkStati);
+  statoDestinazione.addEventListener('change', checkStati);
+
+  // Nota globale sync
+  notaGlobale.addEventListener('input', function() {
+    listaMovimenti.forEach(m => { if (!m.notaCustom) m.nota = this.value; });
+    renderLista();
+  });
+
+  // Autocomplete
+  prodottoInput.addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    prodottoId.value = '';
+    
+    if (q.length < 2) { suggestions.classList.add('hidden'); return; }
+    
+    const filtered = prodottiData.filter(p => 
+      p.nome_prodotto.toLowerCase().includes(q) || p.codice_prodotto.toLowerCase().includes(q)
+    ).slice(0, 6);
+    
+    if (!filtered.length) { suggestions.classList.add('hidden'); return; }
+    
+    suggestions.innerHTML = filtered.map(p => `
+      <div class="px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0" 
+           data-id="${p.id}" data-nome="${p.nome_prodotto}" data-codice="${p.codice_prodotto}">
+        <div class="font-medium text-gray-900 dark:text-white text-sm">${p.nome_prodotto}</div>
+        <div class="text-xs text-gray-500">${p.codice_prodotto}</div>
+      </div>
+    `).join('');
+    suggestions.classList.remove('hidden');
+  });
+
+  suggestions.addEventListener('click', function(e) {
+    const item = e.target.closest('[data-id]');
+    if (item) {
+      prodottoInput.value = `${item.dataset.codice} - ${item.dataset.nome}`;
+      prodottoId.value = item.dataset.id;
+      suggestions.classList.add('hidden');
+      loadUbicazioni(item.dataset.id);
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!prodottoInput.contains(e.target) && !suggestions.contains(e.target)) {
+      suggestions.classList.add('hidden');
+    }
+  });
+
+  // Load ubicazioni
+  function loadUbicazioni(id) {
+    daUbicazione.innerHTML = '<option value="">Caricamento...</option>';
+    fetch(`/api/ubicazioni_prodotto/${id}`)
+      .then(r => r.json())
+      .then(data => {
+        const ubicazioni = data.ubicazioni || [];
+        daUbicazione.innerHTML = '<option value="">-- Seleziona --</option>' + 
+          ubicazioni.map(u => `<option value="${u.ubicazione}" data-qty="${u.quantita}">${u.ubicazione} (${u.quantita})</option>`).join('');
+        if (ubicazioni.length === 1) {
+          daUbicazione.selectedIndex = 1;
+          daUbicazione.dispatchEvent(new Event('change'));
+        }
+      });
+  }
+
+  daUbicazione.addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    giacenzaDisponibile = opt?.dataset?.qty ? parseInt(opt.dataset.qty) : 0;
+    giacenzaInfo.textContent = giacenzaDisponibile ? `Disponibili: ${giacenzaDisponibile}` : '';
+    quantitaInput.max = giacenzaDisponibile || '';
+    checkAggiungi();
+  });
+
+  // Quantità validation
+  quantitaInput.addEventListener('input', function() {
+    const val = parseInt(this.value) || 0;
+    if (val > giacenzaDisponibile && giacenzaDisponibile > 0) {
+      quantitaError.textContent = `Max: ${giacenzaDisponibile}`;
+      quantitaError.classList.remove('hidden');
+    } else {
+      quantitaError.classList.add('hidden');
+    }
+    checkAggiungi();
+  });
+
+  // Check aggiungi enabled
+  function checkAggiungi() {
+    const ok = prodottoId.value && daUbicazione.value && 
+               statoOrigine.value && statoDestinazione.value &&
+               parseInt(quantitaInput.value) > 0 && 
+               parseInt(quantitaInput.value) <= giacenzaDisponibile;
+    btnAggiungi.disabled = !ok;
+  }
+
+  // Aggiungi
+  btnAggiungi.addEventListener('click', function() {
+    const pid = prodottoId.value;
+    const ubic = daUbicazione.value;
+    
+    if (listaMovimenti.some(m => m.prodottoId === pid && m.daUbicazione === ubic)) {
+      alert('Prodotto già presente con questa ubicazione!');
+      return;
+    }
+
+    const prod = prodottiData.find(p => p.id == pid);
+    listaMovimenti.push({
+      prodottoId: pid,
+      prodottoNome: prod.nome_prodotto,
+      prodottoCodice: prod.codice_prodotto,
+      daUbicazione: ubic,
+      aUbicazione: aUbicazione.value || null,
+      quantita: parseInt(quantitaInput.value),
+      nota: notaGlobale.value,
+      notaCustom: false,
+      statoDestinazione: statoDestinazione.value,
+      statoCustom: false,
+      giacenzaMax: giacenzaDisponibile
+    });
+
+    // Reset
+    prodottoInput.value = '';
+    prodottoId.value = '';
+    daUbicazione.innerHTML = '<option value="">-- Seleziona --</option>';
+    aUbicazione.value = '';
+    quantitaInput.value = '1';
+    giacenzaInfo.textContent = '';
+    giacenzaDisponibile = 0;
+    btnAggiungi.disabled = true;
+    
+    renderLista();
+  });
+
+  // Render lista
+  function renderLista() {
+    const count = listaMovimenti.length;
+    countBadge.textContent = count;
+    totalItems.textContent = count;
+    totalQty.textContent = listaMovimenti.reduce((s, m) => s + m.quantita, 0);
+
+    $('btn_svuota').disabled = !count;
+    $('btn_salva_bozza').disabled = !count;
+    $('btn_anteprima').disabled = !count;
+
+    if (!count) {
+      listaVuota.classList.remove('hidden');
+      listaContainer.classList.add('hidden');
+      return;
+    }
+
+    listaVuota.classList.add('hidden');
+    listaContainer.classList.remove('hidden');
+
+    listaContainer.innerHTML = listaMovimenti.map((m, i) => {
+      const notaBadge = m.notaCustom ? '<span class="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded">custom</span>' : '';
+      const statoBadge = m.statoCustom ? '<span class="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded">custom</span>' : '';
+      const statoDisplay = m.statoCustom ? formatStato(m.statoDestinazione) : formatStato(statoDestinazione.value);
+      const notaDisplay = m.notaCustom ? m.nota : notaGlobale.value;
+
+      return `
+        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-gray-900 dark:text-white text-sm truncate">${m.prodottoNome}</div>
+            <div class="text-xs text-gray-500 flex flex-wrap gap-2 mt-1">
+              <span><i class="fas fa-map-marker-alt mr-1"></i>${m.daUbicazione} → ${m.aUbicazione || '-'}</span>
+              <span>${statoDisplay} ${statoBadge}</span>
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-lg font-bold text-blue-600 dark:text-blue-400">${m.quantita}</div>
+            <div class="text-xs text-gray-500">unità</div>
+          </div>
+          <div class="hidden sm:block max-w-32 text-xs text-gray-600 dark:text-gray-400 truncate">
+            ${notaDisplay || '-'} ${notaBadge}
+          </div>
+          <div class="flex gap-1">
+            <button onclick="modificaItem(${i})" class="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg"><i class="fas fa-edit"></i></button>
+            <button onclick="rimuoviItem(${i})" class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.rimuoviItem = i => { listaMovimenti.splice(i, 1); renderLista(); };
+
+  // Modifica
+  window.modificaItem = function(i) {
+    const m = listaMovimenti[i];
+    $('modifica_index').value = i;
+    $('modifica_prodotto').value = `${m.prodottoCodice} - ${m.prodottoNome}`;
+    $('modifica_quantita').value = m.quantita;
+    $('modifica_quantita').max = m.giacenzaMax;
+    $('modifica_nota').value = m.notaCustom ? m.nota : '';
+    $('modifica_nota_custom').checked = m.notaCustom;
+    $('modifica_stato').value = m.statoCustom ? m.statoDestinazione : '';
+    $('modal_modifica').classList.remove('hidden');
+  };
+
+  $('btn_annulla_modifica').onclick = () => $('modal_modifica').classList.add('hidden');
+  $('btn_conferma_modifica').onclick = function() {
+    const i = parseInt($('modifica_index').value);
+    const m = listaMovimenti[i];
+    m.quantita = parseInt($('modifica_quantita').value);
+    m.notaCustom = $('modifica_nota_custom').checked;
+    m.nota = m.notaCustom ? $('modifica_nota').value : notaGlobale.value;
+    m.statoCustom = $('modifica_stato').value !== '';
+    m.statoDestinazione = m.statoCustom ? $('modifica_stato').value : statoDestinazione.value;
+    $('modal_modifica').classList.add('hidden');
+    renderLista();
+  };
+
+  // Svuota
+  $('btn_svuota').onclick = () => $('modal_svuota').classList.remove('hidden');
+  $('btn_annulla_svuota').onclick = () => $('modal_svuota').classList.add('hidden');
+  $('btn_conferma_svuota').onclick = () => { listaMovimenti = []; renderLista(); $('modal_svuota').classList.add('hidden'); };
+
+  // Bozze
+  $('btn_salva_bozza').onclick = () => { $('nome_bozza').value = ''; $('modal_salva_bozza').classList.remove('hidden'); };
+  $('btn_annulla_salva').onclick = () => $('modal_salva_bozza').classList.add('hidden');
+  $('btn_conferma_salva').onclick = function() {
+    const nome = $('nome_bozza').value.trim();
+    if (!nome) { alert('Inserisci un nome'); return; }
+    
+    fetch('/api/movimento-multiplo/bozza', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nome_bozza: nome,
+        stato_origine: statoOrigine.value,
+        stato_destinazione: statoDestinazione.value,
+        nota_globale: notaGlobale.value,
+        movimenti: listaMovimenti
+      })
+    }).then(r => r.json()).then(d => {
+      if (d.success) { alert('Bozza salvata!'); $('modal_salva_bozza').classList.add('hidden'); }
+      else alert('Errore: ' + d.error);
+    });
+  };
+
+  $('btn_carica_bozza').onclick = function() {
+    $('bozze_lista').innerHTML = '<p class="text-gray-500 text-center py-4">Caricamento...</p>';
+    $('modal_carica_bozza').classList.remove('hidden');
+    
+    fetch('/api/movimento-multiplo/bozze').then(r => r.json()).then(data => {
+      if (!data.length) {
+        $('bozze_lista').innerHTML = '<p class="text-gray-500 text-center py-4">Nessuna bozza salvata</p>';
+        return;
+      }
+      $('bozze_lista').innerHTML = data.map(b => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
+          <div>
+            <div class="font-medium text-gray-900 dark:text-white">${b.nome_bozza}</div>
+            <div class="text-xs text-gray-500">${new Date(b.created_at).toLocaleString('it-IT')}</div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="caricaBozza(${b.id})" class="px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fas fa-upload"></i></button>
+            <button onclick="eliminaBozza(${b.id})" class="px-3 py-1.5 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    });
+  };
+
+  $('btn_chiudi_bozze').onclick = () => $('modal_carica_bozza').classList.add('hidden');
+
+  window.caricaBozza = function(id) {
+    fetch(`/api/movimento-multiplo/bozza/${id}`).then(r => r.json()).then(d => {
+      statoOrigine.value = d.stato_origine || '';
+      statoDestinazione.value = d.stato_destinazione || '';
+      notaGlobale.value = d.nota_globale || '';
+      listaMovimenti = d.movimenti || [];
+      checkStati();
+      renderLista();
+      $('modal_carica_bozza').classList.add('hidden');
+    });
+  };
+
+  window.eliminaBozza = function(id) {
+    if (!confirm('Eliminare questa bozza?')) return;
+    fetch(`/api/movimento-multiplo/bozza/${id}`, {method:'DELETE'}).then(() => $('btn_carica_bozza').click());
+  };
+
+  // Anteprima
+  $('btn_anteprima').onclick = function() {
+    $('modal_error').classList.add('hidden');
+    
+    $('modal_riepilogo').innerHTML = `
+      <div class="grid grid-cols-2 gap-2 text-gray-700 dark:text-gray-300">
+        <div><span class="text-gray-500">Movimenti:</span> <strong>${listaMovimenti.length}</strong></div>
+        <div><span class="text-gray-500">Stato:</span> <strong>${formatStato(statoOrigine.value)} → ${formatStato(statoDestinazione.value)}</strong></div>
+        <div class="col-span-2"><span class="text-gray-500">Nota:</span> <strong>${notaGlobale.value || '(nessuna)'}</strong></div>
+      </div>
+    `;
+
+    $('modal_tbody').innerHTML = listaMovimenti.map(m => `
+      <tr>
+        <td class="px-3 py-2"><div class="font-medium">${m.prodottoNome}</div><div class="text-xs text-gray-500">${m.prodottoCodice}</div></td>
+        <td class="px-3 py-2 text-gray-600 dark:text-gray-400">${m.daUbicazione} → ${m.aUbicazione || '-'}</td>
+        <td class="px-3 py-2 text-center font-semibold">${m.quantita}</td>
+        <td class="px-3 py-2 text-gray-600 dark:text-gray-400">${m.notaCustom ? '<span class="text-amber-600">'+m.nota+'</span>' : (notaGlobale.value || '-')}</td>
+      </tr>
+    `).join('');
+
+    $('btn_conferma_tutti').disabled = false;
+    $('btn_conferma_tutti').innerHTML = '<i class="fas fa-check"></i> Esegui Tutti';
+    $('modal_anteprima').classList.remove('hidden');
+  };
+
+  $('btn_chiudi_modal').onclick = () => $('modal_anteprima').classList.add('hidden');
+  $('btn_annulla_modal').onclick = () => $('modal_anteprima').classList.add('hidden');
+
+  $('btn_conferma_tutti').onclick = function() {
+    this.disabled = true;
+    this.innerHTML = '<span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Elaborazione...';
+    $('modal_error').classList.add('hidden');
+
+    fetch('/api/movimento-multiplo/execute', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        stato_origine_globale: statoOrigine.value,
+        stato_destinazione_globale: statoDestinazione.value,
+        nota_globale: notaGlobale.value,
+        movimenti: listaMovimenti.map(m => ({
+          prodotto_id: m.prodottoId,
+          da_ubicazione: m.daUbicazione,
+          a_ubicazione: m.aUbicazione,
+          quantita: m.quantita,
+          nota: m.notaCustom ? m.nota : notaGlobale.value,
+          stato_destinazione: m.statoCustom ? m.statoDestinazione : statoDestinazione.value
+        }))
+      })
+    }).then(r => r.json()).then(d => {
+      if (d.success) {
+        window.location.href = '/movimento-multiplo?success=' + encodeURIComponent(d.message);
+      } else {
+        $('modal_error_text').textContent = d.error;
+        $('modal_error').classList.remove('hidden');
+        $('btn_conferma_tutti').disabled = false;
+        $('btn_conferma_tutti').innerHTML = '<i class="fas fa-check"></i> Esegui Tutti';
+      }
+    }).catch(() => {
+      $('modal_error_text').textContent = 'Errore di connessione';
+      $('modal_error').classList.remove('hidden');
+      $('btn_conferma_tutti').disabled = false;
+      $('btn_conferma_tutti').innerHTML = '<i class="fas fa-check"></i> Esegui Tutti';
+    });
+  };
+
+  // Beforeunload
+  window.addEventListener('beforeunload', e => {
+    if (listaMovimenti.length) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  // Success message
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success')) {
+    alert(urlParams.get('success'));
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  checkStati();
+});
+</script>
+{% endblock %}
