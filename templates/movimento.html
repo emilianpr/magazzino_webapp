@@ -4,172 +4,136 @@
 
 {% block extra_css %}
 <style>
-/* Sistema AMOLED dark mode come carico_merci */
 * {
   box-sizing: border-box;
 }
 
-/* Transizioni fluide */
-/* body transition removed to prevent dark mode flash */
-
-/* Variabili CSS per dark mode AMOLED */
-:root {
-  --bg-primary: rgba(255, 255, 255, 0.95);
-  --bg-secondary: rgba(243, 244, 246, 0.9);
-  --border-light: rgba(150, 150, 150, 0.25);
-  --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --accent-color: #0056a6;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+/* Form container minimal */
+.form-container {
+  background: transparent;
+  padding: 1rem 0;
 }
 
-.dark {
-  --bg-primary: rgba(0, 0, 0, 0.98);
-  --bg-secondary: rgba(0, 0, 0, 0.95);
-  --border-light: rgba(40, 40, 40, 0.8);
-  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-  --accent-color: #60a5fa;
-  --text-primary: #ffffff;
-  --text-secondary: #d1d5db;
-}
-
-/* Icon circle con dark mode */
-.icon-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
-  color: #0056a6;
-  font-size: 2rem;
-  margin: 0 auto 1.5rem auto;
-  box-shadow: 0 2px 8px rgba(0,86,166,0.08);
-  transition: all 0.2s ease;
-}
-
-.dark .icon-circle {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2563eb 100%);
-  color: #60a5fa;
-  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.2);
-}
-
-/* Form styling */
-.form-section-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--accent-color);
-  margin-bottom: 1.2rem;
-  text-align: center;
-  letter-spacing: 0.01em;
-  transition: color 0.2s ease;
-}
-
-form label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-  color: var(--accent-color);
-  margin-top: 1rem;
-  transition: color 0.2s ease;
-}
-
-form input[type="text"],
-form input[type="number"],
-form select,
-form textarea {
-  width: 100%;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--border-light);
-  border-radius: 0.7rem;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  margin-bottom: 0.2rem;
+/* Form title */
+.form-title {
   font-size: 1rem;
-  transition: all 0.2s ease;
-  resize: vertical;
+  font-weight: 600;
+  color: #0056a6;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.dark form input[type="text"],
-.dark form input[type="number"],
-.dark form select,
-.dark form textarea {
-  background: var(--bg-secondary);
-  border-color: var(--border-light);
-  color: var(--text-primary);
+.dark .form-title {
+  color: #60a5fa;
 }
 
-form input[type="text"]:focus,
-form input[type="number"]:focus,
-form select:focus,
-form textarea:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+.form-title i {
+  font-size: 1rem;
 }
 
-.dark form input[type="text"]:focus,
-.dark form input[type="number"]:focus,
-.dark form select:focus,
-.dark form textarea:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+/* Form fields compact */
+.compact-form label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  margin-top: 0.75rem;
 }
 
-/* Button styling */
-form button[type="submit"] {
+.dark .compact-form label {
+  color: #9ca3af;
+}
+
+.compact-form label:first-of-type {
+  margin-top: 0;
+}
+
+.compact-form input[type="text"],
+.compact-form input[type="number"],
+.compact-form select,
+.compact-form textarea {
   width: 100%;
-  margin-top: 2rem;
-  background: linear-gradient(90deg, #0056a6 0%, #00a8e8 100%);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #1e293b;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+
+.dark .compact-form input[type="text"],
+.dark .compact-form input[type="number"],
+.dark .compact-form select,
+.dark .compact-form textarea {
+  background: #1a1a1a;
+  border-color: #333;
   color: #fff;
-  font-weight: 700;
-  font-size: 1.1rem;
+}
+
+.compact-form input:focus,
+.compact-form select:focus,
+.compact-form textarea:focus {
+  outline: none;
+  border-color: #0056a6;
+}
+
+.dark .compact-form input:focus,
+.dark .compact-form select:focus,
+.dark .compact-form textarea:focus {
+  border-color: #60a5fa;
+}
+
+.compact-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Submit button */
+.btn-submit {
+  width: 100%;
+  margin-top: 1.25rem;
+  background: #0056a6;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.875rem;
   border: none;
-  border-radius: 0.8rem;
-  padding: 0.9rem 0;
-  box-shadow: 0 4px 16px 0 rgba(0,86,166,0.09);
+  border-radius: 6px;
+  padding: 0.625rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
-  transition: all 0.2s ease;
+  gap: 0.5rem;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
-.dark form button[type="submit"] {
-  background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
-  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
+.dark .btn-submit {
+  background: #2563eb;
 }
 
-form button[type="submit"]:hover {
-  background: linear-gradient(90deg, #003d7a 0%, #0056a6 100%);
-  box-shadow: 0 8px 24px 0 rgba(0,86,166,0.13);
-  transform: translateY(-1px);
+.btn-submit:hover {
+  background: #003d7a;
 }
 
-.dark form button[type="submit"]:hover {
-  background: linear-gradient(90deg, #1e3a8a 0%, #1d4ed8 100%);
-  box-shadow: 0 8px 24px 0 rgba(29, 78, 216, 0.4);
-  transform: translateY(-1px);
+.dark .btn-submit:hover {
+  background: #1d4ed8;
 }
 
 /* Dropdown suggestions styling */
 .suggestions-dropdown {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-light);
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
 }
 
 .dark .suggestions-dropdown {
-  background: var(--bg-secondary);
-  border-color: var(--border-light);
-  color: var(--text-primary);
-}
-
-.suggestion-item {
-  transition: background-color 0.2s ease;
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
 }
 
 .suggestion-item:hover {
@@ -179,106 +143,86 @@ form button[type="submit"]:hover {
 .dark .suggestion-item:hover {
   background-color: rgba(96, 165, 250, 0.2);
 }
-/* Layout pagina movimento: occupa meno spazio verticale */
-body.non-scroll-page { overflow:hidden; }
-.movimento-wrapper { min-height: calc(100vh - 80px); display:flex; align-items:center; justify-content:center; padding:2.2rem 0 2.6rem; }
-@media (max-height: 820px) {
-  .movimento-wrapper { align-items:flex-start; padding:1.25rem 0 1.5rem; }
-  body.non-scroll-page { overflow:auto; }
-}
-/* Card compatta mantenendo stile base */
-.mov-card { padding:1.75rem 1.5rem; }
-.mov-card.mov-small { padding:1.1rem .95rem 1.25rem; }
-.mov-card.mov-small h2.form-section-title { font-size:1.05rem; }
-.mov-card.mov-small form label { margin-top:.65rem; font-size:.9rem; }
-.mov-card.mov-small .icon-circle { margin-top:.85rem; }
-.mov-card.mov-small form input[type="text"],
-.mov-card.mov-small form input[type="number"],
-.mov-card.mov-small form select,
-.mov-card.mov-small form textarea { padding:.45rem .65rem; font-size:.9rem; border-radius:.55rem; }
-.mov-card.mov-small form button[type="submit"] { font-size:1rem; padding:.7rem 0; margin-top:1rem; }
-.mov-card h2.form-section-title { margin-bottom:1.25rem !important; }
-.mov-card form label { margin-top:.85rem; }
-.mov-card form label:first-of-type { margin-top:0.25rem; }
-.mov-card form button[type="submit"] { margin-top:1.25rem; }
-
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="px-2 py-6 movimento-wrapper">
-  <div class="glass-card mov-card mov-small w-full max-w-xl mx-auto">
-    <div class="icon-circle mb-4">
-      <i class="fas fa-exchange-alt"></i>
-    </div>
-  <h2 class="form-section-title mb-4">
-      Registra un movimento
-    </h2>
-    <form id="movimento-form" method="POST" autocomplete="off">
-      <label for="da_stato">Tipo di movimento (stato di partenza):</label>
-      <select name="da_stato" id="da_stato" required>
-        <option value="">-- Seleziona stato di partenza --</option>
-        {% for stato in stati %}
-        <option value="{{ stato }}">{{ stato|format_db_string }}</option>
-        {% endfor %}
-      </select>
+<div class="w-full flex justify-center items-center py-8 px-4 bg-gray-50 dark:bg-black min-h-screen">
+  <div class="w-full max-w-3xl flex justify-center">
+    <div class="form-container w-full" style="max-width: 440px;">
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h2 class="form-title">
+          <i class="fas fa-exchange-alt"></i>
+          Registra Movimento
+        </h2>
+        <div class="text-xs text-gray-500 dark:text-gray-400" style="margin-top: -0.5rem; margin-bottom: 0.75rem;">
+          Sposta prodotti tra stati e ubicazioni
+        </div>
+        <form id="movimento-form" method="POST" autocomplete="off" class="compact-form">
+          <label for="da_stato">Stato di partenza</label>
+          <select name="da_stato" id="da_stato" required>
+            <option value="">-- Seleziona stato di partenza --</option>
+            {% for stato in stati %}
+            <option value="{{ stato }}">{{ stato|format_db_string }}</option>
+            {% endfor %}
+          </select>
 
-      <label for="a_stato">Nuovo stato (stato di destinazione):</label>
-      <select name="a_stato" id="a_stato" required>
-        <option value="">-- Seleziona nuovo stato --</option>
-        {% for stato in stati %}
-        <option value="{{ stato }}">{{ stato|format_db_string }}</option>
-        {% endfor %}
-      </select>
+          <label for="a_stato">Nuovo stato</label>
+          <select name="a_stato" id="a_stato" required>
+            <option value="">-- Seleziona nuovo stato --</option>
+            {% for stato in stati %}
+            <option value="{{ stato }}">{{ stato|format_db_string }}</option>
+            {% endfor %}
+          </select>
 
-      <label for="prodotto_input">Prodotto:</label>
-      <div style="position: relative;">
-        <input
-          type="text"
-          id="prodotto_input"
-          name="prodotto_input"
-          autocomplete="off"
-          placeholder="Cerca prodotto per nome o codice..."
-          autofocus
-        />
+          <label for="prodotto_input">Prodotto</label>
+          <div style="position: relative;">
+            <input
+              type="text"
+              id="prodotto_input"
+              name="prodotto_input"
+              autocomplete="off"
+              placeholder="Cerca prodotto..."
+              autofocus
+            />
+          </div>
+          <!-- Dati prodotti nascosti per JavaScript -->
+          <datalist id="prodotti-list" style="display: none;">
+            {% for prodotto in prodotti %}
+            <option
+              data-id="{{ prodotto.id }}"
+              value="{{ prodotto.codice_prodotto }} - {{ prodotto.nome_prodotto|format_db_string }}"
+            ></option>
+            {% endfor %}
+          </datalist>
+          <input type="hidden" name="prodotto_id" id="prodotto_id" />
+
+          <label for="da_ubicazione">Da ubicazione</label>
+          <select name="da_ubicazione" id="da_ubicazione">
+            <option value="">-- Seleziona ubicazione --</option>
+          </select>
+
+          <label for="a_ubicazione">A ubicazione</label>
+          <input type="text" name="a_ubicazione" id="a_ubicazione" placeholder="Nuova ubicazione..." />
+
+          <label for="quantita">Quantità</label>
+          <input type="number" name="quantita" id="quantita" min="1" required placeholder="Quantità..." />
+
+          <label for="note">Note</label>
+          <textarea name="note" id="note" placeholder="Note opzionali..."></textarea>
+
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-check-circle"></i>
+            Registra movimento
+          </button>
+        </form>
       </div>
-      <!-- Dati prodotti nascosti per JavaScript -->
-      <datalist id="prodotti-list" style="display: none;">
-        {% for prodotto in prodotti %}
-        <option
-          data-id="{{ prodotto.id }}"
-          value="{{ prodotto.codice_prodotto }} - {{ prodotto.nome_prodotto|format_db_string }}"
-        ></option>
-        {% endfor %}
-      </datalist>
-      <input type="hidden" name="prodotto_id" id="prodotto_id" />
-
-      <label for="da_ubicazione">Da ubicazione:</label>
-      <select name="da_ubicazione" id="da_ubicazione">
-        <option value="">-- Seleziona ubicazione --</option>
-      </select>
-
-      <label for="a_ubicazione">A ubicazione:</label>
-      <input type="text" name="a_ubicazione" id="a_ubicazione" />
-
-      <label for="quantita">Quantità:</label>
-      <input type="number" name="quantita" min="1" required />
-
-      <label for="note">Note:</label>
-      <textarea name="note" id="note"></textarea>
-
-      <button type="submit">
-        <i class="fas fa-check-circle"></i>
-        Registra movimento
-      </button>
-    </form>
+    </div>
   </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Imposta body non scroll per questa pagina (salvo schermi troppo bassi)
-  document.body.classList.add('non-scroll-page');
   const prodottoInput = document.getElementById("prodotto_input");
   const prodottoIdInput = document.getElementById("prodotto_id");
   const prodottiList = document.getElementById("prodotti-list");

@@ -7,233 +7,222 @@
 
 {% block extra_css %}
 <style>
-/* Layout centrato per la card */
-.page-container {
-  min-height: calc(100vh - 4rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+* {
+  box-sizing: border-box;
 }
 
-/* Card principale con stile unificato */
-.form-card {
-  background: #ffffff;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e5e7eb;
-  width: 100%;
-  max-width: 500px;
+/* Form container minimal */
+.form-container {
+  background: transparent;
+  padding: 1rem 0;
 }
 
-/* Header della card */
-.card-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 1rem;
-}
-
-.page-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
+/* Form title */
+.form-title {
+  font-size: 1rem;
+  font-weight: 600;
   color: #0056a6;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.page-title i { 
-  font-size: 1.2em;
-  flex-shrink: 0;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1.5rem;
-    align-items: flex-start;
-    padding-top: 3rem;
-  }
-  .form-card {
-    padding: 1.5rem;
-    max-width: 100%;
-  }
-  .page-title {
-    font-size: 1.25rem;
-  }
-}
-
-/* Forza background nero puro per tutti gli elementi principali in dark mode */
-.dark .bg-white {
-  background-color: #000000 !important;
-}
-
-.dark .bg-gray-50 {
-  background-color: #000000 !important;
-}
-
-/* Colori di testo ottimizzati per AMOLED */
-.dark .text-gray-900 {
-  color: #f9fafb !important;
-}
-
-.dark .text-gray-700 {
-  color: #d1d5db !important;
-}
-
-.dark .text-gray-500 {
-  color: #9ca3af !important;
-}
-
-/* Input e form elements per dark mode */
-.dark input[type="text"],
-.dark input[type="number"],
-.dark textarea,
-.dark select {
-  background-color: rgba(20, 20, 20, 0.8) !important;
-  border-color: rgba(60, 60, 60, 0.8) !important;
-  color: #f9fafb !important;
-}
-
-.dark input[type="text"]:focus,
-.dark input[type="number"]:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
-}
-
-/* Dark mode per form card */
-.dark .form-card {
-  background-color: #0a0a0a;
-  border-color: #2a2a2a;
-  color: #ffffff;
-}
-
-.dark .card-header {
-  border-bottom-color: #2a2a2a;
-}
-
-.dark .page-title {
+.dark .form-title {
   color: #60a5fa;
 }
 
-/* Input e form per dark mode */
-.dark input[type="text"],
-.dark input[type="number"],
-.dark textarea,
-.dark select {
-  background-color: #1a1a1a;
-  border-color: #404040;
-  color: #f9fafb;
+.form-title i {
+  font-size: 1rem;
 }
 
-.dark input[type="text"]:focus,
-.dark input[type="number"]:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+/* Form fields compact */
+.compact-form label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  margin-top: 0.75rem;
 }
 
-.dark input::placeholder,
-.dark textarea::placeholder {
+.dark .compact-form label {
   color: #9ca3af;
 }
 
-.dark label {
-  color: #d1d5db;
+.compact-form label:first-of-type {
+  margin-top: 0;
 }
 
-/* Dropdown suggerimenti per dark mode */
+.compact-form input[type="text"],
+.compact-form input[type="number"],
+.compact-form select,
+.compact-form textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #1e293b;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+
+.dark .compact-form input[type="text"],
+.dark .compact-form input[type="number"],
+.dark .compact-form select,
+.dark .compact-form textarea {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
+
+.compact-form input:focus,
+.compact-form select:focus,
+.compact-form textarea:focus {
+  outline: none;
+  border-color: #0056a6;
+}
+
+.dark .compact-form input:focus,
+.dark .compact-form select:focus,
+.dark .compact-form textarea:focus {
+  border-color: #60a5fa;
+}
+
+.compact-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Submit button - rosso per scarico */
+.btn-submit {
+  width: 100%;
+  margin-top: 1.25rem;
+  background: #dc2626;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  padding: 0.625rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dark .btn-submit {
+  background: #b91c1c;
+}
+
+.btn-submit:hover {
+  background: #b91c1c;
+}
+
+.dark .btn-submit:hover {
+  background: #991b1b;
+}
+
+/* Dropdown suggestions styling */
+.suggestions-dropdown {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
 .dark .suggestions-dropdown {
-  background-color: #0a0a0a;
-  border-color: #2a2a2a;
-  color: #f9fafb;
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
 }
 
-.dark .suggestion-item:hover,
-.dark .bg-blue-50 {
-  background-color: #1e3a8a !important;
+.suggestion-item:hover {
+  background-color: rgba(96, 165, 250, 0.1);
 }
 
-.dark .bg-blue-100 {
-  background-color: #1e40af !important;
+.dark .suggestion-item:hover {
+  background-color: rgba(96, 165, 250, 0.2);
 }
 
-/* Info quantità per dark mode */
-.dark #quantita-disponibile-info,
-.dark .text-green-700 {
-  color: #34d399 !important;
+/* Quantità info */
+#quantita-disponibile-info {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.text-green-600 {
+  color: #16a34a;
+}
+
+.dark .text-green-600 {
+  color: #34d399;
+}
+
+.text-red-600 {
+  color: #dc2626;
 }
 
 .dark .text-red-600 {
-  color: #f87171 !important;
+  color: #f87171;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-container">
-  <div class="form-card">
-    <div class="card-header">
-      <h1 class="page-title">
-        <i class="fas fa-dolly-flatbed"></i>
-        <span>Scarico Merce in Magazzino</span>
-      </h1>
-    </div>
-  <form method="POST" action="{{ url_for('scaricomerce') }}" class="space-y-5">
-    <div>
-      <label for="prodotto_input" class="block text-sm font-medium text-gray-700 mb-1">Prodotto</label>
-      <input type="text" id="prodotto_input" name="prodotto_input" autocomplete="off" required
-             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-400 focus:border-blue-400"
-             placeholder="Cerca prodotto per nome o codice...">
-      <!-- Dati prodotti nascosti per JavaScript -->
-      <datalist id="prodotti-list" style="display: none;">
-        {% for prodotto in prodotti_magazzino %}
-          {% set nome_clean = prodotto.nome_prodotto.replace('_', ' ').replace('-', ' ').replace('.', ' ').replace('/', ' ').replace('  ', ' ') %}
-          <option data-id="{{ prodotto.id }}" value="{{ nome_clean|title }} ({{ prodotto.codice_prodotto }})"></option>
-        {% endfor %}
-      </datalist>
-      <input type="hidden" name="prodotto_id" id="prodotto_id">
-    </div>
-    
-    <div>
-      <label for="ubicazione" class="block text-sm font-medium text-gray-700 mb-1">Ubicazione</label>
-      <select id="ubicazione" name="ubicazione" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-400 focus:border-blue-400">
-        <option value="">-- Tutte le ubicazioni --</option>
-        {% for ub in ubicazioni_magazzino %}
-          <option value="{{ ub }}">{{ ub }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    
-    <div>
-      <label for="quantita" class="block text-sm font-medium text-gray-700 mb-1">Quantità da scaricare</label>
-      <input type="number" id="quantita" name="quantita" min="1" required 
-             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-400 focus:border-blue-400"
-             placeholder="Inserisci quantità...">
-      <div id="quantita-disponibile-info" class="mt-1 text-green-700 text-sm font-semibold">
-        Seleziona un prodotto per vedere la quantità disponibile
+<div class="w-full flex justify-center items-center py-8 px-4 bg-gray-50 dark:bg-black min-h-screen">
+  <div class="w-full max-w-3xl flex justify-center">
+    <div class="form-container w-full" style="max-width: 440px;">
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h2 class="form-title">
+          <i class="fas fa-arrow-down"></i>
+          Scarico Merce
+        </h2>
+        <div class="text-xs text-gray-500 dark:text-gray-400" style="margin-top: -0.5rem; margin-bottom: 0.75rem;">
+          Rimuovi quantità da un prodotto in magazzino
+        </div>
+        <form method="POST" action="{{ url_for('scaricomerce') }}" class="compact-form">
+          <label for="prodotto_input">Prodotto</label>
+          <div style="position: relative;">
+            <input type="text" id="prodotto_input" name="prodotto_input" autocomplete="off" required
+                   placeholder="Cerca prodotto...">
+            <!-- Dati prodotti nascosti per JavaScript -->
+            <datalist id="prodotti-list" style="display: none;">
+              {% for prodotto in prodotti_magazzino %}
+                {% set nome_clean = prodotto.nome_prodotto.replace('_', ' ').replace('-', ' ').replace('.', ' ').replace('/', ' ').replace('  ', ' ') %}
+                <option data-id="{{ prodotto.id }}" value="{{ nome_clean|title }} ({{ prodotto.codice_prodotto }})"></option>
+              {% endfor %}
+            </datalist>
+            <input type="hidden" name="prodotto_id" id="prodotto_id">
+          </div>
+          
+          <label for="ubicazione">Ubicazione</label>
+          <select id="ubicazione" name="ubicazione">
+            <option value="">-- Tutte le ubicazioni --</option>
+            {% for ub in ubicazioni_magazzino %}
+              <option value="{{ ub }}">{{ ub }}</option>
+            {% endfor %}
+          </select>
+          
+          <label for="quantita">Quantità da scaricare</label>
+          <input type="number" id="quantita" name="quantita" min="1" required placeholder="Quantità...">
+          <div id="quantita-disponibile-info" class="text-green-600">
+            Seleziona un prodotto per vedere la quantità disponibile
+          </div>
+          
+          <label for="note">Note</label>
+          <textarea id="note" name="note" placeholder="Note aggiuntive (opzionale)..."></textarea>
+          
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-arrow-down"></i>
+            Scarica Merce
+          </button>
+        </form>
       </div>
     </div>
-    
-    <div>
-      <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Note</label>
-      <textarea id="note" name="note" rows="3" 
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-400 focus:border-blue-400"
-                placeholder="Note aggiuntive (opzionale)..."></textarea>
-    </div>
-    
-    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center gap-2">
-      <i class="fas fa-arrow-down"></i>
-      Scarica Merce
-    </button>
-  </form>
   </div>
 </div>
 

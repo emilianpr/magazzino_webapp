@@ -41,7 +41,7 @@ except ImportError:
 # ========================================
 # APP VERSION
 # ========================================
-VERSION = "Beta v1.4.2"
+VERSION = "Beta v1.5"
 
 # ========================================
 # STATI DISPONIBILI (lista statica)
@@ -561,7 +561,135 @@ def nuovo_prodotto():
             print("Exception in /nuovo-prodotto POST:\n", error_details)
             return redirect(url_for('nuovo_prodotto'))
 
-    return render_template('nuovo-prodotto.html')
+    # Carica lista prodotti con quantità totale per la visualizzazione
+    prodotti_lista = []
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT p.id, p.nome_prodotto, p.codice_prodotto, 
+                   COALESCE(SUM(g.quantita), 0) as quantita_totale
+            FROM prodotti p
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            GROUP BY p.id, p.nome_prodotto, p.codice_prodotto
+            ORDER BY p.nome_prodotto ASC
+        """)
+        prodotti_lista = cursor.fetchall()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Errore caricamento prodotti: {e}")
+
+    return render_template('nuovo-prodotto.html', prodotti=prodotti_lista)
+
+
+# API per ottenere le giacenze di un prodotto
+@app.route('/api/prodotto/<int:prodotto_id>/giacenze', methods=['GET'])
+def api_giacenze_prodotto(prodotto_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT g.id, g.quantita, g.stato, g.ubicazione, g.note, m.nome as magazzino_nome
+            FROM giacenze g
+            LEFT JOIN magazzini m ON g.magazzino_id = m.id
+            WHERE g.prodotto_id = %s
+            ORDER BY g.stato, g.ubicazione
+        """, (prodotto_id,))
+        giacenze = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({'giacenze': giacenze})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# API per ottenere i dettagli di un prodotto
+@app.route('/api/prodotto/<int:prodotto_id>', methods=['GET'])
+def api_get_prodotto(prodotto_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id, nome_prodotto, codice_prodotto FROM prodotti WHERE id = %s", (prodotto_id,))
+        prodotto = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not prodotto:
+            return jsonify({'error': 'Prodotto non trovato'}), 404
+        
+        return jsonify({'prodotto': prodotto})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# API per modificare un prodotto
+@app.route('/api/prodotto/<int:prodotto_id>', methods=['PUT'])
+def api_modifica_prodotto(prodotto_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    data = request.get_json()
+    nome_prodotto = data.get('nome_prodotto', '').strip()
+    codice_prodotto = data.get('codice_prodotto', '').strip()
+    
+    if not nome_prodotto or not codice_prodotto:
+        return jsonify({'error': 'Nome e codice prodotto sono obbligatori'}), 400
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verifica che il codice non sia già usato da un altro prodotto
+        cursor.execute("SELECT id FROM prodotti WHERE codice_prodotto = %s AND id != %s", (codice_prodotto, prodotto_id))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Codice prodotto già in uso da un altro prodotto'}), 400
+        
+        cursor.execute("""
+            UPDATE prodotti SET nome_prodotto = %s, codice_prodotto = %s WHERE id = %s
+        """, (nome_prodotto, codice_prodotto, prodotto_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Prodotto aggiornato con successo'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# API per eliminare un prodotto (e tutte le sue giacenze)
+@app.route('/api/prodotto/<int:prodotto_id>', methods=['DELETE'])
+def api_elimina_prodotto(prodotto_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autorizzato'}), 401
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Prima elimina tutte le giacenze associate
+        cursor.execute("DELETE FROM giacenze WHERE prodotto_id = %s", (prodotto_id,))
+        
+        # Poi elimina il prodotto
+        cursor.execute("DELETE FROM prodotti WHERE id = %s", (prodotto_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Prodotto e giacenze eliminate con successo'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -2553,13 +2681,9 @@ def movimento_multiplo_execute():
             mag_result = cursor.fetchone()
             magazzino_id = mag_result['magazzino_id'] if mag_result else None
             
-            # Determina tipo movimento
-            if stato_origine == 'IN_MAGAZZINO' and stato_dest != 'IN_MAGAZZINO':
-                tipo_mov = 'SCARICO'
-            elif stato_origine == 'IN_MAGAZZINO' and stato_dest == 'IN_MAGAZZINO':
-                tipo_mov = 'TRASFERIMENTO'
-            else:
-                tipo_mov = 'TRASFERIMENTO'
+            # Tipo movimento: sempre TRASFERIMENTO per movimento multiplo
+            # SCARICO e CARICO sono riservati alle rispettive pagine dedicate
+            tipo_mov = 'TRASFERIMENTO'
             
             # 1. Inserisci record movimento
             cursor.execute("""
