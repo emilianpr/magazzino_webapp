@@ -3392,7 +3392,7 @@ def api_statistiche_export_csv():
 
 @app.route('/api/statistiche/export/pdf')
 def api_statistiche_export_pdf():
-    """Export statistiche in formato PDF con grafici"""
+    """Export statistiche in formato PDF con grafici e dati dettagliati"""
     if 'user_id' not in session:
         return jsonify({'error': 'Non autenticato'}), 401
     
@@ -3409,6 +3409,9 @@ def api_statistiche_export_pdf():
         start_date, end_date = get_date_range_from_param(range_param)
         prev_start, prev_end = get_previous_period_range(start_date, end_date)
         
+        # Calcola giorni nel periodo
+        giorni_periodo = (end_date - start_date).days or 1
+        
         conn = connect_to_database()
         cursor = conn.cursor(dictionary=True)
         
@@ -3419,47 +3422,215 @@ def api_statistiche_export_pdf():
                 SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as totale_carichi,
                 SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as totale_scarichi,
                 SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as totale_trasferimenti,
-                COUNT(DISTINCT prodotto_id) as prodotti_movimentati
+                COUNT(DISTINCT prodotto_id) as prodotti_movimentati,
+                COUNT(DISTINCT DATE(data_ora)) as giorni_attivi,
+                COUNT(DISTINCT user_id) as utenti_attivi
             FROM movimenti
             WHERE data_ora BETWEEN %s AND %s
         """, (start_date, end_date))
-        kpi = cursor.fetchone()
+        kpi_corrente = cursor.fetchone()
         
-        # Trend per grafico
+        # KPI periodo precedente per delta
         cursor.execute("""
             SELECT 
-                DATE(data_ora) as giorno,
-                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as carichi,
-                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as scarichi
+                COUNT(*) as totale_movimenti,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as totale_carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as totale_scarichi,
+                SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as totale_trasferimenti
             FROM movimenti
             WHERE data_ora BETWEEN %s AND %s
-            GROUP BY DATE(data_ora)
-            ORDER BY giorno
-        """, (start_date, end_date))
+        """, (prev_start, prev_end))
+        kpi_prev = cursor.fetchone()
+        
+        # Calcola delta percentuali
+        def calc_delta(current, previous):
+            if previous and previous > 0:
+                return ((current - previous) / previous) * 100
+            elif current > 0:
+                return 100
+            return 0
+        
+        totale_movimenti = kpi_corrente['totale_movimenti'] or 0
+        totale_carichi = int(kpi_corrente['totale_carichi'] or 0)
+        totale_scarichi = int(kpi_corrente['totale_scarichi'] or 0)
+        totale_trasferimenti = int(kpi_corrente['totale_trasferimenti'] or 0)
+        giorni_attivi = kpi_corrente['giorni_attivi'] or 0
+        
+        kpi = {
+            'totale_movimenti': totale_movimenti,
+            'totale_carichi': totale_carichi,
+            'totale_scarichi': totale_scarichi,
+            'totale_trasferimenti': totale_trasferimenti,
+            'prodotti_movimentati': kpi_corrente['prodotti_movimentati'] or 0,
+            'giorni_attivi': giorni_attivi,
+            'utenti_attivi': kpi_corrente['utenti_attivi'] or 0,
+            'media_giornaliera': totale_movimenti / giorni_attivi if giorni_attivi > 0 else 0,
+            'delta_movimenti': calc_delta(totale_movimenti, kpi_prev['totale_movimenti'] or 0),
+            'delta_carichi': calc_delta(totale_carichi, int(kpi_prev['totale_carichi'] or 0)),
+            'delta_scarichi': calc_delta(totale_scarichi, int(kpi_prev['totale_scarichi'] or 0)),
+            'delta_trasferimenti': calc_delta(totale_trasferimenti, int(kpi_prev['totale_trasferimenti'] or 0))
+        }
+        
+        # Trend per grafico
+        if range_param in ['6m', '1y']:
+            # Raggruppa per mese per periodi lunghi
+            cursor.execute("""
+                SELECT 
+                    DATE_FORMAT(data_ora, '%%Y-%%m') as periodo,
+                    SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as carichi,
+                    SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as scarichi
+                FROM movimenti
+                WHERE data_ora BETWEEN %s AND %s
+                GROUP BY DATE_FORMAT(data_ora, '%%Y-%%m')
+                ORDER BY periodo
+            """, (start_date, end_date))
+        else:
+            cursor.execute("""
+                SELECT 
+                    DATE(data_ora) as periodo,
+                    SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as carichi,
+                    SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as scarichi
+                FROM movimenti
+                WHERE data_ora BETWEEN %s AND %s
+                GROUP BY DATE(data_ora)
+                ORDER BY periodo
+            """, (start_date, end_date))
         trend_data = cursor.fetchall()
         
-        # Top 10 prodotti
+        # Top 10 prodotti con dettagli
         cursor.execute("""
-            SELECT p.nome_prodotto as nome, COUNT(*) as movimenti
+            SELECT 
+                p.codice_prodotto as codice,
+                p.nome_prodotto as nome, 
+                COUNT(*) as movimenti,
+                SUM(m.quantita) as quantita
             FROM movimenti m
             JOIN prodotti p ON m.prodotto_id = p.id
             WHERE m.data_ora BETWEEN %s AND %s
-            GROUP BY p.id, p.nome_prodotto
+            GROUP BY p.id, p.codice_prodotto, p.nome_prodotto
             ORDER BY movimenti DESC
             LIMIT 10
         """, (start_date, end_date))
-        top_prodotti = cursor.fetchall()
+        top_prodotti_raw = cursor.fetchall()
         
-        # Breakdown utenti
+        # Calcola percentuali per top prodotti
+        totale_mov = sum(p['movimenti'] for p in top_prodotti_raw) or 1
+        top_prodotti = []
+        for p in top_prodotti_raw:
+            top_prodotti.append({
+                'codice': p['codice'],
+                'nome': p['nome'],
+                'movimenti': p['movimenti'],
+                'quantita': int(p['quantita'] or 0),
+                'percentuale': (p['movimenti'] / totale_mov) * 100
+            })
+        
+        # Breakdown utenti con dettaglio per tipo
         cursor.execute("""
-            SELECT u.username, COUNT(*) as movimenti
+            SELECT 
+                u.username,
+                COUNT(*) as totale,
+                SUM(CASE WHEN m.tipo_movimento = 'CARICO' THEN 1 ELSE 0 END) as carichi,
+                SUM(CASE WHEN m.tipo_movimento = 'SCARICO' THEN 1 ELSE 0 END) as scarichi,
+                SUM(CASE WHEN m.tipo_movimento = 'TRASFERIMENTO' THEN 1 ELSE 0 END) as trasferimenti
             FROM movimenti m
             JOIN utenti u ON m.user_id = u.id
             WHERE m.data_ora BETWEEN %s AND %s
             GROUP BY u.id, u.username
-            ORDER BY movimenti DESC
+            ORDER BY totale DESC
         """, (start_date, end_date))
-        utenti = cursor.fetchall()
+        utenti_raw = cursor.fetchall()
+        
+        # Calcola percentuali per utenti
+        totale_utenti_mov = sum(u['totale'] for u in utenti_raw) or 1
+        utenti = []
+        for u in utenti_raw:
+            utenti.append({
+                'username': u['username'],
+                'totale': u['totale'],
+                'carichi': u['carichi'],
+                'scarichi': u['scarichi'],
+                'trasferimenti': u['trasferimenti'],
+                'percentuale': (u['totale'] / totale_utenti_mov) * 100
+            })
+        
+        # Giacenze per stato
+        cursor.execute("""
+            SELECT stato, SUM(quantita) as quantita
+            FROM giacenze
+            WHERE quantita > 0
+            GROUP BY stato
+            ORDER BY quantita DESC
+        """)
+        stati_giacenze = cursor.fetchall()
+        
+        # Ultimi 20 movimenti
+        cursor.execute("""
+            SELECT 
+                DATE_FORMAT(m.data_ora, '%%d/%%m/%%Y %%H:%%i') as data_ora,
+                m.tipo_movimento as tipo,
+                p.codice_prodotto as codice,
+                p.nome_prodotto as prodotto,
+                m.quantita,
+                m.da_ubicazione,
+                m.a_ubicazione,
+                u.username as utente
+            FROM movimenti m
+            JOIN prodotti p ON m.prodotto_id = p.id
+            JOIN utenti u ON m.user_id = u.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            ORDER BY m.data_ora DESC
+            LIMIT 20
+        """, (start_date, end_date))
+        ultimi_movimenti = cursor.fetchall()
+        
+        # Prodotti sotto soglia
+        cursor.execute("""
+            SELECT 
+                p.codice_prodotto as codice,
+                p.nome_prodotto as nome,
+                COALESCE(SUM(g.quantita), 0) as giacenza,
+                pt.soglia_minima as soglia,
+                pt.soglia_minima - COALESCE(SUM(g.quantita), 0) as mancanti
+            FROM product_thresholds pt
+            JOIN prodotti p ON pt.codice_prodotto COLLATE utf8mb4_unicode_ci = p.codice_prodotto COLLATE utf8mb4_unicode_ci
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            WHERE pt.notifica_attiva = 1
+            GROUP BY p.id, p.codice_prodotto, p.nome_prodotto, pt.soglia_minima
+            HAVING giacenza < pt.soglia_minima
+            ORDER BY mancanti DESC
+            LIMIT 10
+        """)
+        prodotti_sotto_soglia = cursor.fetchall()
+        
+        # Movimenti per magazzino
+        cursor.execute("""
+            SELECT 
+                COALESCE(mag.nome, 'Non specificato') as nome,
+                SUM(CASE WHEN m.tipo_movimento = 'CARICO' THEN m.quantita ELSE 0 END) as entrate,
+                SUM(CASE WHEN m.tipo_movimento = 'SCARICO' THEN m.quantita ELSE 0 END) as uscite
+            FROM movimenti m
+            LEFT JOIN magazzini mag ON m.a_magazzino_id = mag.id OR m.da_magazzino_id = mag.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            GROUP BY COALESCE(mag.nome, 'Non specificato')
+            ORDER BY (entrate + uscite) DESC
+            LIMIT 5
+        """, (start_date, end_date))
+        magazzini_raw = cursor.fetchall()
+        
+        # Calcola percentuali e saldo magazzini
+        totale_mag_mov = sum(m['entrate'] + m['uscite'] for m in magazzini_raw) or 1
+        magazzini = []
+        for m in magazzini_raw:
+            entrate = int(m['entrate'] or 0)
+            uscite = int(m['uscite'] or 0)
+            magazzini.append({
+                'nome': m['nome'],
+                'entrate': entrate,
+                'uscite': uscite,
+                'saldo': entrate - uscite,
+                'percentuale': ((entrate + uscite) / totale_mag_mov) * 100
+            })
         
         cursor.close()
         conn.close()
@@ -3468,15 +3639,22 @@ def api_statistiche_export_pdf():
         trend_chart_base64 = ''
         if trend_data:
             fig, ax = plt.subplots(figsize=(10, 4))
-            giorni = [row['giorno'].strftime('%d/%m') for row in trend_data]
+            
+            if range_param in ['6m', '1y']:
+                labels = [row['periodo'] for row in trend_data]
+            else:
+                labels = [row['periodo'].strftime('%d/%m') if hasattr(row['periodo'], 'strftime') else str(row['periodo']) for row in trend_data]
+            
             carichi = [int(row['carichi'] or 0) for row in trend_data]
             scarichi = [int(row['scarichi'] or 0) for row in trend_data]
             
-            ax.plot(giorni, carichi, label='Carichi', color='#22c55e', linewidth=2)
-            ax.plot(giorni, scarichi, label='Scarichi', color='#ef4444', linewidth=2)
-            ax.set_xlabel('Data')
+            ax.plot(labels, carichi, label='Carichi', color='#22c55e', linewidth=2, marker='o', markersize=4)
+            ax.plot(labels, scarichi, label='Scarichi', color='#ef4444', linewidth=2, marker='o', markersize=4)
+            ax.fill_between(labels, carichi, alpha=0.1, color='#22c55e')
+            ax.fill_between(labels, scarichi, alpha=0.1, color='#ef4444')
+            ax.set_xlabel('Periodo')
             ax.set_ylabel('Quantità')
-            ax.legend()
+            ax.legend(loc='upper left')
             ax.grid(True, alpha=0.3)
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
@@ -3487,32 +3665,37 @@ def api_statistiche_export_pdf():
             trend_chart_base64 = base64.b64encode(buffer.getvalue()).decode()
             plt.close()
         
-        # Genera grafico distribuzione per tipo
+        # Genera grafico distribuzione per tipo (pie)
         pie_chart_base64 = ''
-        totale_c = int(kpi['totale_carichi'] or 0)
-        totale_s = int(kpi['totale_scarichi'] or 0)
-        totale_t = int(kpi['totale_trasferimenti'] or 0)
-        
-        if totale_c > 0 or totale_s > 0 or totale_t > 0:
+        if totale_carichi > 0 or totale_scarichi > 0 or totale_trasferimenti > 0:
             fig, ax = plt.subplots(figsize=(5, 5))
             labels = []
             sizes = []
             colors = []
+            explode = []
             
-            if totale_c > 0:
-                labels.append(f'Carichi ({totale_c})')
-                sizes.append(totale_c)
+            if totale_carichi > 0:
+                labels.append(f'Carichi\n({totale_carichi})')
+                sizes.append(totale_carichi)
                 colors.append('#22c55e')
-            if totale_s > 0:
-                labels.append(f'Scarichi ({totale_s})')
-                sizes.append(totale_s)
+                explode.append(0.02)
+            if totale_scarichi > 0:
+                labels.append(f'Scarichi\n({totale_scarichi})')
+                sizes.append(totale_scarichi)
                 colors.append('#ef4444')
-            if totale_t > 0:
-                labels.append(f'Trasferimenti ({totale_t})')
-                sizes.append(totale_t)
+                explode.append(0.02)
+            if totale_trasferimenti > 0:
+                labels.append(f'Trasferimenti\n({totale_trasferimenti})')
+                sizes.append(totale_trasferimenti)
                 colors.append('#3b82f6')
+                explode.append(0.02)
             
-            ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+            wedges, texts, autotexts = ax.pie(sizes, labels=labels, colors=colors, 
+                                               autopct='%1.1f%%', startangle=90,
+                                               explode=explode, shadow=True)
+            for autotext in autotexts:
+                autotext.set_fontsize(9)
+                autotext.set_fontweight('bold')
             ax.axis('equal')
             plt.tight_layout()
             
@@ -3522,23 +3705,77 @@ def api_statistiche_export_pdf():
             pie_chart_base64 = base64.b64encode(buffer.getvalue()).decode()
             plt.close()
         
+        # Genera grafico confronto periodi (bar chart)
+        bar_chart_base64 = ''
+        if kpi_prev['totale_movimenti'] and kpi_prev['totale_movimenti'] > 0:
+            fig, ax = plt.subplots(figsize=(8, 4))
+            
+            categories = ['Movimenti', 'Carichi', 'Scarichi', 'Trasferimenti']
+            current_values = [totale_movimenti, totale_carichi, totale_scarichi, totale_trasferimenti]
+            prev_values = [
+                kpi_prev['totale_movimenti'] or 0,
+                int(kpi_prev['totale_carichi'] or 0),
+                int(kpi_prev['totale_scarichi'] or 0),
+                int(kpi_prev['totale_trasferimenti'] or 0)
+            ]
+            
+            x = range(len(categories))
+            width = 0.35
+            
+            bars1 = ax.bar([i - width/2 for i in x], prev_values, width, label='Periodo Precedente', color='#94a3b8')
+            bars2 = ax.bar([i + width/2 for i in x], current_values, width, label='Periodo Corrente', color='#0056a6')
+            
+            ax.set_ylabel('Quantità')
+            ax.set_xticks(x)
+            ax.set_xticklabels(categories)
+            ax.legend()
+            ax.grid(True, alpha=0.3, axis='y')
+            
+            # Aggiungi valori sopra le barre
+            for bar in bars1:
+                height = bar.get_height()
+                ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                           xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
+            for bar in bars2:
+                height = bar.get_height()
+                ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                           xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
+            
+            plt.tight_layout()
+            
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+            buffer.seek(0)
+            bar_chart_base64 = base64.b64encode(buffer.getvalue()).decode()
+            plt.close()
+        
+        # Range label mapping
+        range_labels = {
+            '7d': 'Ultimi 7 giorni',
+            '30d': 'Ultimi 30 giorni',
+            '90d': 'Ultimi 90 giorni',
+            '6m': 'Ultimi 6 mesi',
+            '1y': 'Ultimo anno'
+        }
+        
         # Render HTML per PDF
         html_content = render_template('statistiche_pdf.html',
             periodo_inizio=start_date.strftime('%d/%m/%Y'),
             periodo_fine=end_date.strftime('%d/%m/%Y'),
-            range_label=range_param,
-            kpi={
-                'totale_movimenti': kpi['totale_movimenti'] or 0,
-                'totale_carichi': totale_c,
-                'totale_scarichi': totale_s,
-                'totale_trasferimenti': totale_t,
-                'prodotti_movimentati': kpi['prodotti_movimentati'] or 0
-            },
+            periodo_precedente=f"{prev_start.strftime('%d/%m/%Y')} - {prev_end.strftime('%d/%m/%Y')}",
+            range_label=range_labels.get(range_param, range_param),
+            kpi=kpi,
             trend_chart=trend_chart_base64,
             pie_chart=pie_chart_base64,
+            bar_chart=bar_chart_base64,
             top_prodotti=top_prodotti,
             utenti=utenti,
-            generated_at=datetime.now().strftime('%d/%m/%Y %H:%M')
+            stati_giacenze=stati_giacenze,
+            ultimi_movimenti=ultimi_movimenti,
+            prodotti_sotto_soglia=prodotti_sotto_soglia,
+            magazzini=magazzini if magazzini else None,
+            generated_at=datetime.now().strftime('%d/%m/%Y %H:%M'),
+            anno_corrente=datetime.now().year
         )
         
         # Genera PDF
@@ -3546,13 +3783,15 @@ def api_statistiche_export_pdf():
         
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=statistiche_{range_param}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=report_statistiche_{range_param}_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf'
         
         return response
         
     except ImportError as ie:
         return jsonify({'error': f'Dipendenza mancante: {str(ie)}. Installa weasyprint e matplotlib.'}), 500
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 
