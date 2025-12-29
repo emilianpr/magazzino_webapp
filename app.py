@@ -69,6 +69,43 @@ MAINTENANCE_MODE = False
 # Cambia questo testo per descrivere l'operazione specifica
 MAINTENANCE_MESSAGE = "Aggiornamento alla Beta v1.4 - Tempo stimato: 1 ora"
 
+# ========================================
+# STATISTICS CACHE SYSTEM
+# ========================================
+import time
+from functools import wraps
+
+# Cache per le statistiche - evita query pesanti ripetute
+STATS_CACHE = {}
+CACHE_TTL = 300  # 5 minuti in secondi
+
+def get_stats_cache_key(prefix, range_param, user_id=None):
+    """Genera una chiave di cache per le statistiche"""
+    key = f"{prefix}_{range_param}"
+    if user_id:
+        key += f"_{user_id}"
+    return key
+
+def get_cached_stats(key):
+    """Recupera statistiche dalla cache se valide"""
+    if key in STATS_CACHE:
+        cached = STATS_CACHE[key]
+        if time.time() - cached['timestamp'] < CACHE_TTL:
+            return cached['data']
+    return None
+
+def set_cached_stats(key, data):
+    """Salva statistiche in cache"""
+    STATS_CACHE[key] = {
+        'data': data,
+        'timestamp': time.time()
+    }
+
+def clear_stats_cache():
+    """Svuota la cache delle statistiche"""
+    global STATS_CACHE
+    STATS_CACHE = {}
+
 # Before request handler per controllare la manutenzione
 @app.before_request
 def check_maintenance():
@@ -2897,6 +2934,626 @@ def movimento_multiplo_elimina_bozza(bozza_id):
             cursor.close()
         if 'conn' in locals() and conn:
             conn.close()
+
+
+# ========================================
+# STATISTICHE - ROUTES & APIs
+# ========================================
+
+def get_date_range_from_param(range_param):
+    """Converte il parametro range in date di inizio e fine"""
+    from datetime import timedelta
+    now = datetime.now()
+    
+    if range_param == '7d':
+        start_date = now - timedelta(days=7)
+    elif range_param == '30d':
+        start_date = now - timedelta(days=30)
+    elif range_param == '90d':
+        start_date = now - timedelta(days=90)
+    elif range_param == '6m':
+        start_date = now - timedelta(days=180)
+    elif range_param == '1y':
+        start_date = now - timedelta(days=365)
+    else:
+        start_date = now - timedelta(days=30)  # default 30 giorni
+    
+    return start_date, now
+
+def get_previous_period_range(start_date, end_date):
+    """Calcola il periodo precedente per il confronto"""
+    delta = end_date - start_date
+    prev_end = start_date
+    prev_start = prev_end - delta
+    return prev_start, prev_end
+
+
+@app.route('/statistiche')
+def statistiche():
+    """Pagina principale statistiche"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    return render_template('statistiche.html')
+
+
+@app.route('/api/statistiche')
+def api_statistiche():
+    """API per ottenere le statistiche principali (KPI)"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    
+    # Check cache
+    cache_key = get_stats_cache_key('stats_main', range_param)
+    cached = get_cached_stats(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    start_date, end_date = get_date_range_from_param(range_param)
+    prev_start, prev_end = get_previous_period_range(start_date, end_date)
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Movimenti periodo corrente
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as totale_movimenti,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as totale_carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as totale_scarichi,
+                SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as totale_trasferimenti,
+                COUNT(DISTINCT prodotto_id) as prodotti_movimentati
+            FROM movimenti
+            WHERE data_ora BETWEEN %s AND %s
+        """, (start_date, end_date))
+        current = cursor.fetchone()
+        
+        # Movimenti periodo precedente (per calcolo delta)
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as totale_movimenti,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as totale_carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as totale_scarichi,
+                SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as totale_trasferimenti
+            FROM movimenti
+            WHERE data_ora BETWEEN %s AND %s
+        """, (prev_start, prev_end))
+        previous = cursor.fetchone()
+        
+        # Giacenze attuali totali
+        cursor.execute("""
+            SELECT 
+                SUM(quantita) as totale_giacenze,
+                COUNT(DISTINCT prodotto_id) as prodotti_in_stock
+            FROM giacenze
+            WHERE quantita > 0
+        """)
+        giacenze = cursor.fetchone()
+        
+        # Prodotti sotto soglia
+        cursor.execute("""
+            SELECT COUNT(*) as sotto_soglia
+            FROM (
+                SELECT p.id, COALESCE(SUM(g.quantita), 0) as qta_totale, pt.soglia_minima
+                FROM prodotti p
+                LEFT JOIN giacenze g ON p.id = g.prodotto_id
+                LEFT JOIN product_thresholds pt ON p.codice_prodotto COLLATE utf8mb4_unicode_ci = pt.codice_prodotto
+                WHERE pt.soglia_minima IS NOT NULL AND pt.notifica_attiva = 1
+                GROUP BY p.id, pt.soglia_minima
+                HAVING qta_totale < pt.soglia_minima
+            ) as sottosoglia
+        """)
+        soglia_result = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        # Calcola delta percentuali
+        def calc_delta(current_val, prev_val):
+            c = current_val or 0
+            p = prev_val or 0
+            if p == 0:
+                return 100 if c > 0 else 0
+            return round(((c - p) / p) * 100, 1)
+        
+        result = {
+            'periodo': {
+                'range': range_param,
+                'inizio': start_date.strftime('%d/%m/%Y'),
+                'fine': end_date.strftime('%d/%m/%Y')
+            },
+            'kpi': {
+                'totale_movimenti': current['totale_movimenti'] or 0,
+                'delta_movimenti': calc_delta(current['totale_movimenti'], previous['totale_movimenti']),
+                'totale_carichi': int(current['totale_carichi'] or 0),
+                'delta_carichi': calc_delta(current['totale_carichi'], previous['totale_carichi']),
+                'totale_scarichi': int(current['totale_scarichi'] or 0),
+                'delta_scarichi': calc_delta(current['totale_scarichi'], previous['totale_scarichi']),
+                'totale_trasferimenti': int(current['totale_trasferimenti'] or 0),
+                'delta_trasferimenti': calc_delta(current['totale_trasferimenti'], previous['totale_trasferimenti']),
+                'prodotti_movimentati': current['prodotti_movimentati'] or 0,
+                'giacenze_totali': int(giacenze['totale_giacenze'] or 0),
+                'prodotti_in_stock': giacenze['prodotti_in_stock'] or 0,
+                'prodotti_sotto_soglia': soglia_result['sotto_soglia'] or 0
+            }
+        }
+        
+        set_cached_stats(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/trend')
+def api_statistiche_trend():
+    """API per i dati del grafico trend (movimenti nel tempo)"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    
+    cache_key = get_stats_cache_key('stats_trend', range_param)
+    cached = get_cached_stats(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    start_date, end_date = get_date_range_from_param(range_param)
+    
+    # Determina granularità in base al range
+    if range_param in ['7d']:
+        group_by = 'DATE(data_ora)'
+        date_format = '%d/%m'
+    elif range_param in ['30d', '90d']:
+        group_by = 'DATE(data_ora)'
+        date_format = '%d/%m'
+    else:
+        group_by = "DATE_FORMAT(data_ora, '%Y-%m')"
+        date_format = '%m/%Y'
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute(f"""
+            SELECT 
+                {group_by} as periodo,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as scarichi,
+                SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as trasferimenti,
+                COUNT(*) as num_movimenti
+            FROM movimenti
+            WHERE data_ora BETWEEN %s AND %s
+            GROUP BY {group_by}
+            ORDER BY periodo ASC
+        """, (start_date, end_date))
+        
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        labels = []
+        carichi = []
+        scarichi = []
+        trasferimenti = []
+        
+        for row in rows:
+            periodo = row['periodo']
+            if isinstance(periodo, datetime):
+                labels.append(periodo.strftime(date_format))
+            else:
+                labels.append(str(periodo))
+            carichi.append(int(row['carichi'] or 0))
+            scarichi.append(int(row['scarichi'] or 0))
+            trasferimenti.append(int(row['trasferimenti'] or 0))
+        
+        result = {
+            'labels': labels,
+            'datasets': {
+                'carichi': carichi,
+                'scarichi': scarichi,
+                'trasferimenti': trasferimenti
+            }
+        }
+        
+        set_cached_stats(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/per-stato')
+def api_statistiche_per_stato():
+    """API per distribuzione giacenze per stato"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    cache_key = get_stats_cache_key('stats_stato', 'current')
+    cached = get_cached_stats(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT stato, SUM(quantita) as totale
+            FROM giacenze
+            WHERE quantita > 0
+            GROUP BY stato
+            ORDER BY totale DESC
+        """)
+        
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        result = {
+            'labels': [row['stato'].replace('_', ' ').title() for row in rows],
+            'data': [int(row['totale']) for row in rows],
+            'raw_labels': [row['stato'] for row in rows]
+        }
+        
+        set_cached_stats(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/utenti')
+def api_statistiche_utenti():
+    """API per statistiche breakdown per utente"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    
+    cache_key = get_stats_cache_key('stats_utenti', range_param)
+    cached = get_cached_stats(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    start_date, end_date = get_date_range_from_param(range_param)
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                u.username,
+                COUNT(*) as totale_movimenti,
+                SUM(CASE WHEN m.tipo_movimento = 'CARICO' THEN m.quantita ELSE 0 END) as carichi,
+                SUM(CASE WHEN m.tipo_movimento = 'SCARICO' THEN m.quantita ELSE 0 END) as scarichi,
+                SUM(CASE WHEN m.tipo_movimento = 'TRASFERIMENTO' THEN m.quantita ELSE 0 END) as trasferimenti
+            FROM movimenti m
+            JOIN utenti u ON m.user_id = u.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            GROUP BY m.user_id, u.username
+            ORDER BY totale_movimenti DESC
+        """, (start_date, end_date))
+        
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        result = {
+            'utenti': [{
+                'username': row['username'],
+                'totale_movimenti': row['totale_movimenti'],
+                'carichi': int(row['carichi'] or 0),
+                'scarichi': int(row['scarichi'] or 0),
+                'trasferimenti': int(row['trasferimenti'] or 0)
+            } for row in rows]
+        }
+        
+        set_cached_stats(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/top-prodotti')
+def api_statistiche_top_prodotti():
+    """API per i prodotti più movimentati"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    limit = min(int(request.args.get('limit', 10)), 50)
+    
+    cache_key = get_stats_cache_key('stats_top_prodotti', f"{range_param}_{limit}")
+    cached = get_cached_stats(cache_key)
+    if cached:
+        return jsonify(cached)
+    
+    start_date, end_date = get_date_range_from_param(range_param)
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                p.id,
+                p.nome_prodotto as nome,
+                p.codice_prodotto as codice,
+                COUNT(*) as num_movimenti,
+                SUM(m.quantita) as quantita_totale
+            FROM movimenti m
+            JOIN prodotti p ON m.prodotto_id = p.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            GROUP BY p.id, p.nome_prodotto, p.codice_prodotto
+            ORDER BY num_movimenti DESC
+            LIMIT %s
+        """, (start_date, end_date, limit))
+        
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        result = {
+            'prodotti': [{
+                'id': row['id'],
+                'nome': row['nome'],
+                'codice': row['codice'],
+                'num_movimenti': row['num_movimenti'],
+                'quantita_totale': int(row['quantita_totale'] or 0)
+            } for row in rows]
+        }
+        
+        set_cached_stats(cache_key, result)
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/export/csv')
+def api_statistiche_export_csv():
+    """Export statistiche in formato CSV"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    start_date, end_date = get_date_range_from_param(range_param)
+    
+    try:
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Esporta movimenti del periodo
+        cursor.execute("""
+            SELECT 
+                m.data_ora,
+                m.tipo_movimento,
+                p.nome_prodotto as prodotto,
+                p.codice_prodotto as codice,
+                m.quantita,
+                m.stato,
+                m.da_ubicazione,
+                m.a_ubicazione,
+                u.username,
+                m.note
+            FROM movimenti m
+            JOIN prodotti p ON m.prodotto_id = p.id
+            LEFT JOIN utenti u ON m.user_id = u.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            ORDER BY m.data_ora DESC
+        """, (start_date, end_date))
+        
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        # Genera CSV
+        import csv
+        output = io.StringIO()
+        writer = csv.writer(output, delimiter=';')
+        
+        # Header
+        writer.writerow([
+            'Data/Ora', 'Tipo Movimento', 'Prodotto', 'Codice', 'Quantità',
+            'Stato', 'Da Ubicazione', 'A Ubicazione', 'Utente', 'Note'
+        ])
+        
+        for row in rows:
+            writer.writerow([
+                row['data_ora'].strftime('%d/%m/%Y %H:%M') if row['data_ora'] else '',
+                row['tipo_movimento'],
+                row['prodotto'],
+                row['codice'],
+                row['quantita'],
+                row['stato'] or '',
+                row['da_ubicazione'] or '',
+                row['a_ubicazione'] or '',
+                row['username'] or '',
+                row['note'] or ''
+            ])
+        
+        output.seek(0)
+        
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+        response.headers['Content-Disposition'] = f'attachment; filename=statistiche_{range_param}_{datetime.now().strftime("%Y%m%d")}.csv'
+        
+        return response
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/statistiche/export/pdf')
+def api_statistiche_export_pdf():
+    """Export statistiche in formato PDF con grafici"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Non autenticato'}), 401
+    
+    range_param = request.args.get('range', '30d')
+    
+    try:
+        # Importa WeasyPrint e matplotlib
+        from weasyprint import HTML, CSS
+        import matplotlib
+        matplotlib.use('Agg')  # Backend senza GUI
+        import matplotlib.pyplot as plt
+        import base64
+        
+        start_date, end_date = get_date_range_from_param(range_param)
+        prev_start, prev_end = get_previous_period_range(start_date, end_date)
+        
+        conn = connect_to_database()
+        cursor = conn.cursor(dictionary=True)
+        
+        # KPI periodo corrente
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as totale_movimenti,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as totale_carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as totale_scarichi,
+                SUM(CASE WHEN tipo_movimento = 'TRASFERIMENTO' THEN quantita ELSE 0 END) as totale_trasferimenti,
+                COUNT(DISTINCT prodotto_id) as prodotti_movimentati
+            FROM movimenti
+            WHERE data_ora BETWEEN %s AND %s
+        """, (start_date, end_date))
+        kpi = cursor.fetchone()
+        
+        # Trend per grafico
+        cursor.execute("""
+            SELECT 
+                DATE(data_ora) as giorno,
+                SUM(CASE WHEN tipo_movimento = 'CARICO' THEN quantita ELSE 0 END) as carichi,
+                SUM(CASE WHEN tipo_movimento = 'SCARICO' THEN quantita ELSE 0 END) as scarichi
+            FROM movimenti
+            WHERE data_ora BETWEEN %s AND %s
+            GROUP BY DATE(data_ora)
+            ORDER BY giorno
+        """, (start_date, end_date))
+        trend_data = cursor.fetchall()
+        
+        # Top 10 prodotti
+        cursor.execute("""
+            SELECT p.nome_prodotto as nome, COUNT(*) as movimenti
+            FROM movimenti m
+            JOIN prodotti p ON m.prodotto_id = p.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            GROUP BY p.id, p.nome_prodotto
+            ORDER BY movimenti DESC
+            LIMIT 10
+        """, (start_date, end_date))
+        top_prodotti = cursor.fetchall()
+        
+        # Breakdown utenti
+        cursor.execute("""
+            SELECT u.username, COUNT(*) as movimenti
+            FROM movimenti m
+            JOIN utenti u ON m.user_id = u.id
+            WHERE m.data_ora BETWEEN %s AND %s
+            GROUP BY u.id, u.username
+            ORDER BY movimenti DESC
+        """, (start_date, end_date))
+        utenti = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        # Genera grafico trend
+        trend_chart_base64 = ''
+        if trend_data:
+            fig, ax = plt.subplots(figsize=(10, 4))
+            giorni = [row['giorno'].strftime('%d/%m') for row in trend_data]
+            carichi = [int(row['carichi'] or 0) for row in trend_data]
+            scarichi = [int(row['scarichi'] or 0) for row in trend_data]
+            
+            ax.plot(giorni, carichi, label='Carichi', color='#22c55e', linewidth=2)
+            ax.plot(giorni, scarichi, label='Scarichi', color='#ef4444', linewidth=2)
+            ax.set_xlabel('Data')
+            ax.set_ylabel('Quantità')
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+            buffer.seek(0)
+            trend_chart_base64 = base64.b64encode(buffer.getvalue()).decode()
+            plt.close()
+        
+        # Genera grafico distribuzione per tipo
+        pie_chart_base64 = ''
+        totale_c = int(kpi['totale_carichi'] or 0)
+        totale_s = int(kpi['totale_scarichi'] or 0)
+        totale_t = int(kpi['totale_trasferimenti'] or 0)
+        
+        if totale_c > 0 or totale_s > 0 or totale_t > 0:
+            fig, ax = plt.subplots(figsize=(5, 5))
+            labels = []
+            sizes = []
+            colors = []
+            
+            if totale_c > 0:
+                labels.append(f'Carichi ({totale_c})')
+                sizes.append(totale_c)
+                colors.append('#22c55e')
+            if totale_s > 0:
+                labels.append(f'Scarichi ({totale_s})')
+                sizes.append(totale_s)
+                colors.append('#ef4444')
+            if totale_t > 0:
+                labels.append(f'Trasferimenti ({totale_t})')
+                sizes.append(totale_t)
+                colors.append('#3b82f6')
+            
+            ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            plt.tight_layout()
+            
+            buffer = io.BytesIO()
+            plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+            buffer.seek(0)
+            pie_chart_base64 = base64.b64encode(buffer.getvalue()).decode()
+            plt.close()
+        
+        # Render HTML per PDF
+        html_content = render_template('statistiche_pdf.html',
+            periodo_inizio=start_date.strftime('%d/%m/%Y'),
+            periodo_fine=end_date.strftime('%d/%m/%Y'),
+            range_label=range_param,
+            kpi={
+                'totale_movimenti': kpi['totale_movimenti'] or 0,
+                'totale_carichi': totale_c,
+                'totale_scarichi': totale_s,
+                'totale_trasferimenti': totale_t,
+                'prodotti_movimentati': kpi['prodotti_movimentati'] or 0
+            },
+            trend_chart=trend_chart_base64,
+            pie_chart=pie_chart_base64,
+            top_prodotti=top_prodotti,
+            utenti=utenti,
+            generated_at=datetime.now().strftime('%d/%m/%Y %H:%M')
+        )
+        
+        # Genera PDF
+        pdf = HTML(string=html_content).write_pdf()
+        
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=statistiche_{range_param}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+        
+    except ImportError as ie:
+        return jsonify({'error': f'Dipendenza mancante: {str(ie)}. Installa weasyprint e matplotlib.'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

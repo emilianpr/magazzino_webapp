@@ -1,0 +1,841 @@
+{% extends "base.html" %}
+
+{% block page_title_full %}Statistiche - Pharmagest{% endblock %}
+{% block page_title_short %}Statistiche{% endblock %}
+
+{% block extra_css %}
+<style>
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.kpi-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.9) 100%);
+  border: 1px solid rgba(0, 86, 166, 0.15);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+  border-color: rgba(0, 86, 166, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 86, 166, 0.1);
+}
+
+.dark .kpi-card {
+  background: linear-gradient(135deg, rgba(26,26,26,0.95) 0%, rgba(10,10,10,0.9) 100%);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+.dark .kpi-card:hover {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.1);
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0056a6;
+  line-height: 1.2;
+}
+
+.dark .kpi-value {
+  color: #60a5fa;
+}
+
+.kpi-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.dark .kpi-label {
+  color: #9ca3af;
+}
+
+.kpi-delta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  margin-top: 0.5rem;
+}
+
+.kpi-delta.positive {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.kpi-delta.negative {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.kpi-delta.neutral {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+/* Chart containers */
+.chart-container {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.9) 100%);
+  border: 1px solid rgba(0, 86, 166, 0.15);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.dark .chart-container {
+  background: linear-gradient(135deg, rgba(26,26,26,0.95) 0%, rgba(10,10,10,0.9) 100%);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.dark .chart-title {
+  color: #e5e7eb;
+}
+
+/* Range selector */
+.range-selector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.range-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 86, 166, 0.2);
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.range-btn:hover {
+  border-color: #0056a6;
+  background: rgba(0, 86, 166, 0.05);
+}
+
+.range-btn.active {
+  background: #0056a6;
+  color: white;
+  border-color: #0056a6;
+}
+
+.dark .range-btn {
+  background: rgba(26, 26, 26, 0.9);
+  color: #e5e7eb;
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.dark .range-btn:hover {
+  border-color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.dark .range-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Export buttons */
+.export-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn-csv {
+  background: #059669;
+  color: white;
+  border: none;
+}
+
+.export-btn-csv:hover {
+  background: #047857;
+}
+
+.export-btn-pdf {
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+
+.export-btn-pdf:hover {
+  background: #b91c1c;
+}
+
+/* Users table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 86, 166, 0.1);
+}
+
+.users-table th {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.users-table td {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.users-table tbody tr:hover {
+  background: rgba(0, 86, 166, 0.03);
+}
+
+.dark .users-table th {
+  color: #d1d5db;
+  border-bottom-color: rgba(96, 165, 250, 0.1);
+}
+
+.dark .users-table td {
+  color: #9ca3af;
+  border-bottom-color: rgba(96, 165, 250, 0.1);
+}
+
+.dark .users-table tbody tr:hover {
+  background: rgba(96, 165, 250, 0.05);
+}
+
+/* Top products list */
+.top-product-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(0, 86, 166, 0.1);
+}
+
+.top-product-item:last-child {
+  border-bottom: none;
+}
+
+.dark .top-product-item {
+  border-bottom-color: rgba(96, 165, 250, 0.1);
+}
+
+.top-product-rank {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0056a6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dark .top-product-rank {
+  background: #3b82f6;
+}
+
+.top-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-product-name {
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dark .top-product-name {
+  color: #e5e7eb;
+}
+
+.top-product-code {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.top-product-count {
+  font-weight: 600;
+  color: #0056a6;
+  font-size: 0.875rem;
+}
+
+.dark .top-product-count {
+  color: #60a5fa;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 0.25rem;
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .kpi-value {
+    font-size: 1.5rem;
+  }
+  
+  .chart-container {
+    padding: 1rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="statisticheDashboard()" class="container mx-auto px-4 py-6">
+  
+  <!-- Header con filtri e export -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Statistiche</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" x-text="periodoLabel"></p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3">
+      <!-- Range selector -->
+      <div class="range-selector">
+        <template x-for="r in ranges" :key="r.value">
+          <button class="range-btn" 
+                  :class="{ 'active': selectedRange === r.value }"
+                  @click="changeRange(r.value)"
+                  x-text="r.label"></button>
+        </template>
+      </div>
+      
+      <!-- Export buttons -->
+      <div class="flex gap-2">
+        <button @click="exportCSV()" class="export-btn export-btn-csv">
+          <i class="fas fa-file-csv"></i>
+          <span class="hidden sm:inline">CSV</span>
+        </button>
+        <button @click="exportPDF()" class="export-btn export-btn-pdf">
+          <i class="fas fa-file-pdf"></i>
+          <span class="hidden sm:inline">PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Error message -->
+  <div x-show="errorMessage" class="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300">
+    <i class="fas fa-exclamation-triangle mr-2"></i>
+    <span x-text="errorMessage"></span>
+  </div>
+  
+  <!-- KPI Cards -->
+  <div class="kpi-grid mb-6">
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : formatNumber(kpi.totale_movimenti)"></div>
+      <div class="kpi-label">Movimenti Totali</div>
+      <div class="kpi-delta" :class="getDeltaClass(kpi.delta_movimenti)" x-show="!loading">
+        <i :class="getDeltaIcon(kpi.delta_movimenti)"></i>
+        <span x-text="formatDelta(kpi.delta_movimenti)"></span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #22c55e" x-text="loading ? '...' : formatNumber(kpi.totale_carichi)"></div>
+      <div class="kpi-label">Carichi (qta)</div>
+      <div class="kpi-delta" :class="getDeltaClass(kpi.delta_carichi)" x-show="!loading">
+        <i :class="getDeltaIcon(kpi.delta_carichi)"></i>
+        <span x-text="formatDelta(kpi.delta_carichi)"></span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #ef4444" x-text="loading ? '...' : formatNumber(kpi.totale_scarichi)"></div>
+      <div class="kpi-label">Scarichi (qta)</div>
+      <div class="kpi-delta" :class="getDeltaClass(kpi.delta_scarichi, true)" x-show="!loading">
+        <i :class="getDeltaIcon(kpi.delta_scarichi, true)"></i>
+        <span x-text="formatDelta(kpi.delta_scarichi)"></span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #3b82f6" x-text="loading ? '...' : formatNumber(kpi.totale_trasferimenti)"></div>
+      <div class="kpi-label">Trasferimenti (qta)</div>
+      <div class="kpi-delta" :class="getDeltaClass(kpi.delta_trasferimenti)" x-show="!loading">
+        <i :class="getDeltaIcon(kpi.delta_trasferimenti)"></i>
+        <span x-text="formatDelta(kpi.delta_trasferimenti)"></span>
+      </div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : formatNumber(kpi.giacenze_totali)"></div>
+      <div class="kpi-label">Giacenze Totali</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : formatNumber(kpi.prodotti_in_stock)"></div>
+      <div class="kpi-label">Prodotti in Stock</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : formatNumber(kpi.prodotti_movimentati)"></div>
+      <div class="kpi-label">Prodotti Movimentati</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" :style="kpi.prodotti_sotto_soglia > 0 ? 'color: #f59e0b' : ''" 
+           x-text="loading ? '...' : formatNumber(kpi.prodotti_sotto_soglia)"></div>
+      <div class="kpi-label">Sotto Soglia</div>
+    </div>
+  </div>
+  
+  <!-- Charts row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Trend chart -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-chart-line mr-2 text-phg-primary dark:text-blue-400"></i>
+        Trend Movimenti
+      </div>
+      <div class="relative" style="height: 300px;">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Distribution chart -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-chart-pie mr-2 text-phg-primary dark:text-blue-400"></i>
+        Distribuzione per Stato
+      </div>
+      <div class="relative" style="height: 300px;">
+        <canvas id="statoChart"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom row: Users & Top Products -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Users breakdown -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-users mr-2 text-phg-primary dark:text-blue-400"></i>
+        Attività per Utente
+      </div>
+      <div class="overflow-x-auto">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Utente</th>
+              <th class="text-right">Movimenti</th>
+              <th class="text-right">Carichi</th>
+              <th class="text-right">Scarichi</th>
+              <th class="text-right">Trasf.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-if="loading">
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-spinner fa-spin mr-2"></i> Caricamento...
+                </td>
+              </tr>
+            </template>
+            <template x-if="!loading && utenti.length === 0">
+              <tr>
+                <td colspan="5" class="text-center py-4 text-gray-500">
+                  Nessun movimento nel periodo selezionato
+                </td>
+              </tr>
+            </template>
+            <template x-for="u in utenti" :key="u.username">
+              <tr>
+                <td class="font-medium text-gray-800 dark:text-gray-200" x-text="u.username"></td>
+                <td class="text-right font-semibold" x-text="formatNumber(u.totale_movimenti)"></td>
+                <td class="text-right text-green-600" x-text="formatNumber(u.carichi)"></td>
+                <td class="text-right text-red-600" x-text="formatNumber(u.scarichi)"></td>
+                <td class="text-right text-blue-600" x-text="formatNumber(u.trasferimenti)"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Top products -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-trophy mr-2 text-phg-primary dark:text-blue-400"></i>
+        Top 10 Prodotti Movimentati
+      </div>
+      <div>
+        <template x-if="loading">
+          <div class="text-center py-4">
+            <i class="fas fa-spinner fa-spin mr-2"></i> Caricamento...
+          </div>
+        </template>
+        <template x-if="!loading && topProdotti.length === 0">
+          <div class="text-center py-4 text-gray-500">
+            Nessun prodotto movimentato nel periodo
+          </div>
+        </template>
+        <template x-for="(p, idx) in topProdotti" :key="p.id">
+          <div class="top-product-item">
+            <div class="top-product-rank" x-text="idx + 1"></div>
+            <div class="top-product-info">
+              <div class="top-product-name" x-text="p.nome"></div>
+              <div class="top-product-code" x-text="p.codice"></div>
+            </div>
+            <div class="top-product-count" x-text="formatNumber(p.num_movimenti) + ' mov.'"></div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+function statisticheDashboard() {
+  return {
+    loading: true,
+    selectedRange: '30d',
+    ranges: [
+      { value: '7d', label: '7gg' },
+      { value: '30d', label: '30gg' },
+      { value: '90d', label: '90gg' },
+      { value: '6m', label: '6 mesi' },
+      { value: '1y', label: '1 anno' }
+    ],
+    periodoLabel: '',
+    kpi: {
+      totale_movimenti: 0,
+      delta_movimenti: 0,
+      totale_carichi: 0,
+      delta_carichi: 0,
+      totale_scarichi: 0,
+      delta_scarichi: 0,
+      totale_trasferimenti: 0,
+      delta_trasferimenti: 0,
+      giacenze_totali: 0,
+      prodotti_in_stock: 0,
+      prodotti_movimentati: 0,
+      prodotti_sotto_soglia: 0
+    },
+    utenti: [],
+    topProdotti: [],
+    trendChart: null,
+    statoChart: null,
+    errorMessage: '',
+    initialized: false,
+    
+    init() {
+      // Previeni doppia inizializzazione
+      if (this.initialized) {
+        console.log('Already initialized, skipping');
+        return;
+      }
+      this.initialized = true;
+      console.log('Initializing dashboard...');
+      
+      // Aspetta che tutto sia pronto
+      const self = this;
+      if (document.readyState === 'complete') {
+        setTimeout(() => self.loadData(), 150);
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(() => self.loadData(), 150);
+        });
+      }
+    },
+    
+    async changeRange(range) {
+      console.log('Changing range to:', range);
+      this.selectedRange = range;
+      await this.loadData();
+    },
+    
+    async loadData() {
+      console.log('Loading data for range:', this.selectedRange);
+      this.loading = true;
+      this.errorMessage = '';
+      
+      try {
+        // Load all data in parallel
+        const [statsRes, trendRes, statoRes, utentiRes, prodottiRes] = await Promise.all([
+          fetch(`/api/statistiche?range=${this.selectedRange}`),
+          fetch(`/api/statistiche/trend?range=${this.selectedRange}`),
+          fetch('/api/statistiche/per-stato'),
+          fetch(`/api/statistiche/utenti?range=${this.selectedRange}`),
+          fetch(`/api/statistiche/top-prodotti?range=${this.selectedRange}`)
+        ]);
+        
+        // Check for auth errors
+        if (statsRes.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+        
+        const stats = await statsRes.json();
+        const trend = await trendRes.json();
+        const stato = await statoRes.json();
+        const utenti = await utentiRes.json();
+        const prodotti = await prodottiRes.json();
+        
+        console.log('Stats response:', stats);
+        console.log('Trend response:', trend);
+        console.log('Utenti response:', utenti);
+        console.log('Prodotti response:', prodotti);
+        
+        // Check for API errors
+        if (stats.error) {
+          this.errorMessage = stats.error;
+          this.loading = false;
+          return;
+        }
+        
+        // Update KPI
+        if (stats.kpi) {
+          this.kpi = stats.kpi;
+        }
+        if (stats.periodo) {
+          this.periodoLabel = `${stats.periodo.inizio} - ${stats.periodo.fine}`;
+        }
+        
+        // Update users
+        this.utenti = utenti.utenti || [];
+        
+        // Update top products
+        this.topProdotti = prodotti.prodotti || [];
+        
+        // Update charts after DOM updates
+        this.loading = false;
+        
+        // Salva i dati per i grafici
+        const trendData = trend;
+        const statoData = stato;
+        
+        // Usa setTimeout per assicurarsi che il DOM sia aggiornato
+        const self = this;
+        setTimeout(function() {
+          console.log('Rendering charts...');
+          self.renderTrendChart(trendData);
+          self.renderStatoChart(statoData);
+          console.log('Charts rendered:', self.trendChart, self.statoChart);
+        }, 200);
+        
+      } catch (error) {
+        console.error('Error loading statistics:', error);
+        this.errorMessage = 'Errore nel caricamento delle statistiche: ' + error.message;
+        this.loading = false;
+      }
+    },
+    
+    renderTrendChart(data) {
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js non caricato');
+        return;
+      }
+      
+      const canvas = document.getElementById('trendChart');
+      if (!canvas) {
+        console.error('Canvas trendChart non trovato');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#e5e7eb' : '#374151';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      
+      // Distruggi grafico esistente
+      if (this.trendChart) {
+        this.trendChart.destroy();
+        this.trendChart = null;
+      }
+      
+      this.trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels || [],
+          datasets: [
+            {
+              label: 'Carichi',
+              data: data.datasets?.carichi || [],
+              borderColor: '#22c55e',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Scarichi',
+              data: data.datasets?.scarichi || [],
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Trasferimenti',
+              data: data.datasets?.trasferimenti || [],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: textColor }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    },
+    
+    renderStatoChart(data) {
+      if (typeof Chart === 'undefined') {
+        console.error('Chart.js non caricato');
+        return;
+      }
+      
+      const canvas = document.getElementById('statoChart');
+      if (!canvas) {
+        console.error('Canvas statoChart non trovato');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#e5e7eb' : '#374151';
+      
+      // Distruggi grafico esistente
+      if (this.statoChart) {
+        this.statoChart.destroy();
+        this.statoChart = null;
+      }
+      
+      const colors = [
+        '#0056a6', '#22c55e', '#f59e0b', '#ef4444', 
+        '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'
+      ];
+      
+      this.statoChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.labels || [],
+          datasets: [{
+            data: data.data || [],
+            backgroundColor: colors.slice(0, (data.data || []).length),
+            borderWidth: 2,
+            borderColor: isDark ? '#1a1a1a' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor }
+            }
+          }
+        }
+      });
+    },
+    
+    formatNumber(n) {
+      if (n === null || n === undefined) return '0';
+      return new Intl.NumberFormat('it-IT').format(n);
+    },
+    
+    formatDelta(d) {
+      if (d === null || d === undefined || d === 0) return '0%';
+      const sign = d > 0 ? '+' : '';
+      return `${sign}${d}%`;
+    },
+    
+    getDeltaClass(d, inverse = false) {
+      if (d === null || d === undefined || d === 0) return 'neutral';
+      if (inverse) {
+        return d > 0 ? 'negative' : 'positive';
+      }
+      return d > 0 ? 'positive' : 'negative';
+    },
+    
+    getDeltaIcon(d, inverse = false) {
+      if (d === null || d === undefined || d === 0) return 'fas fa-minus';
+      if (inverse) {
+        return d > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+      }
+      return d > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+    },
+    
+    exportCSV() {
+      window.location.href = `/api/statistiche/export/csv?range=${this.selectedRange}`;
+    },
+    
+    exportPDF() {
+      window.location.href = `/api/statistiche/export/pdf?range=${this.selectedRange}`;
+    }
+  };
+}
+</script>
+{% endblock %}
