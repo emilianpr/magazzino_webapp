@@ -3613,7 +3613,7 @@ def api_statistiche_export_pdf():
             LEFT JOIN magazzini mag ON m.a_magazzino_id = mag.id OR m.da_magazzino_id = mag.id
             WHERE m.data_ora BETWEEN %s AND %s
             GROUP BY COALESCE(mag.nome, 'Non specificato')
-            ORDER BY (entrate + uscite) DESC
+            ORDER BY (SUM(CASE WHEN m.tipo_movimento = 'CARICO' THEN m.quantita ELSE 0 END) + SUM(CASE WHEN m.tipo_movimento = 'SCARICO' THEN m.quantita ELSE 0 END)) DESC
             LIMIT 5
         """, (start_date, end_date))
         magazzini_raw = cursor.fetchall()
