@@ -472,7 +472,7 @@
         <p class="card-subtitle">Crea un nuovo account utente per il sistema</p>
       </div>
       
-      <form method="POST" action="{{ url_for('register') }}">
+      <form method="POST" action="{{ url_for('auth.register') }}">
         <input type="hidden" name="action" value="add_user">
         
         <div class="form-grid">
@@ -561,7 +561,7 @@
           
           <div class="user-actions">
             <!-- Toggle Admin -->
-            <form method="POST" action="{{ url_for('register') }}" style="display: inline;">
+            <form method="POST" action="{{ url_for('auth.register') }}" style="display: inline;">
               <input type="hidden" name="action" value="toggle_admin">
               <input type="hidden" name="user_id" value="{{ utente.id }}">
               <input type="hidden" name="new_status" value="{{ 0 if utente.is_admin else 1 }}">
@@ -575,7 +575,7 @@
             
             <!-- Delete User -->
             {% if utente.id != current_user_id %}
-            <form method="POST" action="{{ url_for('register') }}" style="display: inline;">
+            <form method="POST" action="{{ url_for('auth.register') }}" style="display: inline;">
               <input type="hidden" name="action" value="delete_user">
               <input type="hidden" name="user_id" value="{{ utente.id }}">
               <button type="submit" 

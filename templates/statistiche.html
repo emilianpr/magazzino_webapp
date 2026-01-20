@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block page_title_full %}Statistiche - Pharmagest{% endblock %}
+{% block title %}Statistiche - Pharmagest{% endblock %}
 {% block page_title_short %}Statistiche{% endblock %}
 
 {% block extra_css %}
@@ -428,6 +428,57 @@
     </div>
   </div>
   
+  <!-- Metriche Avanzate - Nuova sezione -->
+  <div class="kpi-grid mb-6" x-show="avanzate.metriche_avanzate">
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #8b5cf6" x-text="loading ? '...' : formatNumber(avanzate.metriche_avanzate?.media_movimenti_giorno || 0)"></div>
+      <div class="kpi-label">Media Mov/Giorno</div>
+      <div class="text-xs text-gray-400 mt-1">su giorni attivi</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #06b6d4" x-text="loading ? '...' : formatNumber(avanzate.metriche_avanzate?.giorni_attivi || 0)"></div>
+      <div class="kpi-label">Giorni Attivi</div>
+      <div class="text-xs text-gray-400 mt-1" x-text="'su ' + (avanzate.metriche_avanzate?.giorni_totali_periodo || 0) + ' totali'"></div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #ec4899" x-text="loading ? '...' : formatNumber(avanzate.metriche_avanzate?.utenti_attivi || 0)"></div>
+      <div class="kpi-label">Utenti Attivi</div>
+      <div class="text-xs text-gray-400 mt-1">nel periodo</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" style="color: #10b981" x-text="loading ? '...' : formatNumber(avanzate.metriche_avanzate?.quantita_max_singola || 0)"></div>
+      <div class="kpi-label">Qta Max Singola</div>
+      <div class="text-xs text-gray-400 mt-1">operazione</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : formatNumber(avanzate.metriche_avanzate?.quantita_media || 0)"></div>
+      <div class="kpi-label">Qta Media</div>
+      <div class="text-xs text-gray-400 mt-1">per operazione</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : (avanzate.metriche_avanzate?.ora_piu_attiva || '-')"></div>
+      <div class="kpi-label">Ora Picco</div>
+      <div class="text-xs text-gray-400 mt-1">più operazioni</div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : (avanzate.metriche_avanzate?.picco_giornaliero?.data || '-')"></div>
+      <div class="kpi-label">Giorno Picco</div>
+      <div class="text-xs text-gray-400 mt-1" x-text="(avanzate.metriche_avanzate?.picco_giornaliero?.movimenti || 0) + ' movimenti'"></div>
+    </div>
+    
+    <div class="kpi-card">
+      <div class="kpi-value" x-text="loading ? '...' : '±' + formatNumber(avanzate.metriche_avanzate?.quantita_deviazione_std || 0)"></div>
+      <div class="kpi-label">Deviazione Std</div>
+      <div class="text-xs text-gray-400 mt-1">variabilità qta</div>
+    </div>
+  </div>
+  
   <!-- Charts row -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <!-- Trend chart -->
@@ -450,6 +501,122 @@
       <div class="relative" style="height: 300px;">
         <canvas id="statoChart"></canvas>
       </div>
+    </div>
+  </div>
+  
+  <!-- Nuova riga: Grafici Avanzati -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Grafico Confronto Periodi -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-balance-scale mr-2 text-phg-primary dark:text-blue-400"></i>
+        Confronto con Periodo Precedente
+      </div>
+      <div class="relative" style="height: 300px;">
+        <canvas id="confrontoChart"></canvas>
+      </div>
+      <div class="text-xs text-center text-gray-500 dark:text-gray-400 mt-2" x-show="confrontoPeriodi.periodo_precedente">
+        <span x-text="'Precedente: ' + (confrontoPeriodi.periodo_precedente?.label || '')"></span>
+      </div>
+    </div>
+    
+    <!-- Grafico Distribuzione Oraria -->
+    <div class="chart-container">
+      <div class="chart-title">
+        <i class="fas fa-clock mr-2 text-phg-primary dark:text-blue-400"></i>
+        Distribuzione Oraria Operazioni
+      </div>
+      <div class="relative" style="height: 300px;">
+        <canvas id="orariaChart"></canvas>
+      </div>
+      <div class="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+        Numero di movimenti per fascia oraria
+      </div>
+    </div>
+  </div>
+  
+  <!-- Grafico Distribuzione Settimanale -->
+  <div class="chart-container mb-6">
+    <div class="chart-title">
+      <i class="fas fa-calendar-week mr-2 text-phg-primary dark:text-blue-400"></i>
+      Distribuzione Settimanale
+    </div>
+    <div class="relative" style="height: 200px;">
+      <canvas id="settimanaleChart"></canvas>
+    </div>
+  </div>
+  
+  <!-- Alert Prodotti Sotto Soglia -->
+  <div class="chart-container mb-6" x-show="avanzate.prodotti_sotto_soglia && avanzate.prodotti_sotto_soglia.length > 0">
+    <div class="chart-title text-orange-500">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      Prodotti Sotto Soglia Minima
+    </div>
+    <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-3 mb-4">
+      <span class="text-sm text-orange-700 dark:text-orange-300">
+        <i class="fas fa-info-circle mr-1"></i>
+        <span x-text="(avanzate.prodotti_sotto_soglia?.length || 0) + ' prodotti richiedono rifornimento'"></span>
+      </span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Codice</th>
+            <th>Nome Prodotto</th>
+            <th class="text-right">Giacenza</th>
+            <th class="text-right">Soglia Min.</th>
+            <th class="text-right">Mancanti</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="p in avanzate.prodotti_sotto_soglia" :key="p.codice">
+            <tr>
+              <td class="font-medium" x-text="p.codice"></td>
+              <td x-text="p.nome"></td>
+              <td class="text-right text-red-600 font-semibold" x-text="formatNumber(p.giacenza)"></td>
+              <td class="text-right" x-text="formatNumber(p.soglia)"></td>
+              <td class="text-right text-orange-600 font-bold" x-text="formatNumber(p.mancanti)"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Tabella Movimenti per Magazzino -->
+  <div class="chart-container mb-6" x-show="avanzate.magazzini && avanzate.magazzini.length > 0">
+    <div class="chart-title">
+      <i class="fas fa-warehouse mr-2 text-phg-primary dark:text-blue-400"></i>
+      Movimenti per Magazzino
+    </div>
+    <div class="overflow-x-auto">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Magazzino</th>
+            <th class="text-right">Movimenti</th>
+            <th class="text-right text-green-600">Entrate</th>
+            <th class="text-right text-red-600">Uscite</th>
+            <th class="text-right text-blue-600">Trasf.</th>
+            <th class="text-right">Saldo</th>
+            <th class="text-right">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="m in avanzate.magazzini" :key="m.nome">
+            <tr>
+              <td class="font-medium text-gray-800 dark:text-gray-200" x-text="m.nome"></td>
+              <td class="text-right font-semibold" x-text="formatNumber(m.movimenti)"></td>
+              <td class="text-right text-green-600" x-text="'+' + formatNumber(m.entrate)"></td>
+              <td class="text-right text-red-600" x-text="'-' + formatNumber(m.uscite)"></td>
+              <td class="text-right text-blue-600" x-text="formatNumber(m.trasferimenti)"></td>
+              <td class="text-right font-bold" :class="m.saldo >= 0 ? 'text-green-600' : 'text-red-600'" x-text="(m.saldo >= 0 ? '+' : '') + formatNumber(m.saldo)"></td>
+              <td class="text-right text-gray-500" x-text="m.percentuale + '%'"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
     </div>
   </div>
   
@@ -565,8 +732,22 @@ function statisticheDashboard() {
     },
     utenti: [],
     topProdotti: [],
+    avanzate: {
+      fasce_orarie: [],
+      giorni_settimana: [],
+      metriche_avanzate: null,
+      magazzini: [],
+      prodotti_sotto_soglia: []
+    },
+    confrontoPeriodi: {
+      periodo_corrente: null,
+      periodo_precedente: null
+    },
     trendChart: null,
     statoChart: null,
+    confrontoChart: null,
+    orariaChart: null,
+    settimanaleChart: null,
     errorMessage: '',
     initialized: false,
     
@@ -603,12 +784,14 @@ function statisticheDashboard() {
       
       try {
         // Load all data in parallel
-        const [statsRes, trendRes, statoRes, utentiRes, prodottiRes] = await Promise.all([
+        const [statsRes, trendRes, statoRes, utentiRes, prodottiRes, avanzateRes, confrontoRes] = await Promise.all([
           fetch(`/api/statistiche?range=${this.selectedRange}`),
           fetch(`/api/statistiche/trend?range=${this.selectedRange}`),
           fetch('/api/statistiche/per-stato'),
           fetch(`/api/statistiche/utenti?range=${this.selectedRange}`),
-          fetch(`/api/statistiche/top-prodotti?range=${this.selectedRange}`)
+          fetch(`/api/statistiche/top-prodotti?range=${this.selectedRange}`),
+          fetch(`/api/statistiche/avanzate?range=${this.selectedRange}`),
+          fetch(`/api/statistiche/confronto-periodi?range=${this.selectedRange}`)
         ]);
         
         // Check for auth errors
@@ -622,11 +805,15 @@ function statisticheDashboard() {
         const stato = await statoRes.json();
         const utenti = await utentiRes.json();
         const prodotti = await prodottiRes.json();
+        const avanzate = await avanzateRes.json();
+        const confronto = await confrontoRes.json();
         
         console.log('Stats response:', stats);
         console.log('Trend response:', trend);
         console.log('Utenti response:', utenti);
         console.log('Prodotti response:', prodotti);
+        console.log('Avanzate response:', avanzate);
+        console.log('Confronto response:', confronto);
         
         // Check for API errors
         if (stats.error) {
@@ -649,12 +836,24 @@ function statisticheDashboard() {
         // Update top products
         this.topProdotti = prodotti.prodotti || [];
         
+        // Update avanzate
+        if (!avanzate.error) {
+          this.avanzate = avanzate;
+        }
+        
+        // Update confronto periodi
+        if (!confronto.error) {
+          this.confrontoPeriodi = confronto;
+        }
+        
         // Update charts after DOM updates
         this.loading = false;
         
         // Salva i dati per i grafici
         const trendData = trend;
         const statoData = stato;
+        const avanzateData = avanzate;
+        const confrontoData = confronto;
         
         // Usa setTimeout per assicurarsi che il DOM sia aggiornato
         const self = this;
@@ -662,7 +861,10 @@ function statisticheDashboard() {
           console.log('Rendering charts...');
           self.renderTrendChart(trendData);
           self.renderStatoChart(statoData);
-          console.log('Charts rendered:', self.trendChart, self.statoChart);
+          self.renderConfrontoChart(confrontoData);
+          self.renderOrariaChart(avanzateData);
+          self.renderSettimanaleChart(avanzateData);
+          console.log('Charts rendered');
         }, 200);
         
       } catch (error) {
@@ -795,6 +997,241 @@ function statisticheDashboard() {
             legend: {
               position: 'right',
               labels: { color: textColor }
+            }
+          }
+        }
+      });
+    },
+    
+    renderConfrontoChart(data) {
+      if (typeof Chart === 'undefined' || !data.periodo_corrente || !data.periodo_precedente) {
+        return;
+      }
+      
+      const canvas = document.getElementById('confrontoChart');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#e5e7eb' : '#374151';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      
+      if (this.confrontoChart) {
+        this.confrontoChart.destroy();
+        this.confrontoChart = null;
+      }
+      
+      const labels = ['Movimenti', 'Carichi', 'Scarichi', 'Trasferimenti'];
+      const currentData = [
+        data.periodo_corrente.movimenti,
+        data.periodo_corrente.carichi,
+        data.periodo_corrente.scarichi,
+        data.periodo_corrente.trasferimenti
+      ];
+      const prevData = [
+        data.periodo_precedente.movimenti,
+        data.periodo_precedente.carichi,
+        data.periodo_precedente.scarichi,
+        data.periodo_precedente.trasferimenti
+      ];
+      
+      this.confrontoChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Periodo Precedente',
+              data: prevData,
+              backgroundColor: 'rgba(156, 163, 175, 0.7)',
+              borderColor: 'rgba(156, 163, 175, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Periodo Corrente',
+              data: currentData,
+              backgroundColor: 'rgba(0, 86, 166, 0.7)',
+              borderColor: 'rgba(0, 86, 166, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: textColor }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    },
+    
+    renderOrariaChart(data) {
+      if (typeof Chart === 'undefined' || !data.fasce_orarie || data.fasce_orarie.length === 0) {
+        return;
+      }
+      
+      const canvas = document.getElementById('orariaChart');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#e5e7eb' : '#374151';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      
+      if (this.orariaChart) {
+        this.orariaChart.destroy();
+        this.orariaChart = null;
+      }
+      
+      const labels = data.fasce_orarie.map(f => f.ora);
+      const values = data.fasce_orarie.map(f => f.movimenti);
+      
+      // Trova il massimo per colorare diversamente
+      const maxVal = Math.max(...values);
+      const colors = values.map(v => 
+        v === maxVal ? 'rgba(239, 68, 68, 0.8)' : 
+        v > maxVal * 0.7 ? 'rgba(245, 158, 11, 0.8)' : 
+        'rgba(0, 86, 166, 0.7)'
+      );
+      
+      this.orariaChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Movimenti',
+            data: values,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace('0.7', '1').replace('0.8', '1')),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { 
+                color: textColor,
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    },
+    
+    renderSettimanaleChart(data) {
+      if (typeof Chart === 'undefined' || !data.giorni_settimana || data.giorni_settimana.length === 0) {
+        return;
+      }
+      
+      const canvas = document.getElementById('settimanaleChart');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#e5e7eb' : '#374151';
+      const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+      
+      if (this.settimanaleChart) {
+        this.settimanaleChart.destroy();
+        this.settimanaleChart = null;
+      }
+      
+      const labels = data.giorni_settimana.map(g => g.giorno);
+      const movimenti = data.giorni_settimana.map(g => g.movimenti);
+      const quantita = data.giorni_settimana.map(g => g.quantita);
+      
+      this.settimanaleChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'N° Movimenti',
+              data: movimenti,
+              backgroundColor: 'rgba(0, 86, 166, 0.7)',
+              borderColor: 'rgba(0, 86, 166, 1)',
+              borderWidth: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Quantità Totale',
+              data: quantita,
+              type: 'line',
+              borderColor: '#22c55e',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: textColor }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { display: false }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              ticks: { color: textColor },
+              grid: { color: gridColor },
+              title: {
+                display: true,
+                text: 'Movimenti',
+                color: textColor
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              ticks: { color: '#22c55e' },
+              grid: { drawOnChartArea: false },
+              title: {
+                display: true,
+                text: 'Quantità',
+                color: '#22c55e'
+              }
             }
           }
         }

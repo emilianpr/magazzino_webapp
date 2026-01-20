@@ -358,7 +358,7 @@
         <p class="subtitle">Aggiungi un nuovo utente (fidato) che acceda al magazzino</p>
       </div>
 
-      <form method="POST" action="{{ url_for('register') }}" class="space-y-6" x-data="{ showPassword: false, showConfirmPassword: false }">
+      <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-6" x-data="{ showPassword: false, showConfirmPassword: false }">
         <div class="form-group">
           <label for="username" class="form-label">
             <i class="fas fa-user mr-2"></i>Nome Utente

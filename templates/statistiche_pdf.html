@@ -182,6 +182,8 @@
     .kpi-value.blue { color: #2563eb; }
     .kpi-value.orange { color: #d97706; }
     .kpi-value.purple { color: #7c3aed; }
+    .kpi-value.cyan { color: #0891b2; }
+    .kpi-value.pink { color: #db2777; }
     
     .kpi-label {
       font-size: 7pt;
@@ -274,6 +276,7 @@
     .text-red { color: #dc2626; }
     .text-blue { color: #2563eb; }
     .text-orange { color: #d97706; }
+    .text-purple { color: #7c3aed; }
     .text-bold { font-weight: bold; }
     
     /* Rank badge */
@@ -506,6 +509,55 @@
     </div>
   </div>
   
+  <!-- Metriche Avanzate Aggiuntive -->
+  {% if metriche_avanzate %}
+  <div class="section">
+    <div class="section-title"><span class="icon">🔬</span> Metriche Avanzate</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value cyan">{{ metriche_avanzate.quantita_max_singola }}</div>
+        <div class="kpi-label">Qta Max Singola</div>
+        <div class="kpi-sublabel">per operazione</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ "%.1f"|format(metriche_avanzate.quantita_media) }}</div>
+        <div class="kpi-label">Qta Media</div>
+        <div class="kpi-sublabel">per operazione</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">±{{ "%.1f"|format(metriche_avanzate.quantita_deviazione_std) }}</div>
+        <div class="kpi-label">Deviazione Std</div>
+        <div class="kpi-sublabel">variabilità</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value pink">{{ metriche_avanzate.ora_piu_attiva }}</div>
+        <div class="kpi-label">Ora Picco</div>
+        <div class="kpi-sublabel">più attività</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ metriche_avanzate.picco_giornaliero.data }}</div>
+        <div class="kpi-label">Giorno Picco</div>
+        <div class="kpi-sublabel">{{ metriche_avanzate.picco_giornaliero.movimenti }} mov.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value green">{{ metriche_avanzate.giorni_attivi }}</div>
+        <div class="kpi-label">Giorni Attivi</div>
+        <div class="kpi-sublabel">su {{ metriche_avanzate.giorni_totali_periodo }} tot.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ metriche_avanzate.giorni_inattivi }}</div>
+        <div class="kpi-label">Giorni Fermi</div>
+        <div class="kpi-sublabel">senza operazioni</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">{{ "%.0f"|format((metriche_avanzate.giorni_attivi / metriche_avanzate.giorni_totali_periodo) * 100) if metriche_avanzate.giorni_totali_periodo > 0 else 0 }}%</div>
+        <div class="kpi-label">Tasso Attività</div>
+        <div class="kpi-sublabel">operatività</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
   <!-- Grafici -->
   {% if trend_chart or pie_chart %}
   <div class="section">
@@ -538,6 +590,94 @@
       <img src="data:image/png;base64,{{ bar_chart }}" alt="Confronto">
       <div class="chart-caption">Variazione rispetto al periodo precedente ({{ periodo_precedente }})</div>
     </div>
+  </div>
+  {% endif %}
+  
+  <!-- Distribuzione Oraria -->
+  {% if oraria_chart %}
+  <div class="section">
+    <div class="section-title"><span class="icon">⏰</span> Distribuzione Oraria Operazioni</div>
+    <div class="chart-container" style="max-width: 100%;">
+      <img src="data:image/png;base64,{{ oraria_chart }}" alt="Distribuzione Oraria">
+      <div class="chart-caption">Numero di movimenti per fascia oraria nel periodo analizzato</div>
+    </div>
+  </div>
+  {% endif %}
+  
+  <!-- Distribuzione Settimanale -->
+  {% if settimanale_chart %}
+  <div class="section">
+    <div class="section-title"><span class="icon">📅</span> Distribuzione Settimanale</div>
+    <div class="chart-container" style="max-width: 100%;">
+      <img src="data:image/png;base64,{{ settimanale_chart }}" alt="Distribuzione Settimanale">
+      <div class="chart-caption">Attività per giorno della settimana</div>
+    </div>
+  </div>
+  {% endif %}
+  
+  <!-- Tabella Distribuzione Oraria (testuale) -->
+  {% if fasce_orarie and fasce_orarie|length > 0 %}
+  <div class="section">
+    <div class="section-title"><span class="icon">🕐</span> Dettaglio Fasce Orarie</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Fascia</th>
+          <th class="text-right">Movimenti</th>
+          <th class="text-right">Quantità</th>
+          <th class="text-right">% sul Totale</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set totale_orario = fasce_orarie|sum(attribute='movimenti') %}
+        {% for f in fasce_orarie if f.movimenti > 0 %}
+        <tr>
+          <td><strong>{{ f.ora }} - {{ "%02d"|format((f.ora[:2]|int + 1) % 24) }}:00</strong></td>
+          <td class="text-right">{{ f.movimenti }}</td>
+          <td class="text-right">{{ f.quantita }}</td>
+          <td class="text-right">
+            <div>{{ "%.1f"|format((f.movimenti / totale_orario) * 100) if totale_orario > 0 else 0 }}%</div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-blue" style="width: {{ (f.movimenti / totale_orario) * 100 if totale_orario > 0 else 0 }}%;"></div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  
+  <!-- Tabella Distribuzione Settimanale -->
+  {% if giorni_settimana and giorni_settimana|length > 0 %}
+  <div class="section">
+    <div class="section-title"><span class="icon">📆</span> Dettaglio Giorni Settimana</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Giorno</th>
+          <th class="text-right">Movimenti</th>
+          <th class="text-right">Quantità</th>
+          <th class="text-right">% sul Totale</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set totale_sett = giorni_settimana|sum(attribute='movimenti') %}
+        {% for g in giorni_settimana %}
+        <tr>
+          <td><strong>{{ g.giorno }}</strong></td>
+          <td class="text-right">{{ g.movimenti }}</td>
+          <td class="text-right">{{ g.quantita }}</td>
+          <td class="text-right">
+            <div>{{ "%.1f"|format((g.movimenti / totale_sett) * 100) if totale_sett > 0 else 0 }}%</div>
+            <div class="progress-bar">
+              <div class="progress-fill progress-green" style="width: {{ (g.movimenti / totale_sett) * 100 if totale_sett > 0 else 0 }}%;"></div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
   {% endif %}
   
@@ -750,10 +890,60 @@
   <div class="info-box blue">
     <div class="info-box-title">ℹ️ Note sul Report</div>
     <ul style="margin-left: 15px; margin-top: 5px;">
-      <li>I dati sono aggiornati al momento della generazione del report</li>
-      <li>Le variazioni percentuali sono calcolate rispetto al periodo precedente di pari durata</li>
+      <li>I dati sono aggiornati al momento della generazione del report ({{ generated_at }})</li>
+      <li>Le variazioni percentuali (delta) sono calcolate rispetto al periodo precedente di pari durata</li>
       <li>I valori "Media/Giorno" considerano solo i giorni con almeno un'operazione</li>
+      <li>La deviazione standard misura la variabilità delle quantità movimentate</li>
+      <li>I prodotti "sotto soglia" sono quelli con giacenza inferiore alla soglia minima configurata</li>
+      <li>I grafici orari mostrano la distribuzione delle operazioni nelle 24 ore</li>
     </ul>
+  </div>
+  
+  <!-- Glossario -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📖</span> Glossario Metriche</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">Metrica</th>
+          <th>Descrizione</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Movimenti Totali</strong></td>
+          <td>Numero complessivo di operazioni (carichi, scarichi, trasferimenti) nel periodo</td>
+        </tr>
+        <tr>
+          <td><strong>Quantità Caricata</strong></td>
+          <td>Somma delle quantità di prodotti entrati in magazzino</td>
+        </tr>
+        <tr>
+          <td><strong>Quantità Scaricata</strong></td>
+          <td>Somma delle quantità di prodotti usciti dal magazzino</td>
+        </tr>
+        <tr>
+          <td><strong>Media/Giorno</strong></td>
+          <td>Numero medio di movimenti per ogni giorno attivo (con almeno un'operazione)</td>
+        </tr>
+        <tr>
+          <td><strong>Giorni Attivi</strong></td>
+          <td>Giorni in cui è stata registrata almeno un'operazione di magazzino</td>
+        </tr>
+        <tr>
+          <td><strong>Deviazione Standard</strong></td>
+          <td>Misura la dispersione delle quantità rispetto alla media (alta = quantità variabili)</td>
+        </tr>
+        <tr>
+          <td><strong>Tasso di Attività</strong></td>
+          <td>Percentuale di giorni attivi sul totale dei giorni nel periodo analizzato</td>
+        </tr>
+        <tr>
+          <td><strong>Ora Picco</strong></td>
+          <td>Fascia oraria con il maggior numero di operazioni registrate</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   
   <!-- Footer -->

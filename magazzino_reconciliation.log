@@ -4675,3 +4675,299 @@
 2025-11-25 11:15:33,638 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:15:33] "GET /notifications HTTP/1.1" 200 -
 2025-11-25 11:16:14,950 - werkzeug - INFO - 127.0.0.1 - - [25/Nov/2025 11:16:14] "GET /notifications HTTP/1.1" 200 -
 2025-11-25 11:16:39,380 - werkzeug - INFO -  * Detected change in 'C:\\magazzino_webapp\\app.py', reloading
+2026-01-07 09:23:39,215 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE COMPLETA MAGAZZINI
+2026-01-07 09:23:39,230 - magazzino_reconciliation - INFO - File AS400 da processare: ['Magazzino_27_Grossisti', 'Magazzino_28_Deposito']
+2026-01-07 09:23:39,230 - magazzino_reconciliation - INFO - Processando Magazzino_27_Grossisti...
+2026-01-07 09:23:39,230 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-01-07 09:23:39,231 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-01-07 09:23:39,231 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-01-07 09:23:39,232 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 25 ***        Martedi 30.12.25 Ora 15:21:01 Pag.   1'
+2026-01-07 09:23:39,232 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-01-07 09:23:39,232 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-01-07 09:23:39,233 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-01-07 09:23:39,233 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-01-07 09:23:39,246 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-01-07 09:23:39,247 - magazzino_reconciliation - INFO -   Righe processate: 46
+2026-01-07 09:23:39,247 - magazzino_reconciliation - INFO -   Match pattern originale: 0
+2026-01-07 09:23:39,247 - magazzino_reconciliation - INFO -   Match pattern alternativo: 0
+2026-01-07 09:23:39,248 - magazzino_reconciliation - INFO -   Prodotti estratti: 0
+2026-01-07 09:23:39,248 - magazzino_reconciliation - WARNING - Magazzino_27_Grossisti: nessun prodotto estratto
+2026-01-07 09:23:39,248 - magazzino_reconciliation - INFO - Processando Magazzino_28_Deposito...
+2026-01-07 09:23:39,248 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2026-01-07 09:23:39,249 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 47
+2026-01-07 09:23:39,249 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-01-07 09:23:39,249 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 25 ***        Martedi 30.12.25 Ora 15:21:01 Pag.   1'
+2026-01-07 09:23:39,250 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-01-07 09:23:39,250 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-01-07 09:23:39,250 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-01-07 09:23:39,251 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-01-07 09:23:39,262 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2026-01-07 09:23:39,262 - magazzino_reconciliation - INFO -   Righe processate: 46
+2026-01-07 09:23:39,263 - magazzino_reconciliation - INFO -   Match pattern originale: 0
+2026-01-07 09:23:39,263 - magazzino_reconciliation - INFO -   Match pattern alternativo: 0
+2026-01-07 09:23:39,263 - magazzino_reconciliation - INFO -   Prodotti estratti: 0
+2026-01-07 09:23:39,263 - magazzino_reconciliation - WARNING - Magazzino_28_Deposito: nessun prodotto estratto
+2026-01-07 09:23:39,264 - magazzino_reconciliation - INFO - AS400 unificato: 0 prodotti totali
+2026-01-07 09:23:39,264 - magazzino_reconciliation - INFO - Parsing export WebApp
+2026-01-07 09:23:39,266 - magazzino_reconciliation - INFO - File WebApp - Righe totali: 979
+2026-01-07 09:23:39,267 - magazzino_reconciliation - INFO - File WebApp - Righe di dati (senza header): 979
+2026-01-07 09:23:39,267 - magazzino_reconciliation - INFO - Prime 3 righe di dati:
+2026-01-07 09:23:39,267 - magazzino_reconciliation - INFO -   Riga 1: 'Nome Prodotto,Movimento,Quantità,Ubicazione,Note,Data,Utente...' se lunga
+2026-01-07 09:23:39,268 - magazzino_reconciliation - INFO -   Riga 2: '"TASTIERA_E_MOUSE_LENOVO_WIRELESS","Scarico","1","NA","Tipo scarico: NON_IN_MAGAZZINO - lorenzo","26...' se lunga
+2026-01-07 09:23:39,268 - magazzino_reconciliation - INFO -   Riga 3: '"THINKCENTRE_NEO_50Q","Scarico","1","NA","Tipo scarico: NON_IN_MAGAZZINO - Libarna (GUASTO)","26/11/...' se lunga
+2026-01-07 09:23:39,272 - magazzino_reconciliation - INFO - WebApp parsing completato:
+2026-01-07 09:23:39,273 - magazzino_reconciliation - INFO -   - Righe processate: 979
+2026-01-07 09:23:39,273 - magazzino_reconciliation - INFO -   - Righe valide: 0
+2026-01-07 09:23:39,274 - magazzino_reconciliation - INFO -   - Prodotti estratti: 0
+2026-01-07 09:23:39,274 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-01-07 09:23:39,280 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-01-07 09:23:39,280 - magazzino_reconciliation - INFO - Input AS400: 0 righe
+2026-01-07 09:23:39,280 - magazzino_reconciliation - INFO - Input WebApp: 0 righe
+2026-01-07 09:23:39,281 - magazzino_reconciliation - INFO - RICONCILIAZIONE COMPLETATA CON SUCCESSO
+2026-01-07 09:23:39,281 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:39] "[35m[1mPOST /api/reconcile-warehouse HTTP/1.1[0m" 500 -
+2026-01-07 09:23:46,923 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:46] "GET / HTTP/1.1" 200 -
+2026-01-07 09:23:46,963 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:46] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:23:49,955 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:49] "GET /esporta_magazzino_xlsx HTTP/1.1" 200 -
+2026-01-07 09:23:52,766 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:52] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-01-07 09:23:52,823 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:23:52] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:24:34,638 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:34] "[35m[1mPOST /api/reconcile-warehouse HTTP/1.1[0m" 500 -
+2026-01-07 09:24:40,488 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:40] "GET / HTTP/1.1" 200 -
+2026-01-07 09:24:40,541 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:40] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:24:41,968 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:41] "GET /esporta_magazzino HTTP/1.1" 200 -
+2026-01-07 09:24:44,993 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:44] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-01-07 09:24:45,051 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:45] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:24:50,438 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE COMPLETA MAGAZZINI
+2026-01-07 09:24:50,440 - magazzino_reconciliation - INFO - File AS400 da processare: ['Magazzino_27_Grossisti']
+2026-01-07 09:24:50,440 - magazzino_reconciliation - INFO - Processando Magazzino_27_Grossisti...
+2026-01-07 09:24:50,441 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-01-07 09:24:50,441 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-01-07 09:24:50,442 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-01-07 09:24:50,443 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 25 ***        Martedi 30.12.25 Ora 15:21:01 Pag.   1'
+2026-01-07 09:24:50,443 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-01-07 09:24:50,444 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-01-07 09:24:50,444 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-01-07 09:24:50,444 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-01-07 09:24:50,462 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-01-07 09:24:50,462 - magazzino_reconciliation - INFO -   Righe processate: 46
+2026-01-07 09:24:50,463 - magazzino_reconciliation - INFO -   Match pattern originale: 0
+2026-01-07 09:24:50,463 - magazzino_reconciliation - INFO -   Match pattern alternativo: 0
+2026-01-07 09:24:50,463 - magazzino_reconciliation - INFO -   Prodotti estratti: 0
+2026-01-07 09:24:50,463 - magazzino_reconciliation - WARNING - Magazzino_27_Grossisti: nessun prodotto estratto
+2026-01-07 09:24:50,464 - magazzino_reconciliation - INFO - AS400 unificato: 0 prodotti totali
+2026-01-07 09:24:50,464 - magazzino_reconciliation - INFO - Parsing export WebApp
+2026-01-07 09:24:50,465 - magazzino_reconciliation - INFO - File WebApp - Righe totali: 223
+2026-01-07 09:24:50,466 - magazzino_reconciliation - INFO - File WebApp - Righe di dati (senza header): 217
+2026-01-07 09:24:50,466 - magazzino_reconciliation - INFO - Prime 3 righe di dati:
+2026-01-07 09:24:50,466 - magazzino_reconciliation - INFO -   Riga 1: '245           SCANNER_MANUALE_CANON_DR-M140   farmacia            10D               in_magazzino    ...' se lunga
+2026-01-07 09:24:50,466 - magazzino_reconciliation - INFO -   Riga 2: '564           SCHEDA_SERIALE_2_PORTE_PCI      farmacia            9B                in_magazzino    ...' se lunga
+2026-01-07 09:24:50,467 - magazzino_reconciliation - INFO -   Riga 3: '94308         CASSETTE_ULTRIUM_LTO            grossisti           9D                in_magazzino    ...' se lunga
+2026-01-07 09:24:50,467 - magazzino_reconciliation - INFO - DEBUG 94906: riga_completa='94906         MULTIMEDS_-_KIT_DI_PREPARAZIONE farmacia            6B                in_magazzino        33  VENDIBILI SOLO 25'
+2026-01-07 09:24:50,467 - magazzino_reconciliation - INFO - DEBUG 94906: words=['94906', 'MULTIMEDS_-_KIT_DI_PREPARAZIONE', 'farmacia', '6B', 'in_magazzino', '33', 'VENDIBILI', 'SOLO', '25']
+2026-01-07 09:24:50,468 - magazzino_reconciliation - INFO - DEBUG 94906: tutti_numeri=[(5, 33), (8, 25)], qty_finale=33
+2026-01-07 09:24:50,469 - magazzino_reconciliation - INFO - DEBUG 94964: riga_completa='94964         MINI_TASTIERA_ACK_RF420_WIRELES farmacia            9C                in_magazzino         1'
+2026-01-07 09:24:50,469 - magazzino_reconciliation - INFO - DEBUG 94964: words=['94964', 'MINI_TASTIERA_ACK_RF420_WIRELES', 'farmacia', '9C', 'in_magazzino', '1']
+2026-01-07 09:24:50,470 - magazzino_reconciliation - INFO - DEBUG 94964: tutti_numeri=[(5, 1)], qty_finale=1
+2026-01-07 09:24:50,472 - magazzino_reconciliation - INFO - DEBUG 95592: riga_completa='95592         DISCO_KINGSTONE_480GB_SSD       farmacia            9B                in_magazzino         3  1 pz ha l'imballo riciclato'
+2026-01-07 09:24:50,472 - magazzino_reconciliation - INFO - DEBUG 95592: words=['95592', 'DISCO_KINGSTONE_480GB_SSD', 'farmacia', '9B', 'in_magazzino', '3', '1', 'pz', 'ha', "l'imballo", 'riciclato']
+2026-01-07 09:24:50,473 - magazzino_reconciliation - INFO - DEBUG 95592: tutti_numeri=[(5, 3), (6, 1)], qty_finale=3
+2026-01-07 09:24:50,474 - magazzino_reconciliation - INFO - DEBUG 95774: riga_completa='95774         CARICABATTERIE_4_POS._PLUS_95_2 grossisti           1A                in_magazzino        18'
+2026-01-07 09:24:50,475 - magazzino_reconciliation - INFO - DEBUG 95774: words=['95774', 'CARICABATTERIE_4_POS._PLUS_95_2', 'grossisti', '1A', 'in_magazzino', '18']
+2026-01-07 09:24:50,475 - magazzino_reconciliation - INFO - DEBUG 95774: tutti_numeri=[(5, 18)], qty_finale=18
+2026-01-07 09:24:50,476 - magazzino_reconciliation - INFO - DEBUG 95774: riga_completa='95774         CARICABATTERIE_4_POS._PLUS_95_2 grossisti           1C                in_magazzino        11'
+2026-01-07 09:24:50,476 - magazzino_reconciliation - INFO - DEBUG 95774: words=['95774', 'CARICABATTERIE_4_POS._PLUS_95_2', 'grossisti', '1C', 'in_magazzino', '11']
+2026-01-07 09:24:50,476 - magazzino_reconciliation - INFO - DEBUG 95774: tutti_numeri=[(5, 11)], qty_finale=11
+2026-01-07 09:24:50,483 - magazzino_reconciliation - INFO - WebApp parsing completato:
+2026-01-07 09:24:50,483 - magazzino_reconciliation - INFO -   - Righe processate: 217
+2026-01-07 09:24:50,483 - magazzino_reconciliation - INFO -   - Righe valide: 217
+2026-01-07 09:24:50,484 - magazzino_reconciliation - INFO -   - Prodotti estratti: 217
+2026-01-07 09:24:50,484 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-01-07 09:24:50,533 - magazzino_reconciliation - INFO - Aggregati in 131 prodotti unici
+2026-01-07 09:24:50,533 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-01-07 09:24:50,533 - magazzino_reconciliation - INFO - Input AS400: 0 righe
+2026-01-07 09:24:50,533 - magazzino_reconciliation - INFO - Input WebApp: 131 righe
+2026-01-07 09:24:50,534 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2026-01-07 09:24:50,534 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2026-01-07 09:24:50,535 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2026-01-07 09:24:50,535 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2026-01-07 09:24:50,541 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2026-01-07 09:24:50,542 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2026-01-07 09:24:50,547 - magazzino_reconciliation - INFO - Dopo merge: 131 righe
+2026-01-07 09:24:50,550 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 0
+2026-01-07 09:24:50,562 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 0, WebApp total: 2652
+2026-01-07 09:24:50,563 - magazzino_reconciliation - INFO - Riconciliazione completata: 131 prodotti analizzati
+2026-01-07 09:24:50,564 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2026-01-07 09:24:50,564 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 0
+2026-01-07 09:24:50,565 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 131
+2026-01-07 09:24:50,565 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 0
+2026-01-07 09:24:50,568 - magazzino_reconciliation - INFO - Top 10 differenze: {1: 32, 2: 18, 3: 13, 4: 9, 5: 6, 12: 6, 10: 5, 6: 5, 33: 3, 17: 3}
+2026-01-07 09:24:50,568 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:0, WebApp:1245, Diff:1245)
+2026-01-07 09:24:50,582 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260107_092450.csv
+2026-01-07 09:24:50,582 - magazzino_reconciliation - INFO - RICONCILIAZIONE COMPLETATA CON SUCCESSO
+2026-01-07 09:24:50,584 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:24:50] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-01-07 09:25:18,236 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:25:18] "GET /rientro_merce HTTP/1.1" 200 -
+2026-01-07 09:25:18,287 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:25:18] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:26:19,652 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:26:19] "[32mPOST /rientro_merce HTTP/1.1[0m" 302 -
+2026-01-07 09:26:19,680 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:26:19] "GET /rientro_merce HTTP/1.1" 200 -
+2026-01-07 09:26:19,730 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:26:19] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:31:25,788 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:25] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:31:25,847 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:25] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:31:29,221 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:29] "GET /nuovo-prodotto HTTP/1.1" 200 -
+2026-01-07 09:31:29,270 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:29] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:31:44,060 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:44] "GET / HTTP/1.1" 200 -
+2026-01-07 09:31:44,103 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:31:44] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:33:18,125 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:18] "GET / HTTP/1.1" 200 -
+2026-01-07 09:33:18,182 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:18] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:33:20,003 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:20] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:33:20,089 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:20] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:33:21,288 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:21] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:33:21,366 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:21] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:33:22,149 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:22] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:33:22,198 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:33:22] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:34:06,775 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:34:06] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:34:06,815 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:34:06] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:34:08,683 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:34:08] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:34:08,720 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:34:08] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 09:36:55,192 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:36:55] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 09:36:55,244 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:36:55] "GET /static/optimized.css HTTP/1.1" 200 -
+2026-01-07 09:36:55,815 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 09:36:55] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-07 12:22:39,536 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:22:39] "GET / HTTP/1.1" 200 -
+2026-01-07 12:22:39,766 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:22:39] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 12:22:42,157 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:22:42] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:22:42,252 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:22:42] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 12:24:33,555 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:33] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:24:33,601 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:33] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 12:24:36,092 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:36] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:24:36,145 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:36] "GET /static/optimized.css HTTP/1.1" 200 -
+2026-01-07 12:24:36,511 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:36] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-07 12:24:36,989 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:36] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:24:37,057 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:37] "GET /static/optimized.css HTTP/1.1" 200 -
+2026-01-07 12:24:37,362 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-07 12:24:37,533 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:37] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:24:37,577 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:37] "GET /static/optimized.css HTTP/1.1" 200 -
+2026-01-07 12:24:37,888 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:24:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-01-07 12:33:57,434 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:33:57] "[32mGET /statistiche?id=6f9188f4-d707-4ca3-86ad-0567bc30bd8e&vscodeBrowserReqId=1767785637429 HTTP/1.1[0m" 302 -
+2026-01-07 12:33:57,438 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:33:57] "GET /login HTTP/1.1" 200 -
+2026-01-07 12:34:02,032 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:34:02] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-01-07 12:34:02,035 - app - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\app.py", line 269, in index
+    return redirect(url_for('auth.login'))
+                    ^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\helpers.py", line 222, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\werkzeug\routing\map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login'. Did you mean 'auth.login' instead?
+2026-01-07 12:34:02,040 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:34:02] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2026-01-07 12:36:24,799 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:24] "GET /statistiche HTTP/1.1" 200 -
+2026-01-07 12:36:24,849 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:24] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-01-07 12:36:32,044 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:32] "[32mGET /statistiche?id=6f9188f4-d707-4ca3-86ad-0567bc30bd8e&vscodeBrowserReqId=1767785792037 HTTP/1.1[0m" 302 -
+2026-01-07 12:36:32,047 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:32] "GET /login HTTP/1.1" 200 -
+2026-01-07 12:36:32,149 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:32] "[32mGET /statistiche?id=6f9188f4-d707-4ca3-86ad-0567bc30bd8e&vscodeBrowserReqId=1767785792142 HTTP/1.1[0m" 302 -
+2026-01-07 12:36:32,165 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:32] "GET /login HTTP/1.1" 200 -
+2026-01-07 12:36:33,084 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:33] "[32mGET /statistiche?id=6f9188f4-d707-4ca3-86ad-0567bc30bd8e&vscodeBrowserReqId=1767785793080 HTTP/1.1[0m" 302 -
+2026-01-07 12:36:33,089 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:33] "GET /login HTTP/1.1" 200 -
+2026-01-07 12:36:37,782 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:37] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-01-07 12:36:37,785 - app - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\app.py", line 269, in index
+    return redirect(url_for('auth.login'))
+                    ^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\helpers.py", line 222, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\werkzeug\routing\map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login'. Did you mean 'auth.login' instead?
+2026-01-07 12:36:37,789 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:36:37] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2026-01-07 12:37:15,072 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:37:15] "[32mGET /statistiche?id=6f9188f4-d707-4ca3-86ad-0567bc30bd8e&vscodeBrowserReqId=1767785835066 HTTP/1.1[0m" 302 -
+2026-01-07 12:37:15,077 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:37:15] "GET /login HTTP/1.1" 200 -
+2026-01-07 12:37:58,480 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:37:58] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-01-07 12:37:58,483 - app - ERROR - Exception on / [GET]
+Traceback (most recent call last):
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\app.py", line 269, in index
+    return redirect(url_for('auth.login'))
+                    ^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\helpers.py", line 222, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\flask\app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\magazzino_webapp\.venv\Lib\site-packages\werkzeug\routing\map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login'. Did you mean 'auth.login' instead?
+2026-01-07 12:37:58,486 - werkzeug - INFO - 127.0.0.1 - - [07/Jan/2026 12:37:58] "[35m[1mGET / HTTP/1.1[0m" 500 -

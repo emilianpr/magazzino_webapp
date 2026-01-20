@@ -71,8 +71,8 @@ class MagazzinoReconciliation:
         for i, riga in enumerate(righe[:5]):
             self.logger.info(f"  Riga {i+1}: '{riga}'")
 
-        pattern_originale = r'\s*(\d{6,7})\s+(.+?)\s+[A-Z]\.\s+(\d{1,3}(?:\.\d{3})*|\d+)'
-        pattern_alternativo = r'\s*(\d{6,7})\s+(.+?)\s+(\d{1,3}(?:\.\d{3})*|\d+)'  # Senza [A-Z].
+        pattern_originale = r'\s*(\d{6,7})\s+(.+?)\s+[A-Z]\.\s+(\d{1,3}(?:\.\d{3})*|\d+)\s*$'
+        pattern_alternativo = r'\s*(\d{6,7})\s+(.+)\s+(\d{1,3}(?:\.\d{3})*|\d+)\s*$'  # Greedy + fine riga
         
         righe_processate = 0
         righe_match_originale = 0
