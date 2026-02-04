@@ -55,7 +55,16 @@ class MagazzinoReconciliation:
         )
 
     def parse_as400_magazzino(self, file_content: str, magazzino_name: str = "") -> pd.DataFrame:
-        """Estrae i dati dal formato AS400 valorizzazione magazzino."""
+        """
+        Estrae i dati dal formato AS400 valorizzazione magazzino.
+        
+        Formato AS400 tipico (6 colonne):
+        CODICE     DESCRIZIONE                        U.M.    GIAC.DIN.    C.M.P.         VALORE
+        0095413    ETICHETTA ELETTRONICA ID.TAG       N.      1.103        4,2598         4.698,5594
+        
+        La quantità (Giac.Din.) usa il punto come separatore migliaia.
+        I valori monetari usano virgola come separatore decimali.
+        """
         self.logger.info(f"Parsing file AS400 per magazzino: {magazzino_name}")
 
         if not file_content or not file_content.strip():
@@ -71,95 +80,132 @@ class MagazzinoReconciliation:
         for i, riga in enumerate(righe[:5]):
             self.logger.info(f"  Riga {i+1}: '{riga}'")
 
-        pattern_originale = r'\s*(\d{6,7})\s+(.+?)\s+[A-Z]\.\s+(\d{1,3}(?:\.\d{3})*|\d+)\s*$'
-        pattern_alternativo = r'\s*(\d{6,7})\s+(.+)\s+(\d{1,3}(?:\.\d{3})*|\d+)\s*$'  # Greedy + fine riga
+        # NUOVO PATTERN: cattura tutte le 6 colonne del formato AS400
+        # Codice | Descrizione | U.M. | Giac.Din. | C.M.P. | Valore
+        # Esempio: 0095413    ETICHETTA ELETTRONICA ID.TAG       N.                               1.103            4,2598             4.698,5594
+        pattern_completo = r'^\s*(\d{5,7})\s+(.+?)\s+([A-Z]{1,3}\.?)\s+(\d{1,3}(?:\.\d{3})*|\d+)\s+[\d,.]+\s+[\d,.]+\s*$'
+        
+        # Pattern semplificato: cerca codice, descrizione e primo numero intero dopo U.M.
+        pattern_semplificato = r'^\s*(\d{5,7})\s+(.+?)\s+[A-Z]{1,3}\.?\s+(\d{1,3}(?:\.\d{3})*|\d+)'
+        
+        # Pattern fallback: codice + tutto il resto, poi estrai quantità
+        pattern_fallback = r'^\s*(\d{5,7})\s+'
         
         righe_processate = 0
-        righe_match_originale = 0
-        righe_match_alternativo = 0
+        righe_match_completo = 0
+        righe_match_semplificato = 0
+        righe_match_fallback = 0
 
         for i, riga in enumerate(righe):
             try:
                 if not riga.strip():
                     continue
+                
+                # Salta righe di intestazione/footer
+                riga_lower = riga.lower().strip()
+                if any(header in riga_lower for header in ['codice', 'descrizione', 'giac.', 'totale', '---', '===', 'magazzino']):
+                    continue
                     
                 righe_processate += 1
                 
-                # Debug specifico per prodotti problematici
-                is_target_product = any(target in riga for target in ['95413', '0095413', '095413'])
+                # Debug per prodotti target
+                is_target_product = any(target in riga for target in ['95413', '0095413'])
                 if is_target_product:
                     self.logger.info(f"FOUND TARGET PRODUCT in {magazzino_name} line {i+1}: '{riga.strip()}'")
                 
-                # Prova pattern originale
-                match = re.match(pattern_originale, riga.strip())
+                codice = None
+                descrizione = None
+                quantita = None
+                
+                # Tentativo 1: Pattern completo
+                match = re.match(pattern_completo, riga.strip())
                 if match:
-                    righe_match_originale += 1
+                    righe_match_completo += 1
                     codice = match.group(1).strip()
                     descrizione = match.group(2).strip()
-                    quantita_str = match.group(3).strip()
-                    
-                    # Converti quantità gestendo separatori delle migliaia
+                    quantita_str = match.group(4).strip()
                     quantita = int(quantita_str.replace('.', ''))
+                else:
+                    # Tentativo 2: Pattern semplificato
+                    match = re.search(pattern_semplificato, riga.strip())
+                    if match:
+                        righe_match_semplificato += 1
+                        codice = match.group(1).strip()
+                        descrizione = match.group(2).strip()
+                        quantita_str = match.group(3).strip()
+                        quantita = int(quantita_str.replace('.', ''))
+                    else:
+                        # Tentativo 3: Pattern fallback con parsing a colonne
+                        match = re.match(pattern_fallback, riga.strip())
+                        if match:
+                            righe_match_fallback += 1
+                            codice = match.group(1).strip()
+                            
+                            # Estrai il resto della riga
+                            resto = riga.strip()[match.end():].strip()
+                            
+                            # Trova tutti i numeri nella riga (quantità e valori monetari)
+                            numeri = re.findall(r'(\d{1,3}(?:\.\d{3})*|\d+)', resto)
+                            
+                            # La quantità è tipicamente il primo numero intero (senza virgola)
+                            # I valori monetari hanno la virgola
+                            for num_str in numeri:
+                                # Verifica che questo numero non sia parte di un valore monetario
+                                # cercando se è seguito/preceduto da virgola
+                                pos = resto.find(num_str)
+                                if pos >= 0:
+                                    # Controlla se fa parte di un numero con virgola (monetario)
+                                    ctx_start = max(0, pos - 1)
+                                    ctx_end = min(len(resto), pos + len(num_str) + 1)
+                                    context = resto[ctx_start:ctx_end]
+                                    
+                                    if ',' not in context:
+                                        # Questo è probabilmente la quantità
+                                        quantita = int(num_str.replace('.', ''))
+                                        break
+                            
+                            # Estrai descrizione (tutto prima dei numeri)
+                            desc_match = re.match(r'^(.+?)\s+[A-Z]{1,3}\.?\s+\d', resto)
+                            if desc_match:
+                                descrizione = desc_match.group(1).strip()
+                            else:
+                                # Fallback: tutto fino al primo numero
+                                desc_parts = re.split(r'\s+\d', resto)
+                                descrizione = desc_parts[0].strip() if desc_parts else "N/D"
 
-                    if len(codice) >= 6 and quantita >= 0:
-                        dati.append({
-                            'Codice': codice,
-                            'Descrizione': descrizione,
-                            'Quantita_AS400': quantita,
-                            'Fonte_AS400': magazzino_name or 'AS400'
-                        })
-                        
-                        # Debug per prodotti target
-                        if codice.endswith('95413') or codice == '95413':
-                            self.logger.info(f"PARSED TARGET PRODUCT: {codice} -> {quantita} units (from '{quantita_str}') from {magazzino_name}")
-                        
-                        if len(dati) <= 3:  # Log primi 3 match per debug
-                            self.logger.info(f"Match trovato: Codice={codice}, Desc='{descrizione}', Qty={quantita}")
-                    continue
-                
-                # Prova pattern alternativo
-                match_alt = re.match(pattern_alternativo, riga.strip())
-                if match_alt:
-                    righe_match_alternativo += 1
-                    codice = match_alt.group(1).strip()
-                    descrizione = match_alt.group(2).strip()
-                    quantita_str = match_alt.group(3).strip()
+                # Validazione e salvataggio
+                if codice and quantita is not None and len(codice) >= 5 and quantita >= 0:
+                    dati.append({
+                        'Codice': codice,
+                        'Descrizione': descrizione or "N/D",
+                        'Quantita_AS400': quantita,
+                        'Fonte_AS400': magazzino_name or 'AS400'
+                    })
                     
-                    # Converti quantità gestendo separatori delle migliaia
-                    quantita = int(quantita_str.replace('.', ''))
-
-                    if len(codice) >= 6 and quantita >= 0:
-                        dati.append({
-                            'Codice': codice,
-                            'Descrizione': descrizione,
-                            'Quantita_AS400': quantita,
-                            'Fonte_AS400': magazzino_name or 'AS400'
-                        })
-                        
-                        # Debug per prodotti target
-                        if codice.endswith('95413') or codice == '95413':
-                            self.logger.info(f"PARSED TARGET PRODUCT (alt pattern): {codice} -> {quantita} units (from '{quantita_str}') from {magazzino_name}")
-                        
-                        if len(dati) <= 3:
-                            self.logger.info(f"Match alternativo: Codice={codice}, Desc='{descrizione}', Qty={quantita}")
-                    continue
-                
-                # Se nessun pattern funziona, log per debug
-                if righe_processate <= 10:  # Solo prime 10 righe per evitare spam
-                    self.logger.debug(f"Nessun match riga {i+1}: '{riga.strip()}'")
+                    # Debug per prodotti target
+                    if is_target_product:
+                        self.logger.info(f"PARSED TARGET PRODUCT: {codice} -> {quantita} units from {magazzino_name}")
+                    
+                    if len(dati) <= 3:  # Log primi 3 match per debug
+                        self.logger.info(f"Match trovato: Codice={codice}, Desc='{descrizione}', Qty={quantita}")
+                else:
+                    # Se nessun pattern funziona, log per debug
+                    if righe_processate <= 10:
+                        self.logger.debug(f"Nessun match riga {i+1}: '{riga.strip()}'")
                     
             except Exception as e:
                 if '95413' in riga:
                     self.logger.error(f"ERROR parsing target product line {i+1}: {str(e)} - Line: '{riga.strip()}'")
-                continue
-                self.logger.debug(f"Errore parsing riga {i+1}: {str(e)}")
+                else:
+                    self.logger.debug(f"Errore parsing riga {i+1}: {str(e)}")
                 continue
 
         df = pd.DataFrame(dati)
         self.logger.info(f"AS400 {magazzino_name} - Statistiche parsing:")
         self.logger.info(f"  Righe processate: {righe_processate}")
-        self.logger.info(f"  Match pattern originale: {righe_match_originale}")
-        self.logger.info(f"  Match pattern alternativo: {righe_match_alternativo}")
+        self.logger.info(f"  Match pattern completo: {righe_match_completo}")
+        self.logger.info(f"  Match pattern semplificato: {righe_match_semplificato}")
+        self.logger.info(f"  Match pattern fallback: {righe_match_fallback}")
         self.logger.info(f"  Prodotti estratti: {len(df)}")
         
         return df
@@ -743,10 +789,162 @@ class MagazzinoReconciliation:
         except Exception as e:
             self.logger.error(f"Errore salvataggio audit: {str(e)}")
             return ""
+    
+    def get_webapp_data_from_database(self) -> pd.DataFrame:
+        """
+        Carica i dati delle giacenze direttamente dal database webapp.
+        Questa funzione elimina la necessità di caricare un file export.
+        
+        Returns:
+            DataFrame con colonne: Codice, Descrizione, Quantita_WebApp, Magazzino_Web, Stato, Ubicazione, Note
+        """
+        self.logger.info("Caricamento dati webapp direttamente dal database")
+        
+        try:
+            from database_connection import connect_to_database
+            
+            conn = connect_to_database()
+            cursor = conn.cursor(dictionary=True)
+            
+            # Query per ottenere tutte le giacenze aggregate per codice prodotto
+            query = """
+                SELECT 
+                    p.codice_prodotto AS Codice,
+                    p.nome_prodotto AS Descrizione,
+                    g.quantita AS Quantita,
+                    m.nome AS Magazzino,
+                    g.stato AS Stato,
+                    g.ubicazione AS Ubicazione,
+                    g.note AS Note
+                FROM giacenze g
+                JOIN prodotti p ON g.prodotto_id = p.id
+                LEFT JOIN magazzini m ON g.magazzino_id = m.id
+                WHERE g.quantita > 0
+                ORDER BY p.codice_prodotto
+            """
+            
+            cursor.execute(query)
+            risultati = cursor.fetchall()
+            
+            cursor.close()
+            conn.close()
+            
+            if not risultati:
+                self.logger.warning("Nessuna giacenza trovata nel database webapp")
+                return pd.DataFrame(columns=['Codice', 'Descrizione', 'Quantita_WebApp', 'Magazzino_Web', 'Stato', 'Ubicazione', 'Note'])
+            
+            # Converti in DataFrame
+            df = pd.DataFrame(risultati)
+            
+            # Rinomina colonne per compatibilità
+            df = df.rename(columns={
+                'Quantita': 'Quantita_WebApp',
+                'Magazzino': 'Magazzino_Web'
+            })
+            
+            # Gestione valori nulli
+            df['Magazzino_Web'] = df['Magazzino_Web'].fillna('')
+            df['Stato'] = df['Stato'].fillna('')
+            df['Ubicazione'] = df['Ubicazione'].fillna('')
+            df['Note'] = df['Note'].fillna('')
+            
+            self.logger.info(f"Caricate {len(df)} giacenze dal database webapp")
+            
+            # Debug: mostra alcuni esempi
+            if len(df) > 0:
+                sample = df.head(3)
+                for _, row in sample.iterrows():
+                    self.logger.info(f"  DB Sample: {row['Codice']} -> Qty: {row['Quantita_WebApp']}")
+            
+            return df
+            
+        except ImportError as e:
+            self.logger.error(f"Impossibile importare database_connection: {str(e)}")
+            raise ValueError("Modulo database_connection non disponibile")
+        except Exception as e:
+            self.logger.error(f"Errore caricamento dati da database: {str(e)}")
+            raise
+    
+    def reconcile_with_database(self, as400_files: Dict[str, str]) -> Dict:
+        """
+        Esegue la riconciliazione caricando automaticamente i dati webapp dal database.
+        
+        Args:
+            as400_files: Dizionario con nome magazzino -> contenuto file AS400
+            
+        Returns:
+            Report di riconciliazione completo
+        """
+        self.logger.info("=" * 60)
+        self.logger.info("AVVIO RICONCILIAZIONE CON DATABASE WEBAPP")
+        self.logger.info("=" * 60)
+        
+        try:
+            # Parsing file AS400
+            df_as400_list = []
+            for mag_name, content in as400_files.items():
+                df_mag = self.parse_as400_magazzino(content, mag_name)
+                if not df_mag.empty:
+                    df_as400_list.append(df_mag)
+                    self.logger.info(f"{mag_name}: {len(df_mag)} prodotti estratti")
+
+            if not df_as400_list:
+                return {
+                    'success': False,
+                    'error': 'Nessun dato valido estratto dai file AS400',
+                    'timestamp': datetime.now().isoformat()
+                }
+
+            # Unificazione AS400
+            df_as400_unificato = pd.concat(df_as400_list, ignore_index=True)
+            self.logger.info(f"Totale prodotti AS400 (prima unificazione): {len(df_as400_unificato)}")
+            
+            # Gestione duplicati AS400
+            duplicati = df_as400_unificato[df_as400_unificato.duplicated(subset=['Codice'], keep=False)]
+            if len(duplicati) > 0:
+                self.logger.info(f"Trovati {len(duplicati)} record duplicati in AS400 - verranno sommati")
+                df_as400_unificato = df_as400_unificato.groupby('Codice').agg({
+                    'Descrizione': 'first',
+                    'Quantita_AS400': 'sum',
+                    'Fonte_AS400': lambda x: ' + '.join(sorted(x.unique()))
+                }).reset_index()
+                self.logger.info(f"Dopo unificazione: {len(df_as400_unificato)} prodotti unici")
+
+            # Caricamento dati WebApp dal database
+            df_webapp = self.get_webapp_data_from_database()
+            df_webapp_agg = self.aggregate_webapp_data(df_webapp)
+            self.logger.info(f"Dati WebApp dal database: {len(df_webapp_agg)} prodotti aggregati")
+
+            # Riconciliazione
+            df_risultato = self.perform_reconciliation(df_as400_unificato, df_webapp_agg)
+
+            # Generazione report
+            report = self.generate_reconciliation_report(df_risultato)
+
+            # Salvataggio audit
+            if not df_risultato.empty:
+                self._save_reconciliation_data(df_risultato)
+
+            self.logger.info("RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO")
+            return report
+
+        except Exception as e:
+            error_msg = f"Errore durante riconciliazione: {str(e)}"
+            self.logger.error(error_msg)
+            import traceback
+            self.logger.error(traceback.format_exc())
+            return {
+                'success': False,
+                'error': error_msg,
+                'timestamp': datetime.now().isoformat()
+            }
 
 
 def process_uploaded_files(as400_mag27_file=None, as400_mag28_file=None, webapp_export_file=None) -> Dict:
-    """Processa i file caricati dalla webapp."""
+    """
+    Processa i file caricati dalla webapp.
+    DEPRECATED: Usa process_as400_files_with_database per il nuovo flusso automatico.
+    """
     if not webapp_export_file:
         raise ValueError("File export WebApp è obbligatorio")
 
@@ -776,6 +974,68 @@ def process_uploaded_files(as400_mag27_file=None, as400_mag28_file=None, webapp_
         return {
             'success': False,
             'error': f"Errore lettura file: {str(e)}",
+            'timestamp': datetime.now().isoformat()
+        }
+
+
+def process_as400_files_with_database(as400_mag27_file=None, as400_mag28_file=None) -> Dict:
+    """
+    Processa i file AS400 caricati e confronta con i dati del database webapp.
+    Questo è il nuovo flusso semplificato che non richiede upload del file webapp.
+    
+    Args:
+        as400_mag27_file: File AS400 Magazzino 27 (Grossisti) - opzionale
+        as400_mag28_file: File AS400 Magazzino 28 (Deposito) - opzionale
+        
+    Returns:
+        Report di riconciliazione completo
+    """
+    if not as400_mag27_file and not as400_mag28_file:
+        raise ValueError("Almeno un file AS400 è richiesto")
+
+    reconciler = MagazzinoReconciliation(log_level="INFO")
+    as400_files = {}
+
+    try:
+        if as400_mag27_file:
+            content_27 = as400_mag27_file.read()
+            if isinstance(content_27, bytes):
+                # Prova vari encoding comuni
+                for encoding in ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']:
+                    try:
+                        content_27 = content_27.decode(encoding)
+                        break
+                    except UnicodeDecodeError:
+                        continue
+                else:
+                    # Fallback con errori ignorati
+                    content_27 = content_27.decode('utf-8', errors='ignore')
+            as400_files['Magazzino_27_Grossisti'] = content_27
+
+        if as400_mag28_file:
+            content_28 = as400_mag28_file.read()
+            if isinstance(content_28, bytes):
+                # Prova vari encoding comuni
+                for encoding in ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']:
+                    try:
+                        content_28 = content_28.decode(encoding)
+                        break
+                    except UnicodeDecodeError:
+                        continue
+                else:
+                    # Fallback con errori ignorati
+                    content_28 = content_28.decode('utf-8', errors='ignore')
+            as400_files['Magazzino_28_Deposito'] = content_28
+
+        # Usa il nuovo metodo che carica i dati webapp dal database
+        return reconciler.reconcile_with_database(as400_files)
+
+    except Exception as e:
+        import traceback
+        return {
+            'success': False,
+            'error': f"Errore lettura file: {str(e)}",
+            'details': traceback.format_exc(),
             'timestamp': datetime.now().isoformat()
         }
 

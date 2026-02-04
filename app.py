@@ -70,7 +70,7 @@ app.register_blueprint(stats_bp)                   # /statistiche, /api/statisti
 # ========================================
 # APP VERSION
 # ========================================
-VERSION = "Beta v1.5"
+VERSION = "Beta v1.5.2"
 
 # ========================================
 # STATI DISPONIBILI (lista statica)
@@ -2332,32 +2332,37 @@ def warehouse_reconciliation():
 #Route per verifica e confronto giacenze magazzino
 @app.route('/api/reconcile-warehouse', methods=['POST'])
 def reconcile_warehouse():
-    """Endpoint principale per riconciliazione."""
+    """
+    Endpoint principale per riconciliazione magazzino.
+    
+    Nuovo flusso semplificato:
+    - Richiede solo i file AS400 (Magazzino 27 e/o 28)
+    - I dati WebApp vengono caricati automaticamente dal database
+    """
     try:
-        # Raccolta file
-        files_dict = {
-            'magazzino_27': request.files.get('magazzino_27'),
-            'magazzino_28': request.files.get('magazzino_28'),
-            'webapp_export': request.files.get('webapp_export')
-        }
+        # Raccolta file AS400
+        magazzino_27 = request.files.get('magazzino_27')
+        magazzino_28 = request.files.get('magazzino_28')
 
-        # Validazione
-        if not files_dict['webapp_export']:
+        # Validazione: almeno un file AS400 richiesto
+        if not magazzino_27 and not magazzino_28:
             return jsonify({
                 'success': False,
-                'error': 'File export WebApp è obbligatorio'
+                'error': 'Almeno un file AS400 è richiesto (Magazzino 27 o 28)'
             }), 400
 
         # Reset posizione file
-        for file_obj in files_dict.values():
-            if file_obj:
-                file_obj.seek(0)
+        if magazzino_27:
+            magazzino_27.seek(0)
+        if magazzino_28:
+            magazzino_28.seek(0)
 
-        # Processamento
-        report = process_uploaded_files(
-            files_dict['magazzino_27'],
-            files_dict['magazzino_28'], 
-            files_dict['webapp_export']
+        # Importa e usa il nuovo processore con database
+        from magazzino_reconciliation import process_as400_files_with_database, get_webapp_api_response
+        
+        report = process_as400_files_with_database(
+            as400_mag27_file=magazzino_27,
+            as400_mag28_file=magazzino_28
         )
 
         response = get_webapp_api_response(report)
@@ -2366,8 +2371,10 @@ def reconcile_warehouse():
         return jsonify(response), status_code
 
     except Exception as e:
-        # Log dell'errore (sostituito con print per ora)
+        # Log dell'errore
         print(f"Errore riconciliazione: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
         return jsonify({
             'success': False,
             'error': str(e),

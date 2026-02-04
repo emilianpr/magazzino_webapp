@@ -1,0 +1,141 @@
+Codice,Descrizione,Fonte_AS400,Quantita_AS400,Quantita_WebApp,Differenza,Status,Magazzino_Web,Stato,Ubicazione,Note
+95413,ETICHETTA ELETTRONICA ID.TAG,Magazzino_28_Deposito,1103,1245,142,⚠️ WEBAPP +142,farmacia,"baia_uscita, in_magazzino","-, 15A",*Luparelli guaste da smaltire
+95987,BATTERIA POTENZIATA PER PLUS95,Magazzino_27_Grossisti,17,66,49,⚠️ WEBAPP +49,grossisti,in_magazzino,1B,
+95778,GUSCIO TERMINALE PLUS 95 2D,Magazzino_27_Grossisti,22,62,40,⚠️ WEBAPP +40,grossisti,in_magazzino,"1C, 1E, 1F",
+95638,THINKCENTRE TINY IN ONE 24,Magazzino_28_Deposito,8,41,33,⚠️ WEBAPP +33,farmacia,"IN_PREPARAZIONE, SPEDITO, baia_uscita, in_magazzino, in_preparazione","-, 14E, 4E, 8c",*Giarrizzo | *Rotti | *rotto | Test Mov Multiplo 4 | test test
+95803,FIREWALL WATCHGUARD T25,Magazzino_28_Deposito,19,39,20,⚠️ WEBAPP +20,farmacia,"BAIA_USCITA, IN_PREPARAZIONE, altro, baia_uscita, in_magazzino, in_preparazione",10D,*Farmacia Abate Luigi | *Farmacia Arrighi - Strongoli  | *Farmacia Catanoso | *Farmacia Clementi Torre Del Lago | *Farmacia Parise | *GUASTO (ufficio Mirko) | Farmacia Burruano | TEST | Test API | Test Mov Multiplo 4
+95774,CARICABATTERIE 4 POS. PLUS 95 2D,Magazzino_27_Grossisti,15,29,14,⚠️ WEBAPP +14,grossisti,in_magazzino,"1A, 1C",
+95637,THINKCENTRE TINY IN ONE 22,Magazzino_28_Deposito,8,21,13,⚠️ WEBAPP +13,farmacia,in_magazzino,"5A, 5E, 6E, 6a, 8D, 8E, 9F",
+95633,,Solo_WebApp,0,12,12,⚠️ WEBAPP +12,farmacia,in_magazzino,5A,
+95932,MONITOR LENOVO T24I-30,Magazzino_28_Deposito,3,12,9,⚠️ WEBAPP +9,farmacia,in_magazzino,"10F, 13E, 13F",
+95952,WORKSTATION LENOVO P3,Magazzino_28_Deposito,5,12,7,⚠️ WEBAPP +7,farmacia,"DANNEGGIATO, in_magazzino, in_preparazione, laboratorio","15c, 2a, 4a, 5A, 5B",*Alzaia Pavese (sostituisce quella consegnata guasta) | *TEST EMI | TEST BBBBB
+96219,PC LENOVO M720Q REFURBISHED,Magazzino_28_Deposito,11,17,6,⚠️ WEBAPP +6,farmacia,in_magazzino,10C,
+95050,KIT STAMPA PER TOSHIBA B-FV4T,Magazzino_27_Grossisti,5,10,5,⚠️ WEBAPP +5,grossisti,in_magazzino,12E,
+95871,DGFE PER EPSON FP81II E FP90III,Magazzino_28_Deposito,6,11,5,⚠️ WEBAPP +5,farmacia,in_magazzino,9B,
+96075,MONITOR LENOVO C24-40,Magazzino_28_Deposito,12,17,5,⚠️ WEBAPP +5,farmacia,in_magazzino,"14C, 4C, 6d",
+95183,LETTORE HONEYWELL XENON 1952G,Magazzino_28_Deposito,18,22,4,⚠️ WEBAPP +4,farmacia,in_magazzino,11D,
+95711,,Solo_WebApp,0,4,4,⚠️ WEBAPP +4,farmacia,in_magazzino,9B,
+94881,SWITCH D-LINK DSG-1100-08,Magazzino_28_Deposito,7,10,3,⚠️ WEBAPP +3,farmacia,"IN_MAGAZZINO, baia_uscita, in_magazzino","11C, 9F",Restituzione da modifica giacenza 1616 | San Paolo no offerta 
+94911,ROT. TERMICO REG. CASSA (50 PZ.),Magazzino_28_Deposito,3,6,3,⚠️ WEBAPP +3,farmacia,"baia_uscita, in_magazzino",10B,*Farmacia Nigro 
+95052,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,11E,
+95081,CASSETTO ITALRETAIL 33 NERO 6V,Magazzino_28_Deposito,8,11,3,⚠️ WEBAPP +3,farmacia,in_magazzino,15d,
+95281,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,in_magazzino,9D,
+95689,ACCESS POINT ZYXEL NWA50AX,Magazzino_28_Deposito,6,9,3,⚠️ WEBAPP +3,farmacia,in_magazzino,11C,
+95757,ETICHETTE 20X10 ROTOLO 3000 PZ.,Magazzino_28_Deposito,65,68,3,⚠️ WEBAPP +3,farmacia,in_magazzino,12A,
+95822,LOGITECH SPEAKERS S150 USB,Magazzino_28_Deposito,9,12,3,⚠️ WEBAPP +3,farmacia,in_magazzino,11D,
+96046,,Solo_WebApp,0,3,3,⚠️ WEBAPP +3,farmacia,"baia_uscita, laboratorio",15c,PC guasto Farmacia Milano
+94906,MULTIMEDS - KIT DI PREPARAZIONE,Magazzino_28_Deposito,31,33,2,⚠️ WEBAPP +2,farmacia,in_magazzino,6B,VENDIBILI SOLO 25
+94966,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,"IN_MAGAZZINO, baia_uscita","-, 10D",Rientrato da RHO 3 - guasto
+95242,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11E,*dentro al 95578
+95268,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11D,
+95578,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,11E,"*vendere assieme al 0095242, si trova già dentro alla scatola "
+95601,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,12D,
+95680,,Solo_WebApp,0,2,2,⚠️ WEBAPP +2,farmacia,in_magazzino,10A,
+95950,BATTERIA PER ETICHETTA NOWA,Magazzino_28_Deposito,90,92,2,⚠️ WEBAPP +2,farmacia,"baia_uscita, in_magazzino","-, 6B",*Luparelli guaste da smaltire | *batteria per etichette ID.TAG
+245,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,10D,
+564,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+94874,SERVER LENOVO ST550,Magazzino_28_Deposito,3,4,1,⚠️ WEBAPP +1,farmacia,"in_magazzino, laboratorio","7A, 8A",*TEST MATTEO
+94909,MULTIMEDS - COPERTINA (240 PZ.),Magazzino_28_Deposito,5,6,1,⚠️ WEBAPP +1,farmacia,in_magazzino,6B,
+94967,ROTOLO TERMICO POS (50 PZ.),Magazzino_28_Deposito,7,8,1,⚠️ WEBAPP +1,farmacia,in_magazzino,10C,
+94997,STAMPANTE FISCALE EPSON FP-81II,Magazzino_28_Deposito,15,16,1,⚠️ WEBAPP +1,farmacia,"IN_PREPARAZIONE, baia_uscita, in_magazzino, in_preparazione","-, 13D, 2B, 2C",*PharmaExpo  | Guasta chiamare Epson | Test Mov Multiplo 4
+95032,STAMPANTE CORTESIA EPSON TM-T88,Magazzino_28_Deposito,11,12,1,⚠️ WEBAPP +1,farmacia,in_magazzino,12B,
+95195,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,11E,
+95196,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95252,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95257,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95258,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95294,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9C,
+95314,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,baia_uscita,,*Lenergie
+95678,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95726,TERMINALE OPTICON OPH-3001,Magazzino_28_Deposito,4,5,1,⚠️ WEBAPP +1,farmacia,"in_magazzino, in_utilizzo","-, 12B",*test cristian
+95780,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,in_magazzino,9B,
+95788,MULTIMEDS-COPERTINA BIANCA 240PZ,Magazzino_28_Deposito,11,12,1,⚠️ WEBAPP +1,farmacia,in_magazzino,6B,
+95876,THINKCENTRE LENOVO TS-M70Q,Magazzino_28_Deposito,2,3,1,⚠️ WEBAPP +1,farmacia,"SPEDITO, laboratorio",-,*guasto ex Linfa Oberdan da verificare | TEst mov multiplo 5 
+95949,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,baia_uscita,-,*ex monitor Poce guasto - verificare 
+95974,ROTOLO ETICHETTE 40X30 DA 3.000,Magazzino_28_Deposito,19,20,1,⚠️ WEBAPP +1,farmacia,in_magazzino,12A,TRASFERIMENTO DIRETTO - STAMPANTI SENZA RIBBON 
+96074,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,laboratorio,,
+96142,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,laboratorio,,*Farmacia Bonadeo
+96222,,Solo_WebApp,0,1,1,⚠️ WEBAPP +1,farmacia,baia_uscita,,*Farmacia Ciercello
+94308,CASSETTE ULTRIUM LTO,Magazzino_27_Grossisti,10,10,0,✅ ALLINEATO,grossisti,in_magazzino,9D,
+94624,BATTERIA DENSO BHT,Magazzino_27_Grossisti,3,3,0,✅ ALLINEATO,grossisti,in_magazzino,2D,test
+94625,CARICABATTERIA 4 POSIZIONI DENSO,Magazzino_27_Grossisti,17,17,0,✅ ALLINEATO,grossisti,"IN_MAGAZZINO, in_magazzino","13C, 2D",Restituzione da modifica giacenza 1325
+94838,FIREWALL WATCHGUARD T15,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,11C,
+94859,ETICHETTE 50X30 ROTOLO 1.500 PZ.,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,12A,TRASFERIMENTO DIRETTO - STAMPANTI SENZA RIBBON
+94884,LETTORE BARCODE AXON CS2000BT,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,11D,
+94910,MULTIMEDS - ETICHETTA (240 PZ.),Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,altro,6B,
+94963,MINI TASTIERA ACK 595 USB,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+94964,MINI TASTIERA ACK RF420 WIRELESS,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+95001,LETTORE BARCODE AXON CS3300 2D,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,11D,
+95049,STAMPANTE TOSHIBA TEC B-FV4T,Magazzino_27_Grossisti,2,2,0,✅ ALLINEATO,grossisti,in_magazzino,11A,
+95097,KIT 12.000 LAVORAZIONI 70X23,Magazzino_27_Grossisti,20,20,0,✅ ALLINEATO,grossisti,in_magazzino,10E,
+95136,ACCESS POINT PER ID.TAG,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,15A,
+95140,PORTA ETICHETTA ID.TAG (25 PZ.),Magazzino_28_Deposito,46,46,0,✅ ALLINEATO,farmacia,in_magazzino,15B,da 8mm - nella stessa ubicazione presenti le clip 
+95151,FIREWALL WATCHGUARD T20,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,"altro, in_magazzino","-, 7D",*Cosmofarma | *TEST MATTEO server campospinoso
+95167,PALMARE ZEBRA TC21,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,"altro, in_magazzino, in_utilizzo","-, 15A",luca | sala riunioni
+95176,HID DIGITALPERSONA 4500,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95254,PALO PROLUNGA DISPLAY EPSON FP,Magazzino_28_Deposito,5,5,0,✅ ALLINEATO,farmacia,in_magazzino,13D,
+95272,RAM KINGSTONE DDR4 8GB,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95273,RAM KINGSTONE DDR4 16GB,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95305,LETTORE BARCODE AXON CS2600,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,7D,*solo per Cosmofarma
+95378,LETTORE BARCODE AXON CS2600 LT,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,11D,
+95409,THINKCENTRE LENOVO M70Q,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,"10B, 15A",ID TAG ( non prelevare per altro ) | Id Tag ( Non Prelevare Per Altro )
+95412,PINZA ESTRAZIONE BATTERIA,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,15A,
+95439,RAM KINGSTONE 4GB DDR3L,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95442,DISCO WESTERN DIGITAL 2TB,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+95547,NASTRO NERO INKANTO 110X300 AWR8,Magazzino_27_Grossisti,57,57,0,✅ ALLINEATO,grossisti,in_magazzino,12A,
+95548,PC HP PRODESK 400 G6 DM,Magazzino_28_Deposito,6,6,0,✅ ALLINEATO,farmacia,in_magazzino,11E,
+95585,ROTOLO TERMICO CODALUX (50 PZ.),Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,10B,
+95592,DISCO KINGSTONE 480GB SSD,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,9B,1 pz ha l'imballo riciclato
+95608,SCHEDA NON FISCALE EPSON FP81II,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+95609,SCHEDA NON FISCALE EPSON FP90III,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+95625,TESTINA EPSON FP81II,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9C,
+95632,BATTERIA ZEBRA TC26,Magazzino_27_Grossisti,23,23,0,✅ ALLINEATO,grossisti,in_magazzino,2B,
+95634,CRADLE ZEBRA TC26,Magazzino_27_Grossisti,18,18,0,✅ ALLINEATO,grossisti,in_magazzino,13D,
+95641,TONER BROTHER TN423BK,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,12C,
+95642,TONER BROTHER TN423C,Magazzino_28_Deposito,5,5,0,✅ ALLINEATO,farmacia,in_magazzino,9E,
+95643,TONER BROTHER TN423M,Magazzino_28_Deposito,5,5,0,✅ ALLINEATO,farmacia,in_magazzino,9E,
+95644,TONER BROTHER TN423Y,Magazzino_28_Deposito,6,6,0,✅ ALLINEATO,farmacia,in_magazzino,9E,
+95645,DRUM BROTHER DR421CL,Magazzino_28_Deposito,6,6,0,✅ ALLINEATO,farmacia,in_magazzino,"12D, 9D",
+95646,ACCESS POINT CISCO AIR-AP1815I,Magazzino_27_Grossisti,2,2,0,✅ ALLINEATO,grossisti,"altro, in_magazzino","-, 8B",test matteo
+95649,TERMINALE ZEBRA WT6300,Magazzino_27_Grossisti,43,43,0,✅ ALLINEATO,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly 
+95650,BATTERIA ZEBRA WT6300,Magazzino_27_Grossisti,48,48,0,✅ ALLINEATO,grossisti,"baia_uscita, in_magazzino","-, 13B",*Nelly 
+95651,CARICABATTERIA 4 POSIZIONI ZEBRA,Magazzino_27_Grossisti,13,13,0,✅ ALLINEATO,grossisti,in_magazzino,13B, * + cavi + alimentatore 
+95652,BRACCIALE DA POLSO ZEBRA WT6300,Magazzino_27_Grossisti,42,42,0,✅ ALLINEATO,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly 
+95653,RING SCANNER ZEBRA RS5000,Magazzino_27_Grossisti,43,43,0,✅ ALLINEATO,grossisti,"baia_uscita, in_magazzino","-, 13A",*Nelly 
+95654,CRADLE ZEBRA WT6300,Magazzino_27_Grossisti,4,4,0,✅ ALLINEATO,grossisti,in_magazzino,13B,* + cavi + alimentatore 
+95663,RAM TRANSCEND DDR4 8GB,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95676,TASTIERINO NUMERICO MANHATTAN,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95681,TONER BROTHER TN3480,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,12C,
+95682,DRUM BROTHER DR3400,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,12C,
+95748,ALIMENTATORE LEVELONE POI-3014,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95770,CARRELLO MULTIMEDS 46 RIPIANI,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,altro,-,sottoscala
+95776,NAS SYNOLOGY DS723,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,8B,
+95792,VELCRO RING SCANNER ZEBRA RS5000,Magazzino_27_Grossisti,10,10,0,✅ ALLINEATO,grossisti,in_magazzino,13A,
+95834,TONER BROTHER TN248BK,Magazzino_28_Deposito,4,4,0,✅ ALLINEATO,farmacia,in_magazzino,12C,*per nuova stampante Multimeds 
+95882,BATTERIA PER APC UPS SMC1500,Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,in_magazzino,8B,
+95947,PC LENOVO SLIM M92P,Magazzino_28_Deposito,3,3,0,✅ ALLINEATO,farmacia,in_magazzino,3C,*garanzia 12mesi - PROMO COSMOFARMA 
+95953,DISCO KINGSTON SSD DA 960GB,Magazzino_28_Deposito,2,2,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+95973,ROTOLI ETICHETTE 40X24 DA 1000,Magazzino_28_Deposito,10,10,0,✅ ALLINEATO,farmacia,in_magazzino,10B,NO TRASFERIMENTO DIRETTO – STAMPANTI CON RIBBON
+95994,KIT GOMMINI BC4 BROTHER 8360,Magazzino_28_Deposito,5,5,0,✅ ALLINEATO,farmacia,in_magazzino,9B,*dentro ad un'unica busta
+96076,LETTORE SMART CARD MINILECTOR,Magazzino_28_Deposito,18,18,0,✅ ALLINEATO,farmacia,in_magazzino,9B,
+96221,"ALL IN ONE HP BIANCO 24"" B5QK4EA",Magazzino_28_Deposito,1,1,0,✅ ALLINEATO,farmacia,baia_uscita,,*Farmacia Ciercello
+95749,TOTEM LETTORE PREZZI A PARETE,Magazzino_28_Deposito,2,1,-1,🔴 AS400 +1,farmacia,in_magazzino,7A,
+95829,STAMPANTE BROTHER HL-L8240CDW,Magazzino_28_Deposito,1,0,-1,🔴 AS400 +1,,,,
+95811,GRUPPO CONTINUITA' SATUPS 3000VA,Magazzino_28_Deposito,2,0,-2,🔴 AS400 +2,,,,
+95989,SISTEMA IBM POWER 10 S1012,Magazzino_27_Grossisti,2,0,-2,🔴 AS400 +2,,,,
+96267,ALL IN ONE MSI MODERN AM272P,Magazzino_28_Deposito,2,0,-2,🔴 AS400 +2,,,,
+94882,SWITCH D-LINK DSG-1100-24,Magazzino_28_Deposito,6,3,-3,🔴 AS400 +3,farmacia,in_magazzino,11C,
+94991,SERVER LENOVO ST250,Magazzino_28_Deposito,3,0,-3,🔴 AS400 +3,,,,
+95810,GRUPPO CONTINUITA' SATUPS 2000VA,Magazzino_28_Deposito,3,0,-3,🔴 AS400 +3,,,,
+96062,STAMPANTE EPSON WF-C5390DW,Magazzino_28_Deposito,6,2,-4,🔴 AS400 +4,farmacia,"altro, in_magazzino","-, 7B",sala riunioni
+96215,THINKCENTRE LENOVO TS-NEO50Q,Magazzino_28_Deposito,37,33,-4,🔴 AS400 +4,farmacia,"in_magazzino, in_preparazione, in_utilizzo","2E, 4D",*Emilian (ufficio)  | *Giarrizzo | Per Federico
+94908,MULTIMEDS - BLISTER (240 PZ.),Magazzino_28_Deposito,12,7,-5,🔴 AS400 +5,farmacia,in_magazzino,"14D, 3B, 3C, 3D",
+96241,WORKSTATION P2 ULTRA 9,Magazzino_28_Deposito,5,0,-5,🔴 AS400 +5,,,,
+94995,TASTIERA E MOUSE LENOVO WIRELESS,Magazzino_28_Deposito,12,5,-7,🔴 AS400 +7,farmacia,"altro, baia_uscita, in_magazzino, in_utilizzo","-, 12B",*Luca Ghelfi  | *Nuova assunta Dozio Marialuisa | *nuovo assunto Presotto Francesco | ufficio ex giorgia
+95944,MONITOR LENOVO T22I-30,Magazzino_28_Deposito,24,14,-10,🔴 AS400 +10,farmacia,in_magazzino,"11F, 12F",
+96081,SCHEDA GRAFICA GEFORCE GT 1030,Magazzino_28_Deposito,12,2,-10,🔴 AS400 +10,farmacia,in_magazzino,8B,
+95745,TERMINALE PLUS 95 2D,Magazzino_27_Grossisti,47,33,-14,🔴 AS400 +14,grossisti,in_magazzino,"1D, 5C",
+95508,LETTORE HONEYWELL 1470G 2D,Magazzino_28_Deposito,18,0,-18,🔴 AS400 +18,,,,
+96138,MONITOR LENOVO E24-30,Magazzino_28_Deposito,29,9,-20,🔴 AS400 +20,farmacia,in_magazzino,5D,
+95828,THINKCENTRE NEO 50Q,Magazzino_28_Deposito,66,16,-50,🔴 AS400 +50,farmacia,"ALTRO, BAIA_USCITA, IN_MAGAZZINO, IN_PREPARAZIONE, SPEDITO, in_magazzino","10D, 3E, 6a","TEST AAAAAA | TEst api
+ | Test Mov Multiplo 4 | test test"

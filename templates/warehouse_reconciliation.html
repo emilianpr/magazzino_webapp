@@ -228,7 +228,7 @@
 
         <!-- Upload Section - Horizontal Grid -->
         <form id="reconciliation-form" enctype="multipart/form-data">
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
                 
                 <!-- Magazzino 27 Upload -->
                 <div class="reconciliation-card">
@@ -275,28 +275,23 @@
                     </div>
                     <div id="info_magazzino_28" class="file-info hidden"></div>
                 </div>
+            </div>
 
-                <!-- Export WebApp Upload -->
-                <div class="reconciliation-card">
-                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        <div class="flex items-center justify-center gap-2">
-                            <i class="fas fa-file-export text-green-500"></i>
-                            Export WebApp
-                            <span class="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-full">
-                                Obbligatorio
-                            </span>
-                        </div>
-                    </label>
-                    <div class="upload-area" data-input="webapp_export">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-                            Trascina qui o clicca
-                        </p>
-                        <input type="file" name="webapp_export" id="webapp_export" 
-                               class="hidden" accept=".txt,.csv" required>
-                        <small class="text-gray-500 dark:text-gray-400 text-xs">File WebApp magazzino</small>
+            <!-- Info card: dati webapp automatici -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-database text-2xl text-green-600 dark:text-green-400"></i>
                     </div>
-                    <div id="info_webapp_export" class="file-info hidden"></div>
+                    <div>
+                        <h4 class="font-semibold text-green-800 dark:text-green-300 text-sm">
+                            Dati WebApp automatici
+                        </h4>
+                        <p class="text-green-700 dark:text-green-400 text-xs">
+                            I dati delle giacenze WebApp vengono caricati automaticamente dal database. 
+                            Non è più necessario caricare il file di export.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -499,21 +494,16 @@ document.getElementById('reconciliation-form').addEventListener('submit', functi
     const formData = new FormData();
     const magazzino27 = document.getElementById('magazzino_27').files[0];
     const magazzino28 = document.getElementById('magazzino_28').files[0];
-    const webappExport = document.getElementById('webapp_export').files[0];
     
-    if (!webappExport) {
-        alert('Il file Export WebApp è obbligatorio!');
-        return;
-    }
-    
+    // Validazione: almeno un file AS400 richiesto
     if (!magazzino27 && !magazzino28) {
-        alert('Almeno un file AS400 è richiesto!');
+        alert('Almeno un file AS400 è richiesto (Magazzino 27 o 28)!');
         return;
     }
     
     if (magazzino27) formData.append('magazzino_27', magazzino27);
     if (magazzino28) formData.append('magazzino_28', magazzino28);
-    formData.append('webapp_export', webappExport);
+    // I dati WebApp vengono caricati automaticamente dal database
     
     // Show progress
     document.querySelector('.progress').style.display = 'block';
@@ -629,8 +619,8 @@ function downloadResults() {
     }
 }
 
-// File upload handling
-['magazzino_27', 'magazzino_28', 'webapp_export'].forEach(id => {
+// File upload handling (solo file AS400)
+['magazzino_27', 'magazzino_28'].forEach(id => {
     document.getElementById(id).addEventListener('change', function(e) {
         const file = e.target.files[0];
         const infoDiv = document.getElementById(`info_${id}`);
