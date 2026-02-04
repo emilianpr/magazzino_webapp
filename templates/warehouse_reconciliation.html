@@ -9,19 +9,29 @@
   --bg-secondary: rgba(243, 244, 246, 0.9);
   --border-light: rgba(150, 150, 150, 0.25);
   --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --shadow-hover: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
   --accent-color: #0056a6;
+  --accent-light: #00a8e8;
   --text-primary: #1e293b;
   --text-secondary: #64748b;
+  --success-color: #16a34a;
+  --warning-color: #ca8a04;
+  --danger-color: #dc2626;
 }
 
 .dark {
-  --bg-primary: rgba(0, 0, 0, 0.98);
-  --bg-secondary: rgba(0, 0, 0, 0.95);
-  --border-light: rgba(40, 40, 40, 0.8);
-  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --bg-primary: rgba(17, 24, 39, 0.98);
+  --bg-secondary: rgba(31, 41, 55, 0.95);
+  --border-light: rgba(75, 85, 99, 0.6);
+  --shadow-light: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
   --accent-color: #60a5fa;
-  --text-primary: #ffffff;
+  --accent-light: #93c5fd;
+  --text-primary: #f9fafb;
   --text-secondary: #d1d5db;
+  --success-color: #4ade80;
+  --warning-color: #fbbf24;
+  --danger-color: #f87171;
 }
 
 .upload-area {
@@ -45,17 +55,13 @@
   border-color: var(--accent-color);
   background: var(--bg-secondary);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
+  box-shadow: var(--shadow-hover);
 }
 
 .upload-area.drag-over {
-  border-color: #00a8e8;
+  border-color: var(--accent-light);
   background: linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 86, 166, 0.15) 100%);
   transform: scale(1.02);
-}
-
-.dark .upload-area:hover {
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
 }
 
 .dark .upload-area.drag-over {
@@ -99,11 +105,7 @@
 
 .reconciliation-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
-}
-
-.dark .reconciliation-card:hover {
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-hover);
 }
 
 .btn-primary {
@@ -119,17 +121,13 @@
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px 0 rgba(0, 86, 166, 0.4);
+  box-shadow: var(--shadow-hover);
   background: linear-gradient(135deg, #003d7a 0%, var(--accent-color) 100%);
 }
 
 .dark .btn-primary {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.8) 0%, rgba(37, 99, 235, 0.9) 100%);
+  background: linear-gradient(135deg, var(--accent-color) 0%, #2563eb 100%);
   box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.3);
-}
-
-.dark .btn-primary:hover {
-  box-shadow: 0 8px 24px 0 rgba(37, 99, 235, 0.4);
 }
 
 .table-container {
@@ -139,7 +137,7 @@
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: var(--shadow-light);
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
 }
 
@@ -183,14 +181,9 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e3f2fd 0%, #00a8e8 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--accent-light) 100%);
   color: var(--accent-color);
   font-size: 1.25rem;
-}
-
-.dark .section-icon {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.3) 0%, rgba(37, 99, 235, 0.5) 100%);
-  color: var(--accent-color);
 }
 
 .progress {
@@ -203,7 +196,7 @@
 }
 
 .progress-bar {
-  background: linear-gradient(90deg, var(--accent-color) 0%, #00a8e8 100%);
+  background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-light) 100%);
   transition: width 0.3s ease;
 }
 </style>
@@ -336,9 +329,9 @@
             </div>
         </div>
 
-        <!-- Results Section - 3 Column Grid -->
+        <!-- Results Section - Full Width Cards -->
         <div class="results-container hidden" id="results-container">
-            <div class="grid lg:grid-cols-3 gap-6 mb-8">
+            <div class="space-y-6 mb-8">
                 
                 <!-- WebApp Higher Products -->
                 <div class="reconciliation-card">
@@ -357,6 +350,7 @@
                             <thead>
                                 <tr class="bg-yellow-50 dark:bg-yellow-900/20">
                                     <th class="text-left text-xs">Codice</th>
+                                    <th class="text-left text-xs">Nome Prodotto</th>
                                     <th class="text-center text-xs">AS400</th>
                                     <th class="text-center text-xs">WebApp</th>
                                     <th class="text-center text-xs">Diff</th>
@@ -384,6 +378,7 @@
                             <thead>
                                 <tr class="bg-red-50 dark:bg-red-900/20">
                                     <th class="text-left text-xs">Codice</th>
+                                    <th class="text-left text-xs">Nome Prodotto</th>
                                     <th class="text-center text-xs">AS400</th>
                                     <th class="text-center text-xs">WebApp</th>
                                     <th class="text-center text-xs">Diff</th>
@@ -411,8 +406,8 @@
                             <thead>
                                 <tr class="bg-green-50 dark:bg-green-900/20">
                                     <th class="text-left text-xs">Codice</th>
+                                    <th class="text-left text-xs">Nome Prodotto</th>
                                     <th class="text-center text-xs">Quantità</th>
-                                    <th class="text-left text-xs">Stato</th>
                                 </tr>
                             </thead>
                             <tbody id="aligned-tbody"></tbody>
@@ -545,10 +540,10 @@ function displayResults(data) {
     // Show statistics section
     document.getElementById('stats-section').classList.remove('hidden');
     
-    // Display tables with compact columns
-    populateTable('webapp-higher-tbody', data.details.webapp_higher, ['Codice', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
-    populateTable('as400-higher-tbody', data.details.as400_higher, ['Codice', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
-    populateTable('aligned-tbody', data.details.aligned_products, ['Codice', 'Quantita_AS400', 'Stato']);
+    // Display tables with compact columns (include Descrizione for product name)
+    populateTable('webapp-higher-tbody', data.details.webapp_higher, ['Codice', 'Descrizione', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
+    populateTable('as400-higher-tbody', data.details.as400_higher, ['Codice', 'Descrizione', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']);
+    populateTable('aligned-tbody', data.details.aligned_products, ['Codice', 'Descrizione', 'Quantita_AS400']);
     
     // Show download button
     document.getElementById('download-btn').style.display = 'inline-flex';
@@ -567,12 +562,10 @@ function populateTable(tableBodyId, products, columns) {
         return;
     }
     
-    // Limit to first 50 products for better performance in compact view
-    const displayProducts = products.slice(0, 50);
-    
-    displayProducts.forEach(product => {
+    // Mostra tutti i prodotti (rimosso limite 50)
+    products.forEach(product => {
         const row = tbody.insertRow();
-        row.className = 'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200';
+        row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200';
         
         columns.forEach(col => {
             const cell = row.insertCell();
@@ -582,33 +575,27 @@ function populateTable(tableBodyId, products, columns) {
                 const diff = parseInt(value);
                 cell.className = 'text-center';
                 if (diff > 0) {
-                    cell.innerHTML = `<span class="text-yellow-600 font-bold">+${diff}</span>`;
+                    cell.innerHTML = `<span class="text-yellow-600 dark:text-yellow-400 font-bold">+${diff}</span>`;
                 } else if (diff < 0) {
-                    cell.innerHTML = `<span class="text-red-600 font-bold">${diff}</span>`;
+                    cell.innerHTML = `<span class="text-red-600 dark:text-red-400 font-bold">${diff}</span>`;
                 } else {
-                    cell.innerHTML = `<span class="text-green-600 font-bold">=</span>`;
+                    cell.innerHTML = `<span class="text-green-600 dark:text-green-400 font-bold">=</span>`;
                 }
             } else if (['Quantita_AS400', 'Quantita_WebApp'].includes(col)) {
-                cell.className = 'text-center font-mono font-semibold';
+                cell.className = 'text-center font-mono font-semibold text-gray-800 dark:text-gray-200';
                 cell.textContent = value;
             } else if (col === 'Codice') {
-                cell.className = 'font-mono text-xs';
+                cell.className = 'font-mono text-xs whitespace-nowrap text-gray-900 dark:text-gray-100';
+                cell.textContent = value;
+            } else if (col === 'Descrizione') {
+                cell.className = 'text-xs text-gray-700 dark:text-gray-300';
                 cell.textContent = value;
             } else {
-                cell.className = 'text-xs';
+                cell.className = 'text-xs text-gray-600 dark:text-gray-400';
                 cell.textContent = value;
             }
         });
     });
-    
-    // Add "more results" indicator if truncated
-    if (products.length > 50) {
-        const row = tbody.insertRow();
-        const cell = row.insertCell();
-        cell.colSpan = columns.length;
-        cell.className = 'text-center text-gray-500 dark:text-gray-400 py-3 text-xs italic';
-        cell.textContent = `... e altri ${products.length - 50} prodotti (vedi CSV completo)`;
-    }
 }
 
 function downloadResults() {

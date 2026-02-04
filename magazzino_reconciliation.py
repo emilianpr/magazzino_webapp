@@ -521,8 +521,19 @@ class MagazzinoReconciliation:
                 sample_entrambi = entrambi_presenti[['Codice', 'Quantita_AS400', 'Quantita_WebApp', 'Differenza']].head(5)
                 self.logger.info(f"Sample prodotti in entrambi:\n{sample_entrambi.to_string()}")
 
-            # Pulizia colonne
-            confronto['Descrizione'] = confronto['Descrizione'].fillna('').fillna(confronto.get('Descrizione_web', pd.Series([''] * len(confronto)))).fillna('')
+            # Pulizia colonne - Unisci descrizione da AS400 e WebApp
+            # Se la descrizione AS400 è vuota, usa quella del WebApp
+            if 'Descrizione_web' in confronto.columns:
+                confronto['Descrizione'] = confronto['Descrizione'].fillna('')
+                confronto['Descrizione_web'] = confronto['Descrizione_web'].fillna('')
+                # Usa descrizione AS400 se disponibile, altrimenti usa quella WebApp
+                confronto['Descrizione'] = confronto.apply(
+                    lambda row: row['Descrizione'] if row['Descrizione'].strip() else row['Descrizione_web'],
+                    axis=1
+                )
+            else:
+                confronto['Descrizione'] = confronto['Descrizione'].fillna('')
+            
             confronto['Fonte_AS400'] = confronto['Fonte_AS400'].fillna('Solo_WebApp')
             confronto['Magazzino_Web'] = confronto['Magazzino_Web'].fillna('')
             confronto['Stato'] = confronto['Stato'].fillna('')
