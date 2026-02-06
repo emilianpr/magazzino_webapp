@@ -365,6 +365,16 @@ def index():
         cursor.execute("SELECT COUNT(*) AS movements_today FROM movimenti WHERE DATE(data_ora) = CURDATE()")
         movements_today = cursor.fetchone()['movements_today']
 
+        # Query per lista prodotti (per modal prodotti)
+        cursor.execute("""
+            SELECT p.id, p.nome_prodotto, p.codice_prodotto, 
+                   COALESCE(SUM(g.quantita), 0) as quantita_totale
+            FROM prodotti p
+            LEFT JOIN giacenze g ON p.id = g.prodotto_id
+            GROUP BY p.id, p.nome_prodotto, p.codice_prodotto
+            ORDER BY p.nome_prodotto ASC
+        """)
+        prodotti = cursor.fetchall()
     except Error as e:
         giacenze = []
         magazzini_opzioni = []
@@ -374,6 +384,7 @@ def index():
         low_stock_count = 0
         warehouses_count = 0
         movements_today = 0
+        prodotti = []
         flash(f"Errore nel recupero delle giacenze o filtri: {e}", "error")
     finally:
         if cursor:
@@ -387,6 +398,7 @@ def index():
                            filtro_magazzino=filtro_magazzino,
                            filtro_stato=filtro_stato,
                            filtro_ubicazione=filtro_ubicazione,
+                           filtro_note=filtro_note,
                            ordine=ordine,
                            magazzini_opzioni=magazzini_opzioni,
                            stati_opzioni=stati_opzioni,
@@ -394,7 +406,9 @@ def index():
                            total_products=total_products,
                            low_stock_count=low_stock_count,
                            warehouses_count=warehouses_count,
-                           movements_today=movements_today)
+                           movements_today=movements_today,
+                           prodotti=prodotti,
+                           today_date=datetime.now().strftime('%Y-%m-%d'))
 
 # Pagina per registrare un movimento
 @app.route('/movimento', methods=['GET', 'POST'])

@@ -637,22 +637,22 @@ tr.edit-form.active {
 <div class="px-2 md:px-6 pt-0 pb-4 md:pb-6 w-full page-content index-page">
   <!-- Desktop Stats Cards -->
   <div class="flex flex-col md:flex-row gap-8 mb-8 w-full">
-    <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center">
+    <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-transform" onclick="openProductsModal()">
       <div class="dashboard-card-icon">
         <i class="fas fa-box-open"></i>
       </div>
       <p class="text-base font-medium text-gray-500 dark:text-gray-400 text-center">Prodotti Totali</p>
       <p class="mt-2 text-4xl font-bold dark:text-blue-300 text-center" style="color: #2256a7;">{{ total_products }}</p>
     </div>
-    <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center">
+    <a href="{{ url_for('logmovimenti') }}?data_da={{ today_date }}&data_a={{ today_date }}" class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-transform no-underline">
       <div class="dashboard-card-icon" style="background: linear-gradient(135deg, #e3f2fd 0%, #a7f3d0 100%); color: #059669;">
         <i class="fas fa-exchange-alt"></i>
       </div>
       <p class="text-base font-medium text-gray-500 dark:text-gray-400 text-center">Movimenti Oggi</p>
       <p class="mt-2 text-4xl font-bold dark:text-blue-300 text-center" style="color: #2256a7;">{{ movements_today }}</p>
-    </div>
+    </a>
     <!-- Aggiungiamo una terza card per utilizzare meglio lo spazio -->
-    <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center">
+    <div class="glass-card flex-1 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-transform" onclick="scrollToGiacenze()">
       <div class="dashboard-card-icon" style="background: linear-gradient(135deg, #e3f2fd 0%, #fef3c7 100%); color: #d97706;">
         <i class="fas fa-chart-line"></i>
       </div>
@@ -1194,6 +1194,61 @@ tr.edit-form.active {
     </div>
   </div>
 
+  <!-- Modal per visualizzare tutti i prodotti -->
+  <div id="products-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 700px; max-height: 85vh;">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-300 flex items-center gap-2">
+          <i class="fas fa-boxes"></i>
+          Prodotti in Magazzino
+          <span class="text-sm font-normal text-gray-500 dark:text-gray-400">({{ total_products }})</span>
+        </h3>
+        <button onclick="closeProductsModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Barra di ricerca -->
+      <div class="mb-4">
+        <input type="text" id="modal_search_prodotti" placeholder="Cerca prodotto per nome o codice..." 
+               class="w-full px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+               oninput="filterModalProducts()" />
+      </div>
+      
+      <!-- Lista prodotti scrollabile -->
+      <div class="overflow-y-auto space-y-2 mb-4" style="max-height: 50vh;" id="modal_prodotti_lista">
+        {% if prodotti and prodotti|length > 0 %}
+          {% for prodotto in prodotti %}
+          <div class="modal-prodotto-item flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+               data-nome="{{ prodotto.nome_prodotto|lower }}" data-codice="{{ prodotto.codice_prodotto|lower }}">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-gray-900 dark:text-white text-sm">{{ prodotto.nome_prodotto|format_db_string }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ prodotto.codice_prodotto }}</div>
+            </div>
+            <div class="ml-3 px-3 py-1 rounded-full text-xs font-bold {% if prodotto.quantita_totale > 0 %}bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300{% else %}bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300{% endif %}">
+              {{ prodotto.quantita_totale }} pz
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center text-gray-500 dark:text-gray-400 py-8">
+            <i class="fas fa-inbox text-3xl mb-2 opacity-50"></i>
+            <p class="text-sm">Nessun prodotto registrato</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Pulsante per andare a nuovo prodotto -->
+      <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <a href="{{ url_for('nuovo_prodotto') }}" 
+           class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+          <i class="fas fa-plus"></i>
+          Aggiungi Nuovo Prodotto
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal per selezione ubicazione compensazione -->
   <div id="compensazione-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
@@ -1248,6 +1303,69 @@ tr.edit-form.active {
 
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script>
+    // === Funzioni per le card statistiche cliccabili ===
+    
+    // Apri modal prodotti
+    function openProductsModal() {
+      const modal = document.getElementById('products-modal');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      // Focus sulla barra di ricerca
+      setTimeout(() => {
+        document.getElementById('modal_search_prodotti').focus();
+      }, 100);
+    }
+    
+    // Chiudi modal prodotti
+    function closeProductsModal() {
+      const modal = document.getElementById('products-modal');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      // Reset ricerca
+      document.getElementById('modal_search_prodotti').value = '';
+      filterModalProducts();
+    }
+    
+    // Filtra prodotti nel modal
+    function filterModalProducts() {
+      const searchTerm = document.getElementById('modal_search_prodotti').value.toLowerCase();
+      const items = document.querySelectorAll('.modal-prodotto-item');
+      
+      items.forEach(item => {
+        const nome = item.getAttribute('data-nome') || '';
+        const codice = item.getAttribute('data-codice') || '';
+        
+        if (nome.includes(searchTerm) || codice.includes(searchTerm)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    // Scroll alla sezione giacenze
+    function scrollToGiacenze() {
+      const giacenzeTable = document.querySelector('.desktop-table');
+      if (giacenzeTable) {
+        giacenzeTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    // Chiudi modal cliccando fuori dal contenuto
+    document.addEventListener('click', function(e) {
+      const productsModal = document.getElementById('products-modal');
+      if (e.target === productsModal) {
+        closeProductsModal();
+      }
+    });
+    
+    // Chiudi modal con Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeProductsModal();
+      }
+    });
+
     // Toggle filters visibility
     document.getElementById('toggle-filters').addEventListener('click', function() {
       const filtersContainer = document.getElementById('filters-container');
