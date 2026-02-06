@@ -5066,3 +5066,416 @@ werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login'
 2026-02-04 12:43:38,684 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260204_124338.csv
 2026-02-04 12:43:38,684 - magazzino_reconciliation - INFO - RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO
 2026-02-04 12:43:38,685 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 12:43:38] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-02-04 15:45:25,061 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 15:45:25,063 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE CON DATABASE WEBAPP
+2026-02-04 15:45:25,074 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 15:45:25,085 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-02-04 15:45:25,099 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-02-04 15:45:25,113 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 15:45:25,139 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:41:44 Pag.   1'
+2026-02-04 15:45:25,161 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-02-04 15:45:25,173 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 15:45:25,181 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 15:45:25,189 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 15:45:25,203 - magazzino_reconciliation - INFO - Match trovato: Codice=0094308, Desc='CASSETTE ULTRIUM LTO', Qty=10
+2026-02-04 15:45:25,222 - magazzino_reconciliation - INFO - Match trovato: Codice=0094624, Desc='BATTERIA DENSO BHT', Qty=3
+2026-02-04 15:45:25,241 - magazzino_reconciliation - INFO - Match trovato: Codice=0094625, Desc='CARICABATTERIA 4 POSIZIONI DENSO', Qty=17
+2026-02-04 15:45:25,252 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-02-04 15:45:25,258 - magazzino_reconciliation - INFO -   Righe processate: 38
+2026-02-04 15:45:25,267 - magazzino_reconciliation - INFO -   Match pattern completo: 22
+2026-02-04 15:45:25,270 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 15:45:25,274 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 15:45:25,280 - magazzino_reconciliation - INFO -   Prodotti estratti: 22
+2026-02-04 15:45:25,284 - magazzino_reconciliation - INFO - Magazzino_27_Grossisti: 22 prodotti estratti
+2026-02-04 15:45:25,288 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2026-02-04 15:45:25,294 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 208
+2026-02-04 15:45:25,300 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 15:45:25,302 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:39:14 Pag.   1'
+2026-02-04 15:45:25,302 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :28  Deposito c/Pharmagest Servizi'
+2026-02-04 15:45:25,302 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 15:45:25,303 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 15:45:25,303 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 15:45:25,303 - magazzino_reconciliation - INFO - Match trovato: Codice=0094838, Desc='FIREWALL WATCHGUARD T15', Qty=1
+2026-02-04 15:45:25,304 - magazzino_reconciliation - INFO - Match trovato: Codice=0094859, Desc='ETICHETTE 50X30 ROTOLO 1.500 PZ.', Qty=4
+2026-02-04 15:45:25,304 - magazzino_reconciliation - INFO - Match trovato: Codice=0094874, Desc='SERVER LENOVO ST550', Qty=3
+2026-02-04 15:45:25,306 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 78: '0095413    ETICHETTA ELETTRONICA ID.TAG       N.                               1.103            4,2598             4.698,5594'
+2026-02-04 15:45:25,307 - magazzino_reconciliation - INFO - PARSED TARGET PRODUCT: 0095413 -> 1103 units from Magazzino_28_Deposito
+2026-02-04 15:45:25,312 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2026-02-04 15:45:25,313 - magazzino_reconciliation - INFO -   Righe processate: 181
+2026-02-04 15:45:25,313 - magazzino_reconciliation - INFO -   Match pattern completo: 91
+2026-02-04 15:45:25,315 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 15:45:25,315 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 15:45:25,315 - magazzino_reconciliation - INFO -   Prodotti estratti: 91
+2026-02-04 15:45:25,316 - magazzino_reconciliation - INFO - Magazzino_28_Deposito: 91 prodotti estratti
+2026-02-04 15:45:25,317 - magazzino_reconciliation - INFO - Totale prodotti AS400 (prima unificazione): 113
+2026-02-04 15:45:25,318 - magazzino_reconciliation - INFO - Caricamento dati webapp direttamente dal database
+2026-02-04 15:45:25,332 - magazzino_reconciliation - INFO - Caricate 216 giacenze dal database webapp
+2026-02-04 15:45:25,334 - magazzino_reconciliation - INFO -   DB Sample: 245 -> Qty: 1
+2026-02-04 15:45:25,338 - magazzino_reconciliation - INFO -   DB Sample: 564 -> Qty: 1
+2026-02-04 15:45:25,341 - magazzino_reconciliation - INFO -   DB Sample: 94308 -> Qty: 10
+2026-02-04 15:45:25,346 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-02-04 15:45:25,419 - magazzino_reconciliation - INFO - Aggregati in 131 prodotti unici
+2026-02-04 15:45:25,421 - magazzino_reconciliation - INFO - Dati WebApp dal database: 131 prodotti aggregati
+2026-02-04 15:45:25,423 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-02-04 15:45:25,430 - magazzino_reconciliation - INFO - Input AS400: 113 righe
+2026-02-04 15:45:25,437 - magazzino_reconciliation - INFO - AS400 sample: 0094308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 15:45:25,440 - magazzino_reconciliation - INFO - AS400 sample: 0094624 -> Qty: 3 (type: <class 'int'>)
+2026-02-04 15:45:25,441 - magazzino_reconciliation - INFO - AS400 sample: 0094625 -> Qty: 17 (type: <class 'int'>)
+2026-02-04 15:45:25,441 - magazzino_reconciliation - INFO - AS400 total quantity sum: 2381
+2026-02-04 15:45:25,444 - magazzino_reconciliation - INFO - Sample codici AS400: ['0094308', '0094624', '0094625', '0094838', '0094859', '0094874', '0094881', '0094882', '0094884', '0094906']
+2026-02-04 15:45:25,447 - magazzino_reconciliation - INFO - Input WebApp: 131 righe
+2026-02-04 15:45:25,449 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 15:45:25,450 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 15:45:25,450 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 15:45:25,451 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2026-02-04 15:45:25,451 - magazzino_reconciliation - INFO - PRIMA normalizzazione - Codici in comune: 0
+2026-02-04 15:45:25,454 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2026-02-04 15:45:25,455 - magazzino_reconciliation - INFO - DOPO normalizzazione:
+2026-02-04 15:45:25,455 - magazzino_reconciliation - INFO -   - Codici AS400 unici: 113
+2026-02-04 15:45:25,455 - magazzino_reconciliation - INFO -   - Codici WebApp unici: 131
+2026-02-04 15:45:25,455 - magazzino_reconciliation - INFO -   - Codici in comune: 105
+2026-02-04 15:45:25,456 - magazzino_reconciliation - INFO - Esempi codici comuni: ['94308', '94624', '94625', '94838', '94859']
+2026-02-04 15:45:25,457 - magazzino_reconciliation - INFO -   Match: 94964 -> AS400:1, WebApp:1
+2026-02-04 15:45:25,458 - magazzino_reconciliation - INFO -   Match: 95681 -> AS400:4, WebApp:4
+2026-02-04 15:45:25,460 - magazzino_reconciliation - INFO -   Match: 95585 -> AS400:1, WebApp:1
+2026-02-04 15:45:25,461 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2026-02-04 15:45:25,467 - magazzino_reconciliation - INFO - Dopo merge: 139 righe
+2026-02-04 15:45:25,470 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 105
+2026-02-04 15:45:25,475 - magazzino_reconciliation - INFO - Sample prodotti in entrambi:
+  Codice  Quantita_AS400  Quantita_WebApp  Differenza
+2  94308              10               10           0
+3  94624               3                3           0
+4  94625              17               17           0
+5  94838               1                1           0
+6  94859               4                4           0
+2026-02-04 15:45:25,485 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 2381, WebApp total: 2652
+2026-02-04 15:45:25,486 - magazzino_reconciliation - INFO - Riconciliazione completata: 139 prodotti analizzati
+2026-02-04 15:45:25,487 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2026-02-04 15:45:25,488 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 63
+2026-02-04 15:45:25,488 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 57
+2026-02-04 15:45:25,488 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 19
+2026-02-04 15:45:25,489 - magazzino_reconciliation - INFO - Top 10 differenze: {0: 63, 1: 24, 3: 9, 2: 8, 5: 3, -3: 3, -2: 3, 4: 2, -1: 2, -10: 2}
+2026-02-04 15:45:25,489 - magazzino_reconciliation - INFO - Esempio prodotto allineato: 94308
+2026-02-04 15:45:25,490 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:1103, WebApp:1245, Diff:142)
+2026-02-04 15:45:25,490 - magazzino_reconciliation - INFO - Esempio AS400 maggiore: 95749 (AS400:2, WebApp:1, Diff:-1)
+2026-02-04 15:45:25,508 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260204_154525.csv
+2026-02-04 15:45:25,508 - magazzino_reconciliation - INFO - RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO
+2026-02-04 15:45:25,513 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 15:45:25] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-02-04 15:57:46,232 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 15:57:46] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-02-04 15:57:46,271 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 15:57:46] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 15:58:03,069 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 15:58:03,070 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE CON DATABASE WEBAPP
+2026-02-04 15:58:03,070 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 15:58:03,070 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-02-04 15:58:03,071 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-02-04 15:58:03,071 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 15:58:03,072 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:41:44 Pag.   1'
+2026-02-04 15:58:03,072 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-02-04 15:58:03,073 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 15:58:03,073 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 15:58:03,074 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 15:58:03,074 - magazzino_reconciliation - INFO - Match trovato: Codice=0094308, Desc='CASSETTE ULTRIUM LTO', Qty=10
+2026-02-04 15:58:03,076 - magazzino_reconciliation - INFO - Match trovato: Codice=0094624, Desc='BATTERIA DENSO BHT', Qty=3
+2026-02-04 15:58:03,076 - magazzino_reconciliation - INFO - Match trovato: Codice=0094625, Desc='CARICABATTERIA 4 POSIZIONI DENSO', Qty=17
+2026-02-04 15:58:03,080 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-02-04 15:58:03,081 - magazzino_reconciliation - INFO -   Righe processate: 38
+2026-02-04 15:58:03,081 - magazzino_reconciliation - INFO -   Match pattern completo: 22
+2026-02-04 15:58:03,082 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 15:58:03,082 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 15:58:03,083 - magazzino_reconciliation - INFO -   Prodotti estratti: 22
+2026-02-04 15:58:03,083 - magazzino_reconciliation - INFO - Magazzino_27_Grossisti: 22 prodotti estratti
+2026-02-04 15:58:03,084 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2026-02-04 15:58:03,084 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 208
+2026-02-04 15:58:03,085 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 15:58:03,085 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:39:14 Pag.   1'
+2026-02-04 15:58:03,086 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :28  Deposito c/Pharmagest Servizi'
+2026-02-04 15:58:03,087 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 15:58:03,088 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 15:58:03,088 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 15:58:03,089 - magazzino_reconciliation - INFO - Match trovato: Codice=0094838, Desc='FIREWALL WATCHGUARD T15', Qty=1
+2026-02-04 15:58:03,090 - magazzino_reconciliation - INFO - Match trovato: Codice=0094859, Desc='ETICHETTE 50X30 ROTOLO 1.500 PZ.', Qty=4
+2026-02-04 15:58:03,090 - magazzino_reconciliation - INFO - Match trovato: Codice=0094874, Desc='SERVER LENOVO ST550', Qty=3
+2026-02-04 15:58:03,092 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 78: '0095413    ETICHETTA ELETTRONICA ID.TAG       N.                               1.103            4,2598             4.698,5594'
+2026-02-04 15:58:03,093 - magazzino_reconciliation - INFO - PARSED TARGET PRODUCT: 0095413 -> 1103 units from Magazzino_28_Deposito
+2026-02-04 15:58:03,098 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2026-02-04 15:58:03,099 - magazzino_reconciliation - INFO -   Righe processate: 181
+2026-02-04 15:58:03,099 - magazzino_reconciliation - INFO -   Match pattern completo: 91
+2026-02-04 15:58:03,100 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 15:58:03,100 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 15:58:03,101 - magazzino_reconciliation - INFO -   Prodotti estratti: 91
+2026-02-04 15:58:03,101 - magazzino_reconciliation - INFO - Magazzino_28_Deposito: 91 prodotti estratti
+2026-02-04 15:58:03,103 - magazzino_reconciliation - INFO - Totale prodotti AS400 (prima unificazione): 113
+2026-02-04 15:58:03,104 - magazzino_reconciliation - INFO - Caricamento dati webapp direttamente dal database
+2026-02-04 15:58:03,117 - magazzino_reconciliation - INFO - Caricate 216 giacenze dal database webapp
+2026-02-04 15:58:03,118 - magazzino_reconciliation - INFO -   DB Sample: 245 -> Qty: 1
+2026-02-04 15:58:03,118 - magazzino_reconciliation - INFO -   DB Sample: 564 -> Qty: 1
+2026-02-04 15:58:03,119 - magazzino_reconciliation - INFO -   DB Sample: 94308 -> Qty: 10
+2026-02-04 15:58:03,119 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-02-04 15:58:03,154 - magazzino_reconciliation - INFO - Aggregati in 131 prodotti unici
+2026-02-04 15:58:03,155 - magazzino_reconciliation - INFO - Dati WebApp dal database: 131 prodotti aggregati
+2026-02-04 15:58:03,155 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-02-04 15:58:03,155 - magazzino_reconciliation - INFO - Input AS400: 113 righe
+2026-02-04 15:58:03,156 - magazzino_reconciliation - INFO - AS400 sample: 0094308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 15:58:03,156 - magazzino_reconciliation - INFO - AS400 sample: 0094624 -> Qty: 3 (type: <class 'int'>)
+2026-02-04 15:58:03,157 - magazzino_reconciliation - INFO - AS400 sample: 0094625 -> Qty: 17 (type: <class 'int'>)
+2026-02-04 15:58:03,157 - magazzino_reconciliation - INFO - AS400 total quantity sum: 2381
+2026-02-04 15:58:03,158 - magazzino_reconciliation - INFO - Sample codici AS400: ['0094308', '0094624', '0094625', '0094838', '0094859', '0094874', '0094881', '0094882', '0094884', '0094906']
+2026-02-04 15:58:03,158 - magazzino_reconciliation - INFO - Input WebApp: 131 righe
+2026-02-04 15:58:03,159 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 15:58:03,160 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 15:58:03,161 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 15:58:03,162 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2026-02-04 15:58:03,163 - magazzino_reconciliation - INFO - PRIMA normalizzazione - Codici in comune: 0
+2026-02-04 15:58:03,165 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2026-02-04 15:58:03,166 - magazzino_reconciliation - INFO - DOPO normalizzazione:
+2026-02-04 15:58:03,166 - magazzino_reconciliation - INFO -   - Codici AS400 unici: 113
+2026-02-04 15:58:03,166 - magazzino_reconciliation - INFO -   - Codici WebApp unici: 131
+2026-02-04 15:58:03,167 - magazzino_reconciliation - INFO -   - Codici in comune: 105
+2026-02-04 15:58:03,167 - magazzino_reconciliation - INFO - Esempi codici comuni: ['94308', '94624', '94625', '94838', '94859']
+2026-02-04 15:58:03,168 - magazzino_reconciliation - INFO -   Match: 95953 -> AS400:2, WebApp:2
+2026-02-04 15:58:03,170 - magazzino_reconciliation - INFO -   Match: 95828 -> AS400:66, WebApp:16
+2026-02-04 15:58:03,171 - magazzino_reconciliation - INFO -   Match: 95974 -> AS400:19, WebApp:20
+2026-02-04 15:58:03,171 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2026-02-04 15:58:03,175 - magazzino_reconciliation - INFO - Dopo merge: 139 righe
+2026-02-04 15:58:03,178 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 105
+2026-02-04 15:58:03,183 - magazzino_reconciliation - INFO - Sample prodotti in entrambi:
+  Codice  Quantita_AS400  Quantita_WebApp  Differenza
+2  94308              10               10           0
+3  94624               3                3           0
+4  94625              17               17           0
+5  94838               1                1           0
+6  94859               4                4           0
+2026-02-04 15:58:03,188 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 2381, WebApp total: 2652
+2026-02-04 15:58:03,189 - magazzino_reconciliation - INFO - Riconciliazione completata: 139 prodotti analizzati
+2026-02-04 15:58:03,190 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2026-02-04 15:58:03,191 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 63
+2026-02-04 15:58:03,191 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 57
+2026-02-04 15:58:03,191 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 19
+2026-02-04 15:58:03,193 - magazzino_reconciliation - INFO - Top 10 differenze: {0: 63, 1: 24, 3: 9, 2: 8, 5: 3, -3: 3, -2: 3, 4: 2, -1: 2, -10: 2}
+2026-02-04 15:58:03,193 - magazzino_reconciliation - INFO - Esempio prodotto allineato: 94308
+2026-02-04 15:58:03,194 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:1103, WebApp:1245, Diff:142)
+2026-02-04 15:58:03,195 - magazzino_reconciliation - INFO - Esempio AS400 maggiore: 95749 (AS400:2, WebApp:1, Diff:-1)
+2026-02-04 15:58:03,208 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260204_155803.csv
+2026-02-04 15:58:03,208 - magazzino_reconciliation - INFO - RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO
+2026-02-04 15:58:03,211 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 15:58:03] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-02-04 16:30:25,017 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 16:30:25,017 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE CON DATABASE WEBAPP
+2026-02-04 16:30:25,018 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 16:30:25,018 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-02-04 16:30:25,018 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-02-04 16:30:25,019 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 16:30:25,019 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:41:44 Pag.   1'
+2026-02-04 16:30:25,020 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-02-04 16:30:25,020 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 16:30:25,021 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 16:30:25,021 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 16:30:25,023 - magazzino_reconciliation - INFO - Match trovato: Codice=0094308, Desc='CASSETTE ULTRIUM LTO', Qty=10
+2026-02-04 16:30:25,024 - magazzino_reconciliation - INFO - Match trovato: Codice=0094624, Desc='BATTERIA DENSO BHT', Qty=3
+2026-02-04 16:30:25,025 - magazzino_reconciliation - INFO - Match trovato: Codice=0094625, Desc='CARICABATTERIA 4 POSIZIONI DENSO', Qty=17
+2026-02-04 16:30:25,029 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-02-04 16:30:25,030 - magazzino_reconciliation - INFO -   Righe processate: 38
+2026-02-04 16:30:25,030 - magazzino_reconciliation - INFO -   Match pattern completo: 22
+2026-02-04 16:30:25,030 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 16:30:25,032 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 16:30:25,033 - magazzino_reconciliation - INFO -   Prodotti estratti: 22
+2026-02-04 16:30:25,033 - magazzino_reconciliation - INFO - Magazzino_27_Grossisti: 22 prodotti estratti
+2026-02-04 16:30:25,034 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2026-02-04 16:30:25,034 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 208
+2026-02-04 16:30:25,035 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 16:30:25,035 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:39:14 Pag.   1'
+2026-02-04 16:30:25,035 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :28  Deposito c/Pharmagest Servizi'
+2026-02-04 16:30:25,036 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 16:30:25,036 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 16:30:25,036 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 16:30:25,037 - magazzino_reconciliation - INFO - Match trovato: Codice=0094838, Desc='FIREWALL WATCHGUARD T15', Qty=1
+2026-02-04 16:30:25,040 - magazzino_reconciliation - INFO - Match trovato: Codice=0094859, Desc='ETICHETTE 50X30 ROTOLO 1.500 PZ.', Qty=4
+2026-02-04 16:30:25,041 - magazzino_reconciliation - INFO - Match trovato: Codice=0094874, Desc='SERVER LENOVO ST550', Qty=3
+2026-02-04 16:30:25,043 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 78: '0095413    ETICHETTA ELETTRONICA ID.TAG       N.                               1.103            4,2598             4.698,5594'
+2026-02-04 16:30:25,044 - magazzino_reconciliation - INFO - PARSED TARGET PRODUCT: 0095413 -> 1103 units from Magazzino_28_Deposito
+2026-02-04 16:30:25,047 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2026-02-04 16:30:25,049 - magazzino_reconciliation - INFO -   Righe processate: 181
+2026-02-04 16:30:25,049 - magazzino_reconciliation - INFO -   Match pattern completo: 91
+2026-02-04 16:30:25,049 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 16:30:25,050 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 16:30:25,050 - magazzino_reconciliation - INFO -   Prodotti estratti: 91
+2026-02-04 16:30:25,051 - magazzino_reconciliation - INFO - Magazzino_28_Deposito: 91 prodotti estratti
+2026-02-04 16:30:25,053 - magazzino_reconciliation - INFO - Totale prodotti AS400 (prima unificazione): 113
+2026-02-04 16:30:25,056 - magazzino_reconciliation - INFO - Caricamento dati webapp direttamente dal database
+2026-02-04 16:30:25,068 - magazzino_reconciliation - INFO - Caricate 216 giacenze dal database webapp
+2026-02-04 16:30:25,069 - magazzino_reconciliation - INFO -   DB Sample: 245 -> Qty: 1
+2026-02-04 16:30:25,069 - magazzino_reconciliation - INFO -   DB Sample: 564 -> Qty: 1
+2026-02-04 16:30:25,069 - magazzino_reconciliation - INFO -   DB Sample: 94308 -> Qty: 10
+2026-02-04 16:30:25,070 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-02-04 16:30:25,104 - magazzino_reconciliation - INFO - Aggregati in 131 prodotti unici
+2026-02-04 16:30:25,104 - magazzino_reconciliation - INFO - Dati WebApp dal database: 131 prodotti aggregati
+2026-02-04 16:30:25,104 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-02-04 16:30:25,105 - magazzino_reconciliation - INFO - Input AS400: 113 righe
+2026-02-04 16:30:25,105 - magazzino_reconciliation - INFO - AS400 sample: 0094308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 16:30:25,106 - magazzino_reconciliation - INFO - AS400 sample: 0094624 -> Qty: 3 (type: <class 'int'>)
+2026-02-04 16:30:25,106 - magazzino_reconciliation - INFO - AS400 sample: 0094625 -> Qty: 17 (type: <class 'int'>)
+2026-02-04 16:30:25,106 - magazzino_reconciliation - INFO - AS400 total quantity sum: 2381
+2026-02-04 16:30:25,107 - magazzino_reconciliation - INFO - Sample codici AS400: ['0094308', '0094624', '0094625', '0094838', '0094859', '0094874', '0094881', '0094882', '0094884', '0094906']
+2026-02-04 16:30:25,107 - magazzino_reconciliation - INFO - Input WebApp: 131 righe
+2026-02-04 16:30:25,108 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 16:30:25,108 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 16:30:25,109 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 16:30:25,109 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2026-02-04 16:30:25,112 - magazzino_reconciliation - INFO - PRIMA normalizzazione - Codici in comune: 0
+2026-02-04 16:30:25,116 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2026-02-04 16:30:25,117 - magazzino_reconciliation - INFO - DOPO normalizzazione:
+2026-02-04 16:30:25,117 - magazzino_reconciliation - INFO -   - Codici AS400 unici: 113
+2026-02-04 16:30:25,117 - magazzino_reconciliation - INFO -   - Codici WebApp unici: 131
+2026-02-04 16:30:25,118 - magazzino_reconciliation - INFO -   - Codici in comune: 105
+2026-02-04 16:30:25,118 - magazzino_reconciliation - INFO - Esempi codici comuni: ['94308', '94624', '94625', '94838', '94859']
+2026-02-04 16:30:25,120 - magazzino_reconciliation - INFO -   Match: 94911 -> AS400:3, WebApp:6
+2026-02-04 16:30:25,121 - magazzino_reconciliation - INFO -   Match: 95950 -> AS400:90, WebApp:92
+2026-02-04 16:30:25,122 - magazzino_reconciliation - INFO -   Match: 95774 -> AS400:15, WebApp:29
+2026-02-04 16:30:25,122 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2026-02-04 16:30:25,128 - magazzino_reconciliation - INFO - Dopo merge: 139 righe
+2026-02-04 16:30:25,133 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 105
+2026-02-04 16:30:25,137 - magazzino_reconciliation - INFO - Sample prodotti in entrambi:
+  Codice  Quantita_AS400  Quantita_WebApp  Differenza
+2  94308              10               10           0
+3  94624               3                3           0
+4  94625              17               17           0
+5  94838               1                1           0
+6  94859               4                4           0
+2026-02-04 16:30:25,144 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 2381, WebApp total: 2652
+2026-02-04 16:30:25,145 - magazzino_reconciliation - INFO - Riconciliazione completata: 139 prodotti analizzati
+2026-02-04 16:30:25,147 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2026-02-04 16:30:25,148 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 63
+2026-02-04 16:30:25,148 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 57
+2026-02-04 16:30:25,148 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 19
+2026-02-04 16:30:25,149 - magazzino_reconciliation - INFO - Top 10 differenze: {0: 63, 1: 24, 3: 9, 2: 8, 5: 3, -3: 3, -2: 3, 4: 2, -1: 2, -10: 2}
+2026-02-04 16:30:25,149 - magazzino_reconciliation - INFO - Esempio prodotto allineato: 94308
+2026-02-04 16:30:25,150 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:1103, WebApp:1245, Diff:142)
+2026-02-04 16:30:25,150 - magazzino_reconciliation - INFO - Esempio AS400 maggiore: 95749 (AS400:2, WebApp:1, Diff:-1)
+2026-02-04 16:30:25,165 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260204_163025.csv
+2026-02-04 16:30:25,165 - magazzino_reconciliation - INFO - RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO
+2026-02-04 16:30:25,167 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:30:25] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-02-04 16:33:00,970 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 16:33:00,971 - magazzino_reconciliation - INFO - AVVIO RICONCILIAZIONE CON DATABASE WEBAPP
+2026-02-04 16:33:00,971 - magazzino_reconciliation - INFO - ============================================================
+2026-02-04 16:33:00,972 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_27_Grossisti
+2026-02-04 16:33:00,972 - magazzino_reconciliation - INFO - File AS400 Magazzino_27_Grossisti - Total righe: 47
+2026-02-04 16:33:00,972 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 16:33:00,973 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:41:44 Pag.   1'
+2026-02-04 16:33:00,973 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :27  Magazzino Grossisti'
+2026-02-04 16:33:00,974 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 16:33:00,974 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 16:33:00,974 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 16:33:00,976 - magazzino_reconciliation - INFO - Match trovato: Codice=0094308, Desc='CASSETTE ULTRIUM LTO', Qty=10
+2026-02-04 16:33:00,977 - magazzino_reconciliation - INFO - Match trovato: Codice=0094624, Desc='BATTERIA DENSO BHT', Qty=3
+2026-02-04 16:33:00,980 - magazzino_reconciliation - INFO - Match trovato: Codice=0094625, Desc='CARICABATTERIA 4 POSIZIONI DENSO', Qty=17
+2026-02-04 16:33:00,984 - magazzino_reconciliation - INFO - AS400 Magazzino_27_Grossisti - Statistiche parsing:
+2026-02-04 16:33:00,984 - magazzino_reconciliation - INFO -   Righe processate: 38
+2026-02-04 16:33:00,985 - magazzino_reconciliation - INFO -   Match pattern completo: 22
+2026-02-04 16:33:00,985 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 16:33:00,986 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 16:33:00,986 - magazzino_reconciliation - INFO -   Prodotti estratti: 22
+2026-02-04 16:33:00,987 - magazzino_reconciliation - INFO - Magazzino_27_Grossisti: 22 prodotti estratti
+2026-02-04 16:33:00,987 - magazzino_reconciliation - INFO - Parsing file AS400 per magazzino: Magazzino_28_Deposito
+2026-02-04 16:33:00,988 - magazzino_reconciliation - INFO - File AS400 Magazzino_28_Deposito - Total righe: 208
+2026-02-04 16:33:00,988 - magazzino_reconciliation - INFO - Prime 5 righe del file:
+2026-02-04 16:33:00,988 - magazzino_reconciliation - INFO -   Riga 1: ' Pharmagest Italia s                          *** VALORIZZAZIONE MAGAZZINO ANNO 26 ***        Venerdi 30.01.26 Ora 16:39:14 Pag.   1'
+2026-02-04 16:33:00,989 - magazzino_reconciliation - INFO -   Riga 2: ' MAGAZZINO :28  Deposito c/Pharmagest Servizi'
+2026-02-04 16:33:00,989 - magazzino_reconciliation - INFO -   Riga 3: '------------------------------------------------------------------------------------------------------------------------------------'
+2026-02-04 16:33:00,989 - magazzino_reconciliation - INFO -   Riga 4: '                                                    U.                              Totale                                   Totale'
+2026-02-04 16:33:00,990 - magazzino_reconciliation - INFO -   Riga 5: '      Codice     Descrizione                        M.                            Giac.Din.       C.M.P.                     Valore'
+2026-02-04 16:33:00,990 - magazzino_reconciliation - INFO - Match trovato: Codice=0094838, Desc='FIREWALL WATCHGUARD T15', Qty=1
+2026-02-04 16:33:00,990 - magazzino_reconciliation - INFO - Match trovato: Codice=0094859, Desc='ETICHETTE 50X30 ROTOLO 1.500 PZ.', Qty=4
+2026-02-04 16:33:00,991 - magazzino_reconciliation - INFO - Match trovato: Codice=0094874, Desc='SERVER LENOVO ST550', Qty=3
+2026-02-04 16:33:00,991 - magazzino_reconciliation - INFO - FOUND TARGET PRODUCT in Magazzino_28_Deposito line 78: '0095413    ETICHETTA ELETTRONICA ID.TAG       N.                               1.103            4,2598             4.698,5594'
+2026-02-04 16:33:00,993 - magazzino_reconciliation - INFO - PARSED TARGET PRODUCT: 0095413 -> 1103 units from Magazzino_28_Deposito
+2026-02-04 16:33:00,998 - magazzino_reconciliation - INFO - AS400 Magazzino_28_Deposito - Statistiche parsing:
+2026-02-04 16:33:00,998 - magazzino_reconciliation - INFO -   Righe processate: 181
+2026-02-04 16:33:00,999 - magazzino_reconciliation - INFO -   Match pattern completo: 91
+2026-02-04 16:33:00,999 - magazzino_reconciliation - INFO -   Match pattern semplificato: 0
+2026-02-04 16:33:01,000 - magazzino_reconciliation - INFO -   Match pattern fallback: 0
+2026-02-04 16:33:01,000 - magazzino_reconciliation - INFO -   Prodotti estratti: 91
+2026-02-04 16:33:01,000 - magazzino_reconciliation - INFO - Magazzino_28_Deposito: 91 prodotti estratti
+2026-02-04 16:33:01,003 - magazzino_reconciliation - INFO - Totale prodotti AS400 (prima unificazione): 113
+2026-02-04 16:33:01,005 - magazzino_reconciliation - INFO - Caricamento dati webapp direttamente dal database
+2026-02-04 16:33:01,017 - magazzino_reconciliation - INFO - Caricate 216 giacenze dal database webapp
+2026-02-04 16:33:01,018 - magazzino_reconciliation - INFO -   DB Sample: 245 -> Qty: 1
+2026-02-04 16:33:01,018 - magazzino_reconciliation - INFO -   DB Sample: 564 -> Qty: 1
+2026-02-04 16:33:01,018 - magazzino_reconciliation - INFO -   DB Sample: 94308 -> Qty: 10
+2026-02-04 16:33:01,019 - magazzino_reconciliation - INFO - Aggregazione dati WebApp per codice prodotto
+2026-02-04 16:33:01,053 - magazzino_reconciliation - INFO - Aggregati in 131 prodotti unici
+2026-02-04 16:33:01,053 - magazzino_reconciliation - INFO - Dati WebApp dal database: 131 prodotti aggregati
+2026-02-04 16:33:01,053 - magazzino_reconciliation - INFO - Esecuzione riconciliazione AS400 vs WebApp
+2026-02-04 16:33:01,054 - magazzino_reconciliation - INFO - Input AS400: 113 righe
+2026-02-04 16:33:01,054 - magazzino_reconciliation - INFO - AS400 sample: 0094308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 16:33:01,055 - magazzino_reconciliation - INFO - AS400 sample: 0094624 -> Qty: 3 (type: <class 'int'>)
+2026-02-04 16:33:01,055 - magazzino_reconciliation - INFO - AS400 sample: 0094625 -> Qty: 17 (type: <class 'int'>)
+2026-02-04 16:33:01,055 - magazzino_reconciliation - INFO - AS400 total quantity sum: 2381
+2026-02-04 16:33:01,056 - magazzino_reconciliation - INFO - Sample codici AS400: ['0094308', '0094624', '0094625', '0094838', '0094859', '0094874', '0094881', '0094882', '0094884', '0094906']
+2026-02-04 16:33:01,056 - magazzino_reconciliation - INFO - Input WebApp: 131 righe
+2026-02-04 16:33:01,056 - magazzino_reconciliation - INFO - WebApp sample: 245 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 16:33:01,056 - magazzino_reconciliation - INFO - WebApp sample: 564 -> Qty: 1 (type: <class 'int'>)
+2026-02-04 16:33:01,057 - magazzino_reconciliation - INFO - WebApp sample: 94308 -> Qty: 10 (type: <class 'int'>)
+2026-02-04 16:33:01,057 - magazzino_reconciliation - INFO - Sample codici WebApp: ['245', '564', '94308', '94624', '94625', '94838', '94859', '94874', '94881', '94882']
+2026-02-04 16:33:01,058 - magazzino_reconciliation - INFO - PRIMA normalizzazione - Codici in comune: 0
+2026-02-04 16:33:01,062 - magazzino_reconciliation - INFO - Codici normalizzati (zeri iniziali rimossi)
+2026-02-04 16:33:01,063 - magazzino_reconciliation - INFO - DOPO normalizzazione:
+2026-02-04 16:33:01,064 - magazzino_reconciliation - INFO -   - Codici AS400 unici: 113
+2026-02-04 16:33:01,064 - magazzino_reconciliation - INFO -   - Codici WebApp unici: 131
+2026-02-04 16:33:01,065 - magazzino_reconciliation - INFO -   - Codici in comune: 105
+2026-02-04 16:33:01,065 - magazzino_reconciliation - INFO - Esempi codici comuni: ['94308', '94624', '94625', '94838', '94859']
+2026-02-04 16:33:01,067 - magazzino_reconciliation - INFO -   Match: 95409 -> AS400:2, WebApp:2
+2026-02-04 16:33:01,068 - magazzino_reconciliation - INFO -   Match: 95001 -> AS400:1, WebApp:1
+2026-02-04 16:33:01,069 - magazzino_reconciliation - INFO -   Match: 95050 -> AS400:5, WebApp:10
+2026-02-04 16:33:01,070 - magazzino_reconciliation - INFO - Esecuzione merge con codici normalizzati...
+2026-02-04 16:33:01,073 - magazzino_reconciliation - INFO - Dopo merge: 139 righe
+2026-02-04 16:33:01,075 - magazzino_reconciliation - INFO - Prodotti presenti in ENTRAMBI i sistemi: 105
+2026-02-04 16:33:01,082 - magazzino_reconciliation - INFO - Sample prodotti in entrambi:
+  Codice  Quantita_AS400  Quantita_WebApp  Differenza
+2  94308              10               10           0
+3  94624               3                3           0
+4  94625              17               17           0
+5  94838               1                1           0
+6  94859               4                4           0
+2026-02-04 16:33:01,089 - magazzino_reconciliation - INFO - RISULTATO FINALE - AS400 total: 2381, WebApp total: 2652
+2026-02-04 16:33:01,090 - magazzino_reconciliation - INFO - Riconciliazione completata: 139 prodotti analizzati
+2026-02-04 16:33:01,092 - magazzino_reconciliation - INFO - Analisi riconciliazione:
+2026-02-04 16:33:01,092 - magazzino_reconciliation - INFO -   - Prodotti allineati (diff=0): 63
+2026-02-04 16:33:01,093 - magazzino_reconciliation - INFO -   - WebApp maggiore (diff>0): 57
+2026-02-04 16:33:01,093 - magazzino_reconciliation - INFO -   - AS400 maggiore (diff<0): 19
+2026-02-04 16:33:01,095 - magazzino_reconciliation - INFO - Top 10 differenze: {0: 63, 1: 24, 3: 9, 2: 8, 5: 3, -3: 3, -2: 3, 4: 2, -1: 2, -10: 2}
+2026-02-04 16:33:01,095 - magazzino_reconciliation - INFO - Esempio prodotto allineato: 94308
+2026-02-04 16:33:01,097 - magazzino_reconciliation - INFO - Esempio WebApp maggiore: 95413 (AS400:1103, WebApp:1245, Diff:142)
+2026-02-04 16:33:01,098 - magazzino_reconciliation - INFO - Esempio AS400 maggiore: 95749 (AS400:2, WebApp:1, Diff:-1)
+2026-02-04 16:33:01,108 - magazzino_reconciliation - INFO - Audit salvato: reconciliation_20260204_163301.csv
+2026-02-04 16:33:01,108 - magazzino_reconciliation - INFO - RICONCILIAZIONE CON DATABASE COMPLETATA CON SUCCESSO
+2026-02-04 16:33:01,112 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:01] "POST /api/reconcile-warehouse HTTP/1.1" 200 -
+2026-02-04 16:33:33,569 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:33] "GET /admin HTTP/1.1" 200 -
+2026-02-04 16:33:33,860 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:33] "GET /static/style.css HTTP/1.1" 200 -
+2026-02-04 16:33:43,977 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:43] "GET /admin/users HTTP/1.1" 200 -
+2026-02-04 16:33:44,026 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:44] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-02-04 16:33:44,946 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:44] "GET / HTTP/1.1" 200 -
+2026-02-04 16:33:45,080 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:45] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 16:33:51,305 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:51] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-02-04 16:33:51,608 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:51] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 16:33:52,844 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:52] "GET / HTTP/1.1" 200 -
+2026-02-04 16:33:53,012 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:33:53] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 16:34:02,569 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:02] "GET /statistiche HTTP/1.1" 200 -
+2026-02-04 16:34:02,871 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:02] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 16:34:03,496 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/trend?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:03,498 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/per-stato HTTP/1.1" 200 -
+2026-02-04 16:34:03,499 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/utenti?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:03,501 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/top-prodotti?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:03,502 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:03,623 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/avanzate?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:03,806 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:03] "GET /api/statistiche/confronto-periodi?range=30d HTTP/1.1" 200 -
+2026-02-04 16:34:13,091 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:13,404 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/per-stato HTTP/1.1" 200 -
+2026-02-04 16:34:13,410 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/utenti?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:13,416 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/top-prodotti?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:13,417 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/confronto-periodi?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:13,420 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/trend?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:13,438 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:13] "GET /api/statistiche/avanzate?range=1y HTTP/1.1" 200 -
+2026-02-04 16:34:25,242 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:25] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-02-04 16:34:25,303 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 16:34:25] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
+2026-02-04 17:21:20,160 - werkzeug - INFO - 127.0.0.1 - - [04/Feb/2026 17:21:20] "GET /warehouse-reconciliation HTTP/1.1" 200 -
+2026-02-05 16:24:33,629 - werkzeug - INFO - 127.0.0.1 - - [05/Feb/2026 16:24:33] "GET /changelogs HTTP/1.1" 200 -
+2026-02-05 16:24:33,701 - werkzeug - INFO - 127.0.0.1 - - [05/Feb/2026 16:24:33] "[36mGET /static/optimized.css HTTP/1.1[0m" 304 -
