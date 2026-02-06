@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+<!-- Last update: 2026-02-06 - Fixed duplicate detection -->
 
 {% block title %}Movimento Multiplo (Beta) - Pharmagest{% endblock %}
 
@@ -482,9 +483,23 @@ document.addEventListener('DOMContentLoaded', function() {
   btnAggiungi.addEventListener('click', function() {
     const pid = prodottoId.value;
     const ubic = daUbicazione.value;
+    const nuovaNota = notaGlobale.value || '';
+    const nuovoStato = statoDestinazione.value;
     
-    if (listaMovimenti.some(m => m.prodottoId === pid && m.daUbicazione === ubic)) {
-      alert('Prodotto già presente con questa ubicazione!');
+    // Controllo duplicati: verifica la nota effettiva di ogni movimento
+    // Se notaCustom è false, il movimento usa la nota globale corrente
+    // Se notaCustom è true, il movimento usa la sua nota salvata
+    const isDuplicato = listaMovimenti.some(m => {
+      if (m.prodottoId !== pid || m.daUbicazione !== ubic) return false;
+      
+      const notaEffettiva = m.notaCustom ? m.nota : notaGlobale.value;
+      const statoEffettivo = m.statoCustom ? m.statoDestinazione : statoDestinazione.value;
+      
+      return notaEffettiva === nuovaNota && statoEffettivo === nuovoStato;
+    });
+    
+    if (isDuplicato) {
+      alert('Movimento duplicato! Esiste già un movimento identico nella lista (stesso prodotto, ubicazione, nota e stato).');
       return;
     }
 
@@ -586,11 +601,34 @@ document.addEventListener('DOMContentLoaded', function() {
   $('btn_conferma_modifica').onclick = function() {
     const i = parseInt($('modifica_index').value);
     const m = listaMovimenti[i];
-    m.quantita = parseInt($('modifica_quantita').value);
-    m.notaCustom = $('modifica_nota_custom').checked;
-    m.nota = m.notaCustom ? $('modifica_nota').value : notaGlobale.value;
-    m.statoCustom = $('modifica_stato').value !== '';
-    m.statoDestinazione = m.statoCustom ? $('modifica_stato').value : statoDestinazione.value;
+    const nuovaQuantita = parseInt($('modifica_quantita').value);
+    const notaCustom = $('modifica_nota_custom').checked;
+    const nuovaNota = notaCustom ? $('modifica_nota').value : notaGlobale.value;
+    const statoCustom = $('modifica_stato').value !== '';
+    const nuovoStato = statoCustom ? $('modifica_stato').value : statoDestinazione.value;
+    
+    // Controllo duplicati: verifica se esiste già un altro movimento identico (escluso quello corrente)
+    // Usa la nota/stato effettivi di ogni movimento (considerando custom vs globale)
+    const duplicato = listaMovimenti.some((altro, idx) => {
+      if (idx === i) return false; // Escludi il movimento corrente
+      if (altro.prodottoId !== m.prodottoId || altro.daUbicazione !== m.daUbicazione) return false;
+      
+      const notaEffettivaAltro = altro.notaCustom ? altro.nota : notaGlobale.value;
+      const statoEffettivoAltro = altro.statoCustom ? altro.statoDestinazione : statoDestinazione.value;
+      
+      return notaEffettivaAltro === nuovaNota && statoEffettivoAltro === nuovoStato;
+    });
+    
+    if (duplicato) {
+      alert('Esiste già un movimento identico nella lista (stesso prodotto, ubicazione, nota e stato)!');
+      return;
+    }
+    
+    m.quantita = nuovaQuantita;
+    m.notaCustom = notaCustom;
+    m.nota = nuovaNota;
+    m.statoCustom = statoCustom;
+    m.statoDestinazione = nuovoStato;
     $('modal_modifica').classList.add('hidden');
     renderLista();
   };
